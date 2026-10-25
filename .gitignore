@@ -30,3 +30,9 @@ venv
 # ide
 .idea
 *.iml
+
+# 本地验证用构建目录
+dist-verify/
+
+# 本地验证用构建目录
+dist-verify/

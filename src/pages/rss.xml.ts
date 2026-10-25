@@ -5,6 +5,7 @@ import type { APIContext } from "astro";
 import MarkdownIt from "markdown-it";
 import sanitizeHtml from "sanitize-html";
 import { siteConfig } from "@/config";
+import { sanitizeMarkdownForFeed } from "@/utils/markdown-sanitize";
 
 const parser = new MarkdownIt();
 
@@ -26,7 +27,11 @@ export async function GET(context: APIContext) {
 		items: blog.map((post) => {
 			const content =
 				typeof post.body === "string" ? post.body : String(post.body || "");
-			const cleanedContent = stripInvalidXmlChars(content);
+			// RSS 是公开订阅源，必须先脱敏：否则 ::download 里的
+			// 下载地址 / 访问密码 / 提取码会被原样吐出去
+			const cleanedContent = stripInvalidXmlChars(
+				sanitizeMarkdownForFeed(content),
+			);
 			return {
 				title: post.data.title,
 				pubDate: post.data.published,

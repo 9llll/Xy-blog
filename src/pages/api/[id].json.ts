@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import type { APIRoute, ImageMetadata } from "astro";
 import MarkdownIt from "markdown-it";
 import { isApiCover, resolveCoverImage } from "../../utils/cover-image";
+import { sanitizeMarkdownForFeed } from "../../utils/markdown-sanitize";
 
 // 预加载 src/assets 下的图片，用于把 frontmatter 中的相对路径
 // 解析成 Astro 构建后的 /_astro/xxx.webp 真实地址。
@@ -99,8 +100,10 @@ export const GET: APIRoute = async ({ params }) => {
 		const imageUrlNormalized = await resolveImageUrl(frontmatter?.image, a.id);
 
 		// 使用markdown-it渲染HTML
+		// 注意：这是公开接口，必须先脱敏，否则 ::download 里的
+		// 下载地址 / 访问密码 / 提取码会随正文一起泄露出去
 		const md = new MarkdownIt();
-		const renderedHTML = md.render(a.body);
+		const renderedHTML = md.render(sanitizeMarkdownForFeed(a.body));
 
 		return new Response(
 			JSON.stringify({

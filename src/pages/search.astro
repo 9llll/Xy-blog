@@ -2,8 +2,13 @@
 import { getCollection } from "astro:content";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 
-const posts = await getCollection("posts");
+const allPosts = await getCollection("posts");
 const POSTS_PER_PAGE = 10;
+
+// 搜索只用得到标题 / 摘要 / 标签 / 分类 / 封面 / 日期，
+// 正文（含下载地址、访问密码、提取码）不需要内联进页面 ——
+// 否则搜索页源码里会直接暴露这些敏感信息。
+const posts = allPosts.map(({ body, ...rest }) => rest);
 ---
 
 <MainGridLayout title="搜索文章" description="搜索博客文章">

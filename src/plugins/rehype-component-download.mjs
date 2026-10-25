@@ -16,6 +16,7 @@ import {
 } from "../utils/download-styles.ts";
 import {
 	encodeDownloadUrl,
+	encryptDownloadUrl,
 	hashDownloadPassword,
 } from "../utils/download-utils.ts";
 
@@ -124,6 +125,9 @@ function normalizeItem(props) {
 		hint,
 		icon,
 		hash: password ? hashDownloadPassword(password) : "",
+		// 有访问密码时，用密码派生的密钥加密地址：页面源码里连 Base64 都没有，
+		// 用户输入正确密码后前端才解密出真实地址。
+		encrypted: password ? encryptDownloadUrl(url, password) : "",
 	};
 }
 
@@ -201,7 +205,9 @@ export function DownloadComponent(props, children) {
 						id: `dl-btn-md-${uuid}`,
 						type: "button",
 						class: dlDownloadBtn,
-						"data-dl-url": encodeDownloadUrl(item.url),
+						// 有密码 → 加密后的密文（前端解密）；无密码 → Base64 混淆
+						"data-dl-url": item.encrypted || encodeDownloadUrl(item.url),
+						"data-dl-enc": item.encrypted ? "1" : "",
 						"data-dl-name": item.name,
 						"data-dl-hash": item.hash,
 						"data-dl-hint": item.hint ?? "",
