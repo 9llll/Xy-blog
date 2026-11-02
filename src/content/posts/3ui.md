@@ -21,14 +21,12 @@ comment: true
 ---
 3Ui假人精修版仿官14称谓  
 
+::download{name="【🔒加密资源】**大话西游2单机一键端**" url="[https://pan.baidu.com/s/1Iwat2opZHGM4SymVDGFstw](https://pan.baidu.com/s/1Iwat2opZHGM4SymVDGFstw)" desc="**大话西游2单机一键端AI假人一键组队功能3Ui假人精修版仿官14称谓**" code="8888" size="4 GB" password="11259" hint="联系：++[golooo@qq.com](mailto:golooo@qq.com)++" icon="zip"}
 
-::download{name="【🔒加密资源】**大话西游2单机一键端**" url="https://pan.baidu.com/s/1Iwat2opZHGM4SymVDGFstw" desc="**大话西游2单机一键端AI假人一键组队功能3Ui假人精修版仿官14称谓**" code="8888" size="4 GB" password="11259" hint="联系：++golooo@qq.com++" icon="zip"}
-
-  
 解压说明：  
 第1步：鼠标右键单击下载好的3Ui假人版精修仿官14称谓压缩包，解压到当前文件夹就行  
 第2步：点开那个游戏服务端和客户端文件夹，里面有登录教程，照着登录就行。  
-  
+
 服务端data文件夹是账号存档信息，里面放了2个成品存档号，注意是服务端，不是客户端。  
 可以注册账号自己玩，也可以直接玩成品存档号。  
 换电脑的话把原来电脑的服务端data文件夹存档复制过去就能接着玩原来的号。
