@@ -24,14 +24,14 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔒免费资源】河马西游单机 GGE6.1 特技改版" url="https://pan.baidu.com/s/1Afha5rOdEcRXt61NiOEpwg" desc="河马西游单机 GGE6.1 特技改版 新增葫芦娃橙黄宠物 界面重制" size="4.5 GB" code="8888" }
+::download{name="【🔒免费资源】河马西游单机 GGE6.1 特技改版" url="[https://pan.baidu.com/s/1Afha5rOdEcRXt61NiOEpwg](https://pan.baidu.com/s/1Afha5rOdEcRXt61NiOEpwg)" desc="河马西游单机 GGE6.1 特技改版 新增葫芦娃橙黄宠物 界面重制" size="4.5 GB" code="8888" }
 
 -----------------单机玩家启动步骤如下：----------------------------------------------  
 打开服务端----运行 ggeserver.exe 连接成功---  
 打开客户端 g2d.exe 进游戏~~~  
 最后打开GM工具直接给自己号发东西即可~~~~~  
 PS：如果有个别电脑服务端运行闪退的，自己去下个微软常用运行库合集安装~  
-微软常用运行库合集最/新版（2025.2.12）++[https://mefcl.lanzouw.com/iDrn32nk251e++](https://mefcl.lanzouw.com/iDrn32nk251e)  
+微软常用运行库合集最/新版（2025.2.12）++[[https://mefcl.lanzouw.com/iDrn32nk251e](https://mefcl.lanzouw.com/iDrn32nk251e)++]([https://mefcl.lanzouw.com/iDrn32nk251e](https://mefcl.lanzouw.com/iDrn32nk251e))  
 游戏配置需求  
 【支持系统】： win7、win10、win11  
 【CPU】： 4核  
