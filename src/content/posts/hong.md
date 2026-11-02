@@ -1,6 +1,6 @@
 ---
-title: 【单机】红警2025高清重置版安装包，单机游戏，win7|||/10/11全兼容
-description: 红警2025高清重置版安装包，单机游戏，win7|||/10/11全兼容
+title: 【单机】红警2025高清重置版安装包，单机游戏，win7/10/11全兼容
+description: 红警2025高清重置版安装包，单机游戏，win7/10/11全兼容
 published: 2026-11-02
 updated: 2026-11-02
 tags:
@@ -19,7 +19,7 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔑免费资源】大话西游2 光武单机全修复精修版（虚拟机版本）" url="https://pan.baidu.com/s/1Zm-uxJZlk-FeMr7JwbkaBA" desc="虚拟机版本完整包，基于官方逻辑真实修正、全系统功能稳定运行" code="561j" size="10 GB" icon="zip"}
+::download{name="【🔑免费资源】红警2025高清重置版安装包" url="https://pan.baidu.com/s/13PsLKBTRIUd0h0upCbPYJQ" desc="红警2025高清重置版安装包，单机游戏，win7/10/11全兼容" code="8888" size="10 GB" icon="zip"}
 
 ![版本截图一](images/hong/hong.avif)
 
