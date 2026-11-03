@@ -22,7 +22,7 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔒加密资源】**修仙西游 AI修复一键端**" url="[https://pan.baidu.com/s/1TeIR7zrnMl6as3MhCGtQ5Q](https://pan.baidu.com/s/1TeIR7zrnMl6as3MhCGtQ5Q)" desc="**【修仙西游 ai修复一键端】160阶仙器+烧香+10000坐骑端**" code="8888" size="4.2 GB" password="33759" hint="联系：++[golooo@qq.com](mailto:golooo@qq.com)++" icon="zip"}
+::download{name="【🔒加密资源】**修仙西游 AI修复一键端**" url="https://pan.baidu.com/s/1TeIR7zrnMl6as3MhCGtQ5Q" desc="**【修仙西游 ai修复一键端】160阶仙器+烧香+10000坐骑端**" code="8888" size="4.2 GB" password="33759" hint="联系：++golooo@qq.com++" icon="zip"}
 
 ![版本截图三](images/xxxy/xxxy1.avif)
 
