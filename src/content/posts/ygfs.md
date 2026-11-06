@@ -5,6 +5,9 @@ published: 2026-11-06
 updated: 2026-11-06
 tags:
   - 源码
+  - 网游单机
+  - 架设
+  - 可外网
 category:
   - 游戏资源
 image: images/ygfs/ygfs1.avif
