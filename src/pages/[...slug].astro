@@ -8,6 +8,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
+import { DEFAULT_OG_IMAGE, toAbsoluteOgImage } from "@utils/og-image";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
@@ -29,22 +30,12 @@ const { Content, headings } = await entry.render();
 
 const { remarkPluginFrontmatter } = await entry.render();
 
-// 从正文中提取第一张图，作为 OG 图回退
-const bodyText = entry.body ?? "";
-const firstBodyImage =
-	bodyText.match(/!\[[^\]]*\]\(\s*<?([^\s)>]+)>?[^)]*\)/)?.[1] ??
-	bodyText.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] ??
-	"";
-
-// SEO：ogImage 优先用字段，其次封面，再次正文第一张图，最后站点 banner
-const ogRaw =
-	entry.data.ogImage?.trim() ||
-	entry.data.image?.trim() ||
-	firstBodyImage ||
-	"";
-const ogImageFinal = /^https?:\/\//i.test(ogRaw)
-	? ogRaw
-	: undefined;
+// SEO：社交分享图统一转成同域名绝对地址。
+// 注意：文章封面 / 正文图片是内容集合相对路径（images/xxx.avif），构建后会被
+// Astro 优化改写到 /_astro/xxx.hash.avif，直接拼接会产生坏链；因此未填 ogImage
+// 时统一回退到 public 下的站点默认分享图，保证任何文章都有可用的分享缩略图。
+const ogRaw = entry.data.ogImage?.trim() || DEFAULT_OG_IMAGE;
+const ogImageFinal = toAbsoluteOgImage(ogRaw, Astro.site?.href);
 
 // 系列文章导航：按 series + seriesOrder 计算同系列前后篇
 const seriesName = entry.data.series?.trim() ?? "";

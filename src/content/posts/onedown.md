@@ -20,7 +20,7 @@ keywords:
 author: 羡鱼
 series: 网站源码
 seriesOrder: 0
-ogImage: https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/fenxiang.avif
+ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true

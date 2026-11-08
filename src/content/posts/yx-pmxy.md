@@ -16,7 +16,7 @@ image: images/dhsy.avif
 author: 羡鱼
 series: 回合制
 seriesOrder: 3
-ogImage: https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/dhsy.avif
+ogImage: https://www.3x3.top/images/dhsy.avif
 draft: false
 pinned: false
 comment: true

@@ -15,7 +15,7 @@ image: images/yjd/3uiyj1.avif
 author: 羡鱼
 series: 回合制
 seriesOrder: 0
-ogImage: https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/xy2.avif
+ogImage: https://www.3x3.top/images/xy2.avif
 draft: false
 pinned: false
 comment: true

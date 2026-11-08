@@ -15,7 +15,7 @@ keywords:
 author: 羡鱼
 series: 指令
 seriesOrder: 0
-ogImage: https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/fenxiang.avif
+ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
@@ -86,7 +86,7 @@ comment: true
 
 ::download{title="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
 
-::download{title="自定义图片图标" icon="https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
+::download{title="自定义图片图标" icon="https://www.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
 
 ## 常见问题
 

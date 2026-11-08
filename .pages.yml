@@ -107,7 +107,10 @@ content:
         default: 0
 
       - name: ogImage
-        label: 社交分享图 OG Image（填完整 http(s) 链接）
+        # 图片请先上传到「站点图片」或 public/images，再填 /images/xxx.avif；
+        # 构建时会自动拼成 https://www.3x3.top/images/xxx.avif 同域名绝对地址。
+        # 留空则自动使用站点默认分享图，不要填 raw.githubusercontent.com 等外部图床。
+        label: 社交分享图 OG Image（推荐 /images/xxx.avif）
         type: string
         optional: true
 

@@ -14,6 +14,7 @@ import {
 import { defaultFavicons } from "../constants/icon";
 import type { Favicon } from "../types/config";
 import { pathsEqual, url } from "../utils/url-utils";
+import { DEFAULT_OG_IMAGE, toAbsoluteOgImage } from "@utils/og-image";
 import "katex/dist/katex.css";
 
 interface Props {
@@ -23,12 +24,15 @@ interface Props {
 	description?: string;
 	lang?: string;
 	setOGTypeArticle?: boolean;
-	/** 社交分享图（OG Image），完整 http(s) 链接 */
+	/** 社交分享图：完整 http(s) 链接或 /images/... 相对路径；未传时用站点默认图 */
 	ogImage?: string;
 }
 
-let { title, banner, description, keywords, lang, setOGTypeArticle, ogImage } =
+let { title, banner, description, keywords, lang, setOGTypeArticle, ogImage = DEFAULT_OG_IMAGE } =
 	Astro.props;
+
+// 分享图统一转同域名绝对地址（og:image / twitter:image 必须是绝对地址）
+const ogImageAbs = toAbsoluteOgImage(ogImage, Astro.site?.href);
 
 // apply a class to the body element to decide the height of the banner, only used for initial page load
 const isHomePage = pathsEqual(Astro.url.pathname, url("/"));
@@ -97,10 +101,10 @@ const bannerOffset =
 		<meta property="twitter:url" content={Astro.url}>
 		<meta name="twitter:title" content={pageTitle}>
 		<meta name="twitter:description" content={description || pageTitle}>
-		{ogImage && (
+		{ogImageAbs && (
 			<>
-				<meta property="og:image" content={ogImage} />
-				<meta name="twitter:image" content={ogImage} />
+				<meta property="og:image" content={ogImageAbs} />
+				<meta name="twitter:image" content={ogImageAbs} />
 			</>
 		)}
 
