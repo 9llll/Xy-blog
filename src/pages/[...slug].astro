@@ -79,21 +79,11 @@ const jsonLd = {
 	...(ogImageFinal ? { image: ogImageFinal } : {}),
 };
 ---
-<!-- Artalk 评论样式：异步加载。
-     第三方域名 api.eta.im 在部分网络下不可达，阻塞式 <link> 会拖住
-     window load 事件，导致页面长时间停留在加载动画上。 -->
-<link
-    href="https://api.eta.im/dist/Artalk.css"
-    rel="stylesheet"
-    media="print"
-    onload="this.media='all'"
-/>
-<noscript>
-    <link href="https://api.eta.im/dist/Artalk.css" rel="stylesheet" />
-</noscript>
 <MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} keywords={entry.data.keywords?.join(", ")} ogImage={ogImageFinal}>
+    <!-- 评论区尚未接入（评论后端待定），相关前端与后端待补充 -->
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
-    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
+
+<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>

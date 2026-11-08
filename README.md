@@ -17,7 +17,7 @@
 - **独立搜索** — 基于 [Pagefind](https://pagefind.app/)，无需后端
 - **文章阅读时长 / 字数统计**
 - **文章摘要** — 列表页自动截取正文摘要
-- **评论区** — 内置 [Artalk](https://github.com/ArtalkJS/Artalk) 评论
+- **评论区** — 暂未启用（评论后端方案待定，前端与后端待补充）
 
 ### 自定义 Markdown 指令
 
