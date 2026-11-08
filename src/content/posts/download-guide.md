@@ -1,6 +1,6 @@
 ---
 title: 【文档】下载按钮使用说明
-description: 如何在文章任意位置插入下载按钮，支持网盘提取码与独立密码保护
+description: 如何在文章任意位置插入下载按钮，支持网盘提取码、独立密码保护与付费资源卡片
 published: 2026-10-01
 updated: 2026-10-01
 tags:
@@ -33,7 +33,7 @@ comment: true
 
 | 属性 | 说明 | 示例 |
 | ---------- | ---------------------------------------------- | ----------------------- |
-| `url` | **必填**，下载地址。必须是 http(s) 或 `/` 开头的站内路径 | `"/downloads/demo.zip"` |
+| `url` | 普通 / 加密下载**必填**；付费卡片不要填。必须是 http(s) 或 `/` 开头 | `"/downloads/demo.zip"` |
 | `title` | 资源名称（`name` 为同义别名） | `"示例包"` |
 | `desc` | 资源简介（`source` 为同义别名，兼容旧写法） | `"合集资源，持续更新"` |
 | `size` | 文件大小 | `"12.4 MB"` |
@@ -41,6 +41,10 @@ comment: true
 | `hint` | 密码提示，仅在设置密码时有意义 | `"提示：四位数字"` |
 | `password` | 访问密码，独立于文章密码 | `"1234"` |
 | `icon` | 图标：网盘关键字（`baidu`/`quark`/`aliyun`/`123`/`lanzou`/`tianyi`/`xunlei`/`chengtong`/`cowtransfer`/`weiyun`…）、通用类型（`zip`/`image`/`file`/`lock`/`key`）、或图片地址 / emoji（自定义） | `"baidu"` |
+| `pay` | 付费卡片开关，填商品编号即可；填了之后卡片**不会**输出任何下载地址 | `"SKU001"` |
+| `buy` | **付费时必填**，发卡平台商品购买页链接（http(s)） | `"https://发卡平台/商品"` |
+| `price` | 价格，显示在购买按钮上 | `"19.9"` |
+| `buyText` | 自定义按钮文字（可选） | `"立即下单"` |
 
 
 ## 完整示例
@@ -60,6 +64,8 @@ comment: true
 3. 明文密码**不会出现在任何输出文件**中，查看网页源码也看不到
 
 需要注意：这是**访问门禁**而非强加密。校验发生在浏览器端，理论上仍可被绕过。纯静态站点没有后端，做不到真正的服务端鉴权——若需要彻底控制，请配合 Cloudflare Pages Functions 做中转。
+
+> ⚠️ **公开仓库警示**：本站源码托管在公开 GitHub 仓库，`src/content/posts/*.md` 可被任何人通过 `raw.githubusercontent.com` 直接读取。写在 `password` / `url` / `code` 里的内容虽然在**构建产物**中不可见，但在**源仓库**里是公开的。因此这套机制只能防「顺手扒页面」，**不能用来保护付费资源**。付费请走下面的「付费下载」，把地址和卡密放到发卡平台。
 
 ## 地址混淆
 
@@ -87,6 +93,38 @@ comment: true
 ::download{title="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
 
 ::download{title="自定义图片图标" icon="https://www.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
+
+## 付费下载（卡密 / 发卡平台）
+
+付费资源**不要**把真实地址或卡密写进文章——仓库是公开的，写进去等于直接公开。
+
+正确做法是把**下载地址 / 提取码 / 卡密**填到第三方发卡平台（XorPay、虎皮椒、易支付、独角数卡、爱发电等）的商品「发货内容」里，用户付款后由平台自动发货；本站只展示购买入口。
+
+```markdown
+::download{title="完整源码包" desc="含全部源码、素材与持续更新" size="1.2 GB" pay="SKU001" price="19.9" buy="https://发卡平台/你的商品链接"}
+```
+
+会渲染成一张和其它下载卡片样式一致的「付费资源」卡片，右侧是购买按钮，点击在新标签页打开发卡平台。**卡片里不含任何下载地址、提取码或密码**，HTML / RSS / 接口 / 搜索索引里也都没有。
+
+::download{title="付费完整包（演示）" desc="演示卡片，购买链接为占位地址" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
+
+### 同一篇文章混排三种下载
+
+```markdown
+::download{title="免费预览包" url="https://example.com/preview.zip"}
+
+::download{title="会员加密包" password="abcd1234" url="https://example.com/member.zip"}
+
+::download{title="付费完整包" pay="SKU001" price="19.9" buy="https://发卡平台/你的商品链接"}
+```
+
+每条指令独立渲染，互不干扰：免费块直接下载、加密块输密码解密、付费块跳转发卡平台。
+
+### 为什么不用「购买后输卡密解密」
+
+看起来更站内化的做法是把卡密当 `password`，复用现有加密下载机制在购买后解密。但卡密必须先写进文章才能在构建期加密 URL，而文章在公开仓库里 —— **卡密和地址会一起泄露**。要做成真卡密，得把密钥挪进 CI Secrets 并改造构建流程（已接近服务端方案），个人站起步阶段不划算。
+
+> 极简替代：不需要卡片样式的话，直接用 `::btn{text="购买完整包 ¥19.9" href="发卡链接"}` 也完全可行，零配置。
 
 ## 常见问题
 

@@ -56,7 +56,9 @@ function directiveToText(name: string, rawAttrs: string): string {
 
 	switch (name) {
 		case "download":
-			return "🔒 资源下载：下载地址 / 提取码 / 访问密码请前往原文查看";
+			return attrs.pay || attrs.buy
+				? "💰 付费资源：购买方式与下载地址请前往原文查看"
+				: "🔒 资源下载：下载地址 / 提取码 / 访问密码请前往原文查看";
 		case "btn": {
 			const text = pick(attrs, "text", "title");
 			return text ? `链接：${text}` : "链接";

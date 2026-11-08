@@ -123,11 +123,86 @@ function normalizeItem(props) {
  * 密码在构建期转为 SHA-256 哈希，明文不会出现在任何输出文件中。
  * 交互由 DownloadSupport.astro 的全局事件委托处理。
  */
+
+/**
+ * 付费资源卡片（::download{pay="..." buy="..." price="..."}）
+ *
+ * 真实下载地址 / 卡密只放在第三方发卡平台的商品发货内容里，
+ * 本卡片不输出任何 url / password / code / 密文，因此公开的 GitHub 仓库、
+ * HTML、RSS、接口里都不会出现付费资源。
+ */
+function renderPayCard(props) {
+	const buy = asString(props.buy).trim();
+	if (!/^https?:\/\//i.test(buy)) {
+		return usageHint(
+			'"buy" is required for pay downloads and must be an http(s) URL',
+		);
+	}
+
+	const name =
+		asString(props.title).trim() ||
+		asString(props.name).trim() ||
+		"付费资源";
+	const desc =
+		asString(props.desc).trim() || asString(props.source).trim();
+	const size = asString(props.size).trim();
+	const price = asString(props.price).trim();
+	const buyText =
+		asString(props.buyText).trim() ||
+		(price ? `立即购买 · ¥${price}` : "立即购买");
+
+	return h("div", { class: "not-prose my-4" }, [
+		h("div", { class: dlRow }, [
+			h("span", { class: dlBadge, style: "background:#F59E0B" }, [
+				h(
+					"span",
+					{
+						style: "font-size:1.15rem;font-weight:700;line-height:1",
+					},
+					["¥"],
+				),
+			]),
+			h("div", { class: dlInfo }, [
+				h("div", { class: dlName }, [
+					h("span", { class: "truncate" }, [name]),
+				]),
+				h("div", { class: dlMeta }, [
+					h("span", { class: dlLock }, [
+						svgIcon("lock", 12),
+						"付费资源",
+					]),
+					desc ? h("span", { class: dlDesc }, [desc]) : null,
+					desc && size ? h("span", {}, ["·"]) : null,
+					size ? h("span", { class: dlSize }, [size]) : null,
+				]),
+			]),
+			h("div", { class: dlActions }, [
+				h(
+					"a",
+					{
+						class: dlDownloadBtn,
+						href: buy,
+						target: "_blank",
+						rel: "noopener noreferrer",
+						"data-dl-pay": asString(props.pay).trim() || "1",
+					},
+					[svgIcon("arrow", 16), h("span", {}, [buyText])],
+				),
+			]),
+		]),
+	]);
+}
+
 export function DownloadComponent(props, children) {
 	if (Array.isArray(children) && children.length !== 0) {
 		return usageHint(
 			'"download" directive must be leaf type ::download{title="..." url="..."}',
 		);
+	}
+
+	// 付费资源：地址与卡密只存在发卡平台，页面不输出任何 url / 密码 / 密文
+	if (asString(props?.pay).trim() || asString(props?.buy).trim()) {
+		return renderPayCard(props ?? {});
 	}
 
 	const item = normalizeItem(props ?? {});
