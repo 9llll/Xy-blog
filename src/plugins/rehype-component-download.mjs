@@ -19,6 +19,7 @@ import {
 	encryptDownloadUrl,
 	hashDownloadPassword,
 } from "../utils/download-utils.ts";
+import { resolveNetdisk } from "../utils/netdisk.ts";
 
 /** 内联 SVG 图标（hast 环境无法使用 astro-icon，这里用轻量路径集） */
 const ICON_PATHS = {
@@ -31,24 +32,6 @@ const ICON_PATHS = {
 	arrow: "M13 5l7 7-7 7v-4.5H4v-5h9V5z",
 	key: "M12 2a5 5 0 0 1 4.6 3h-2.2A2.8 2.8 0 1 0 12 5c.6 0 1.2.2 1.7.5l-2 2H9.6l-1 1H7v1.6l-1.6 1.6H3v-3.5l6.3-6.3A5 5 0 0 1 12 2z",
 };
-
-/** 把 icon 字段映射为内置图标 */
-function resolveIcon(icon) {
-	if (!icon) return "download";
-	const name = icon.toLowerCase();
-	if (name.includes("zip") || name.includes("rar") || name.includes("archive"))
-		return "zip";
-	if (
-		name.includes("image") ||
-		name.includes("photo") ||
-		name.includes("picture")
-	)
-		return "image";
-	if (name.includes("lock")) return "lock";
-	if (name.includes("key")) return "key";
-	if (name.includes("file") || name.includes("doc")) return "file";
-	return "download";
-}
 
 function svgIcon(name, size = 20) {
 	return h(
@@ -156,9 +139,41 @@ export function DownloadComponent(props, children) {
 
 	const uuid = `DL${Math.random().toString(36).slice(-6)}`;
 
+	// 解析网盘/自定义图标表现（品牌圆牌 / 图片 / 文字 / 通用 svg）
+	const nd = resolveNetdisk(item.icon, item.url);
+	let badgeInner;
+	let badgeStyle = "";
+	if (nd.kind === "svg") {
+		badgeInner = [svgIcon(nd.name, 24)];
+	} else if (nd.kind === "img") {
+		badgeInner = [
+			h("img", {
+				src: nd.src,
+				alt: "",
+				loading: "lazy",
+				style:
+					"width:62%;height:62%;object-fit:contain;display:block",
+			}),
+		];
+		badgeStyle = "background:#ffffff";
+	} else {
+		const label = nd.label ?? "";
+		const fs = label.length > 2 ? "0.56rem" : "0.72rem";
+		if (nd.kind === "badge") badgeStyle = `background:${nd.color}`;
+		badgeInner = [
+			h(
+				"span",
+				{
+					style: `font-size:${fs};font-weight:700;line-height:1.05;text-align:center;display:block;letter-spacing:-0.02em`,
+				},
+				[label],
+			),
+		];
+	}
+
 	return h(`div#${uuid}`, { class: "not-prose my-4" }, [
 		h("div", { class: dlRow }, [
-			h("span", { class: dlBadge }, [svgIcon(resolveIcon(item.icon), 24)]),
+			h("span", { class: dlBadge, style: badgeStyle }, badgeInner),
 			h("div", { class: dlInfo }, [
 				h("div", { class: dlName }, [
 					h("span", { class: "truncate" }, [item.name]),

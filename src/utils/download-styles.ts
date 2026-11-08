@@ -47,11 +47,12 @@ export const dlDesc = "dl-desc break-words";
 export const dlActions =
 	"dl-actions flex items-center gap-2 shrink-0 max-[560px]:w-full max-[560px]:justify-end";
 
-/** 提取码按钮（浅色） */
+/** 提取码按钮（浅色，允许两行、限制宽度更紧凑） */
 export const dlCodeBtn =
-	"dl-code inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[0.8rem] font-medium " +
+	"dl-code inline-flex items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-[0.78rem] font-medium " +
 	"bg-[var(--primary-soft)] text-[var(--primary)] hover:bg-[var(--primary-soft-hover)] active:scale-[0.97] " +
-	"transition-all cursor-pointer select-none whitespace-nowrap max-[560px]:flex-1";
+	"transition-all cursor-pointer select-none text-center leading-tight max-w-[8.5rem] " +
+	"max-[560px]:flex-1 max-[560px]:max-w-none";
 
 /** 下载按钮（实心主色） */
 export const dlDownloadBtn =

@@ -40,7 +40,7 @@ comment: true
 | `code` | 网盘提取码，点击一键复制 | `"a1b2"` |
 | `hint` | 密码提示，仅在设置密码时有意义 | `"提示：四位数字"` |
 | `password` | 访问密码，独立于文章密码 | `"1234"` |
-| `icon` | 图标类型：`zip` / `image` / `file` / `lock` / `key` | `"zip"` |
+| `icon` | 图标：网盘关键字（`baidu`/`quark`/`aliyun`/`123`/`lanzou`/`tianyi`/`xunlei`/`chengtong`/`cowtransfer`/`weiyun`…）、通用类型（`zip`/`image`/`file`/`lock`/`key`）、或图片地址 / emoji（自定义） | `"baidu"` |
 
 
 ## 完整示例
@@ -69,6 +69,24 @@ comment: true
 - 但点击下载的瞬间，浏览器 Network 面板仍会显示真实地址
 
 这是混淆而非加密，目的是防止地址被批量采集。
+
+## 网盘品牌图标
+
+下载地址如果是常见网盘（百度网盘 / 夸克 / 阿里云盘 / 123 网盘 / 蓝奏云 / 天翼云 / 迅雷 / 城通 / 奶牛 / 微云 / 360 / 115 / PikPak 等），**无需任何配置**，左侧徽章会自动显示对应网盘的品牌色圆牌（按链接域名识别）：
+
+::download{title="百度网盘（自动识别）" desc="pan.baidu.com 自动显示百度蓝圆牌" size="1.2 GB" code="8888" url="https://pan.baidu.com/s/1DemoBaiduAutoDetect"}
+
+::download{title="蓝奏云（自动识别）" desc="lanzou 域名自动显示蓝奏云圆牌" size="30 MB" url="https://8x8.lanzout.com/DemoLanzouAuto"}
+
+手动指定网盘（覆盖自动识别，或用于非网盘地址）：
+
+::download{title="手动指定夸克" icon="quark" desc="icon=quark 手动指定" size="800 MB" url="https://example.com/quark-file"}
+
+自定义图标：填图片地址渲染图片，填 emoji / 文字渲染文字：
+
+::download{title="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
+
+::download{title="自定义图片图标" icon="https://raw.githubusercontent.com/9llll/Xy-blog/refs/heads/main/src/content/posts/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
 
 ## 常见问题
 
