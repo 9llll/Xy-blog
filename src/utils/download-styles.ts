@@ -59,3 +59,22 @@ export const dlDownloadBtn =
 	"dl-download inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-[0.9rem] font-semibold " +
 	"text-white bg-[var(--primary)] shadow-sm hover:brightness-110 active:scale-[0.97] " +
 	"transition-all cursor-pointer select-none whitespace-nowrap max-[560px]:flex-1";
+
+/**
+ * 付费卡片黑金配色（独立于普通下载，不影响其它按钮）。
+ * 黑底 + 金字 + 金边，在浅色/深色主题下都保持高对比，文字清晰可见。
+ */
+export const dlPayBadge =
+	"dl-pay-badge shrink-0 grid place-items-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl " +
+	"bg-[#111111] text-[#E8C766] border border-[#E8C766] shadow-sm";
+
+export const dlPayLock =
+	"dl-pay-lock mr-1.5 inline-flex items-center gap-0.5 rounded-md " +
+	"bg-[#111111] px-1.5 py-0.5 text-[0.65rem] font-bold text-[#E8C766] " +
+	"border border-[#E8C766]/50 shrink-0 align-middle";
+
+export const dlPayBtn =
+	"dl-pay-btn inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-[0.9rem] font-bold " +
+	"text-[#E8C766] bg-[#111111] border border-[#E8C766] shadow-sm " +
+	"hover:bg-[#262626] hover:border-[#F3D98B] hover:text-[#F3D98B] active:scale-[0.97] " +
+	"transition-all cursor-pointer select-none whitespace-nowrap max-[560px]:flex-1";

@@ -100,8 +100,14 @@ comment: true
 
 正确做法是把**下载地址 / 提取码 / 卡密**填到第三方发卡平台（XorPay、虎皮椒、易支付、独角数卡、爱发电等）的商品「发货内容」里，用户付款后由平台自动发货；本站只展示购买入口。
 
+下面这张就是付费卡片的**真实渲染效果**（黑金配色，点击在新标签页打开示例购买页）：
+
+::download{title="示例付费资源（效果预览）" desc="付费卡片真实渲染效果，非真实商品" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
+
+完整语法如下（下方代码块展示写法，不会渲染成卡片）：
+
 ```markdown
-::download{title="完整源码包" desc="含全部源码、素材与持续更新" size="1.2 GB" pay="SKU001" price="19.9" buy="https://发卡平台/你的商品链接"}
+::download{title="完整源码包" desc="含全部源码、素材与持续更新" size="1.2 GB" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
 ```
 
 会渲染成一张和其它下载卡片样式一致的「付费资源」卡片，右侧是购买按钮，点击在新标签页打开发卡平台。**卡片里不含任何下载地址、提取码或密码**，HTML / RSS / 接口 / 搜索索引里也都没有。
@@ -115,7 +121,7 @@ comment: true
 
 ::download{title="会员加密包" password="abcd1234" url="https://example.com/member.zip"}
 
-::download{title="付费完整包" pay="SKU001" price="19.9" buy="https://发卡平台/你的商品链接"}
+::download{title="付费完整包" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
 ```
 
 每条指令独立渲染，互不干扰：免费块直接下载、加密块输密码解密、付费块跳转发卡平台。

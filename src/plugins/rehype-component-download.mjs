@@ -11,6 +11,9 @@ import {
 	dlLock,
 	dlMeta,
 	dlName,
+	dlPayBadge,
+	dlPayBtn,
+	dlPayLock,
 	dlRow,
 	dlSize,
 } from "../utils/download-styles.ts";
@@ -151,46 +154,46 @@ function renderPayCard(props) {
 		asString(props.buyText).trim() ||
 		(price ? `立即购买 · ¥${price}` : "立即购买");
 
-	return h("div", { class: "not-prose my-4" }, [
-		h("div", { class: dlRow }, [
-			h("span", { class: dlBadge, style: "background:#F59E0B" }, [
-				h(
-					"span",
-					{
-						style: "font-size:1.15rem;font-weight:700;line-height:1",
-					},
-					["¥"],
-				),
-			]),
-			h("div", { class: dlInfo }, [
-				h("div", { class: dlName }, [
-					h("span", { class: "truncate" }, [name]),
+		return h("div", { class: "not-prose my-4" }, [
+			h("div", { class: dlRow }, [
+				h("span", { class: dlPayBadge }, [
+					h(
+						"span",
+						{
+							style: "font-size:1.15rem;font-weight:700;line-height:1",
+						},
+						["¥"],
+					),
 				]),
-				h("div", { class: dlMeta }, [
-					h("span", { class: dlLock }, [
-						svgIcon("lock", 12),
-						"付费资源",
+				h("div", { class: dlInfo }, [
+					h("div", { class: dlName }, [
+						h("span", { class: "truncate" }, [name]),
 					]),
-					desc ? h("span", { class: dlDesc }, [desc]) : null,
-					desc && size ? h("span", {}, ["·"]) : null,
-					size ? h("span", { class: dlSize }, [size]) : null,
+					h("div", { class: dlMeta }, [
+						h("span", { class: dlPayLock }, [
+							svgIcon("lock", 12),
+							"付费资源",
+						]),
+						desc ? h("span", { class: dlDesc }, [desc]) : null,
+						desc && size ? h("span", {}, ["·"]) : null,
+						size ? h("span", { class: dlSize }, [size]) : null,
+					]),
+				]),
+				h("div", { class: dlActions }, [
+					h(
+						"a",
+						{
+							class: dlPayBtn,
+							href: buy,
+							target: "_blank",
+							rel: "noopener noreferrer",
+							"data-dl-pay": asString(props.pay).trim() || "1",
+						},
+						[svgIcon("arrow", 16), h("span", {}, [buyText])],
+					),
 				]),
 			]),
-			h("div", { class: dlActions }, [
-				h(
-					"a",
-					{
-						class: dlDownloadBtn,
-						href: buy,
-						target: "_blank",
-						rel: "noopener noreferrer",
-						"data-dl-pay": asString(props.pay).trim() || "1",
-					},
-					[svgIcon("arrow", 16), h("span", {}, [buyText])],
-				),
-			]),
-		]),
-	]);
+		]);
 }
 
 export function DownloadComponent(props, children) {
