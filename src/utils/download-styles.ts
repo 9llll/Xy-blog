@@ -55,12 +55,7 @@ export const dlTitle =
 	"dl-title text-[0.9rem] sm:text-[1.05rem] font-bold leading-snug " +
 	"text-black/90 dark:text-white/90 line-clamp-2";
 
-/** 简介（手机端隐藏，避免卡片过高） */
-export const dlDesc =
-	"dl-desc mt-1 hidden sm:block truncate text-[0.76rem] leading-relaxed " +
-	"text-black/40 dark:text-white/40";
-
-/** 元信息行（网盘 / 提取码 / 需密码 / 大小） */
+/** 元信息行（网盘 / 需密码） */
 export const dlMetaRow =
 	"dl-meta-row mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 " +
 	"text-[0.73rem] leading-none text-black/45 dark:text-white/45";
@@ -72,15 +67,21 @@ export const dlNdDot =
 /** 网盘小图标（自定义图片时） */
 export const dlNdImg = "dl-nd-img w-3.5 h-3.5 rounded object-contain shrink-0";
 
-/** 提取码胶囊（可点击复制） */
+/** 提取码胶囊（放在下载按钮左边，点击即复制）
+ *
+ * 用琥珀色而不是主题色：紧挨着红色下载按钮时，同色系会糊成一片，
+ * 用户最容易漏看的就是这一块，必须靠对比度把它顶出来。
+ */
 export const dlCodeChip =
-	"dl-code inline-flex items-center gap-1 rounded-md px-2 py-1 " +
-	"text-[0.72rem] text-[var(--primary)] bg-[var(--primary-soft)] " +
-	"cursor-pointer select-none hover:bg-[var(--primary-soft-hover)] transition-colors";
+	"dl-code inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-2 " +
+	"text-[0.76rem] sm:text-[0.8rem] font-bold leading-none whitespace-nowrap " +
+	"text-[#9a3412] bg-[#ffedd5] border border-[#fdba74] " +
+	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
+	"cursor-pointer select-none hover:brightness-95 active:scale-[0.97] transition-all";
 
-/** 底部行：左侧价格/类型 + 右侧按钮 */
+/** 底部行：左侧价格/类型 + 右侧「提取码 + 按钮」，窄屏自动换行 */
 export const dlFoot =
-	"dl-foot mt-auto pt-2.5 flex items-end justify-between gap-2";
+	"dl-foot mt-auto pt-2.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-2";
 
 /** 价格行 */
 export const dlPriceRow = "dl-price-row flex items-baseline gap-1.5 min-w-0";
@@ -103,13 +104,15 @@ export const dlFootLock = "dl-foot-lock font-semibold text-[#7c3aed] dark:text-[
 /** 类型文案的通用字号 */
 export const dlFootKind = "dl-foot-kind inline-flex items-center gap-1 text-[0.75rem]";
 
-/** 右侧操作区 */
-export const dlAction = "dl-action shrink-0";
+/** 右侧操作区（提取码 + 按钮并排） */
+export const dlAction = "dl-action ml-auto flex items-center gap-2 shrink-0";
 
-/** 立即下载 / 解锁下载按钮（主题色胶囊） */
+/** 立即下载 / 解锁下载按钮（红色渐变胶囊） */
 export const dlNowBtn =
 	"dl-now inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
-	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white bg-[var(--primary)] shadow-sm " +
+	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white " +
+	"bg-gradient-to-r from-[#ff5b4a] to-[#e01b32] " +
+	"shadow-[0_6px_16px_-8px_rgba(224,27,50,0.85)] " +
 	"hover:brightness-110 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
 
 /** 付费购买按钮（橙色渐变胶囊，与价格同色系）
@@ -156,19 +159,22 @@ export const dlMiniMeta =
 	"dl-mini-meta flex flex-wrap items-center gap-x-1.5 gap-y-0.5 " +
 	"text-[0.65rem] leading-none text-black/45 dark:text-white/45";
 
-/** 操作行 */
+/** 操作行（提取码紧贴按钮，统一右对齐） */
 export const dlMiniFoot =
-	"dl-mini-foot flex items-center justify-between gap-1.5 min-w-0";
+	"dl-mini-foot flex items-center justify-end gap-1.5 min-w-0";
 
-/** 紧凑提取码（可点击复制） */
+/** 紧凑提取码（可点击复制，琥珀色与正文卡一致） */
 export const dlMiniCode =
-	"dl-code inline-flex min-w-0 items-center gap-0.5 rounded-md px-1.5 py-1 " +
-	"text-[0.65rem] text-[var(--primary)] bg-[var(--primary-soft)] " +
-	"cursor-pointer select-none hover:bg-[var(--primary-soft-hover)] transition-colors";
+	"dl-code inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 " +
+	"text-[0.66rem] font-bold leading-none whitespace-nowrap " +
+	"text-[#9a3412] bg-[#ffedd5] border border-[#fdba74] " +
+	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
+	"cursor-pointer select-none hover:brightness-95 transition-all";
 
-/** 紧凑下载按钮 */
+/** 紧凑下载按钮（红色渐变，与正文卡同色） */
 export const dlMiniBtn =
 	"dl-now shrink-0 inline-flex items-center justify-center gap-1 rounded-full " +
-	"px-2.5 py-1.5 text-[0.7rem] font-semibold text-white bg-[var(--primary)] " +
+	"px-2.5 py-1.5 text-[0.7rem] font-semibold text-white " +
+	"bg-gradient-to-r from-[#ff5b4a] to-[#e01b32] " +
 	"hover:brightness-110 active:scale-[0.95] transition-all cursor-pointer " +
 	"select-none whitespace-nowrap";

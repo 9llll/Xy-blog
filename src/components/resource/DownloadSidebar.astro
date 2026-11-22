@@ -88,14 +88,13 @@ const TAG_CLASS: Record<string, string> = {
                                 {d.kind === "pay" && d.price && (
                                     <span class="font-semibold text-[#d97706] dark:text-[#fbbf24]">¥{d.price}</span>
                                 )}
-                                {d.size && <span class="shrink-0">{d.size}</span>}
                             </span>
                         </span>
                     </a>
 
-                    <!-- 操作行：提取码 + 下载/购买 -->
+                    <!-- 操作行：提取码 + 下载/购买（提取码紧贴按钮，便于看到） -->
                     <div class={dlMiniFoot}>
-                        {d.hasCode ? (
+                        {d.hasCode && (
                             <button
                                 type="button"
                                 class={dlMiniCode}
@@ -108,10 +107,6 @@ const TAG_CLASS: Record<string, string> = {
                                     {i18n(I18nKey.downloadCode)}
                                 </span>
                             </button>
-                        ) : (
-                            <span class="min-w-0 flex-1 truncate text-[0.65rem] text-black/40 dark:text-white/40">
-                                {d.desc}
-                            </span>
                         )}
 
                         {d.kind === "pay" && d.buy ? (

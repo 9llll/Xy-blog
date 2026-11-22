@@ -10,7 +10,6 @@ import {
 	dlCover,
 	dlCoverTag,
 	dlCoverWrap,
-	dlDesc,
 	dlFoot,
 	dlFootFree,
 	dlFootKind,
@@ -116,8 +115,11 @@ function netdiskInline(nd) {
 }
 
 /**
- * 卡片外壳：左封面（角标压左上角）+ 右侧标题 / 简介 / 元信息 + 底部「价格或类型 + 按钮」。
+ * 卡片外壳：左封面（角标压左上角）+ 右侧标题 / 元信息 + 底部「类型 + 提取码 + 按钮」。
  * 普通 / 加密 / 付费三种卡片共用，仅传入内容与配色不同。
+ *
+ * 卡片刻意不显示简介与文件大小：简介那行小灰字没人看，还会把卡片撑高；
+ * 提取码则从元信息行挪到按钮左边，避免用户「看不到提取码」。
  */
 function renderShell({
 	id,
@@ -125,10 +127,10 @@ function renderShell({
 	tagText,
 	tagClass,
 	name,
-	desc,
 	meta,
 	footLeft,
-	action,
+	footLeftClass = "min-w-0",
+	footRight,
 }) {
 	// 显式写 id 属性，而不是 "div#id" 选择器：锚点里可能含中文，
 	// hastscript 的 CSS 选择器解析只认 ASCII，中文会解析失败。
@@ -142,11 +144,10 @@ function renderShell({
 			]),
 			h("div", { class: dlBody }, [
 				h("div", { class: dlTitle, title: name }, [name]),
-				desc ? h("div", { class: dlDesc, title: desc }, [desc]) : null,
 				meta && meta.length ? h("div", { class: dlMetaRow }, meta) : null,
 				h("div", { class: dlFoot }, [
-					h("div", { class: "min-w-0" }, [footLeft]),
-					h("div", { class: dlAction }, [action]),
+					h("div", { class: footLeftClass }, [footLeft]),
+					h("div", { class: dlAction }, footRight),
 				]),
 			]),
 		]),
@@ -230,10 +231,6 @@ function renderPayCard(props) {
 		asString(props.title).trim() ||
 		asString(props.source).trim();
 	const name = stripMdEmphasis(rawName) || LABEL_PAY_RES;
-	const desc = stripMdEmphasis(
-		asString(props.desc).trim() || asString(props.source).trim(),
-	);
-	const size = asString(props.size).trim();
 	const price = asString(props.price).trim();
 	const cover = resolveCover(asString(props.cover).trim());
 	const buyText = asString(props.buyText).trim() || "获取或购买";
@@ -244,7 +241,7 @@ function renderPayCard(props) {
 
 	const id = dlAnchorId(rawName);
 
-	/* 元信息行：网盘（可选）· 需访问密码 · 大小 */
+	/* 元信息行：网盘（可选）· 需访问密码 */
 	const meta = [];
 	const ndEl = netdiskInline(resolveNetdisk(asString(props.icon).trim(), ""));
 	if (ndEl) meta.push(ndEl);
@@ -256,7 +253,6 @@ function renderPayCard(props) {
 			]),
 		);
 	}
-	if (size) meta.push(h("span", { class: "shrink-0" }, [size]));
 
 	/* 底部左侧：价格 + 「付费 / 密码」 */
 	const footLeft = h("div", { class: dlPriceRow }, [
@@ -287,10 +283,9 @@ function renderPayCard(props) {
 		tagText: hasPassword ? "付费/加密" : "付费",
 		tagClass: dlTagPay,
 		name,
-		desc,
 		meta,
 		footLeft,
-		action,
+		footRight: [action],
 	});
 }
 
@@ -317,13 +312,22 @@ export function DownloadComponent(props, children) {
 	const lock = Boolean(item.hash);
 	const nd = resolveNetdisk(item.icon, item.url);
 
-	/* 元信息行：网盘名 · 提取码（可点击复制）· 大小 */
+	/* 元信息行：网盘名 · 需访问密码（提取码不在这里，见下方按钮左侧） */
 	const meta = [];
 	const ndEl = netdiskInline(nd);
 	if (ndEl) meta.push(ndEl);
-	if (item.code) {
+	if (lock) {
 		meta.push(
-			h(
+			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
+				svgIcon("lock", 12),
+				LABEL_NEED_PASSWORD,
+			]),
+		);
+	}
+
+	/* 提取码：紧贴下载按钮左侧，点一下即复制 */
+	const codeChip = item.code
+		? h(
 				"button",
 				{
 					type: "button",
@@ -333,23 +337,13 @@ export function DownloadComponent(props, children) {
 					title: `${i18n(I18nKey.downloadCode)}: ${item.code}`,
 				},
 				[
-					svgIcon("key", 12),
+					svgIcon("key", 13),
 					h("span", { "data-dl-code-text": true }, [
 						`${i18n(I18nKey.downloadCode)}：${item.code}`,
 					]),
 				],
-			),
-		);
-	}
-	if (item.size) meta.push(h("span", { class: "shrink-0" }, [item.size]));
-	if (lock) {
-		meta.push(
-			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
-				svgIcon("lock", 12),
-				LABEL_NEED_PASSWORD,
-			]),
-		);
-	}
+			)
+		: null;
 
 	/* 底部左侧：资源类型（免费 / 加密 / 付费） */
 	const footLeft = h("span", { class: `${dlFootKind} ${lock ? dlFootLock : dlFootFree}` }, [
@@ -388,9 +382,10 @@ export function DownloadComponent(props, children) {
 		tagText,
 		tagClass,
 		name: item.name,
-		desc: item.desc,
 		meta,
 		footLeft,
-		action,
+		// 手机端卡片窄，封面角标已经写明「免费 / 加密」，这里不再占一行
+		footLeftClass: "min-w-0 hidden sm:block",
+		footRight: codeChip ? [codeChip, action] : [action],
 	});
 }
