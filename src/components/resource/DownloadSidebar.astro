@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import { Icon } from "astro-icon/components";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
@@ -51,6 +52,37 @@ const TAG_CLASS: Record<string, string> = {
 	lock: dlTagLock,
 	pay: dlTagPay,
 };
+
+/**
+ * 自动封面是内容集合里的相对路径（如 images/yjd/3uiyj1.avif），
+ * .astro 模板里的 <img src> 不会被 Astro 改写，直接输出会 404。
+ * 这里用 glob 取到 ImageMetadata，交给 <Image> 生成 /_astro 哈希地址。
+ */
+const coverModules = import.meta.glob<ImageMetadata>(
+	"../../content/posts/**/*.{avif,png,jpg,jpeg,webp,gif}",
+	{ import: "default" },
+);
+const coverKeys = Object.keys(coverModules);
+const coverMetaCache = new Map<string, ImageMetadata | null>();
+
+function isContentCover(src: string) {
+	return Boolean(src) && !/^(https?:|\/\/|\/|data:)/i.test(src);
+}
+
+async function resolveContentCover(src: string) {
+	if (coverMetaCache.has(src)) return coverMetaCache.get(src) ?? null;
+	const key = coverKeys.find((k) => k.endsWith(`/content/posts/${src}`));
+	const meta = key ? await coverModules[key]() : null;
+	coverMetaCache.set(src, meta);
+	return meta;
+}
+
+const items = await Promise.all(
+	downloads.map(async (d) => ({
+		...d,
+		coverMeta: isContentCover(d.cover) ? await resolveContentCover(d.cover) : null,
+	})),
+);
 ---
 
 <div class="dl-side overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
@@ -63,13 +95,23 @@ const TAG_CLASS: Record<string, string> = {
     </div>
 
     <ul class="space-y-2 p-2">
-        {downloads.map((d) => (
+        {items.map((d) => (
             <li>
                 <div class={dlMiniCard}>
                     <!-- 信息行：点击跳到正文卡片 -->
                     <a href={`#${d.key}`} class={dlMiniTop} title={d.name}>
                         <span class={dlMiniCoverWrap}>
-                            <img class={dlCover} src={d.cover} alt="" loading="lazy" />
+                            {d.coverMeta ? (
+                                <Image
+                                    src={d.coverMeta}
+                                    alt=""
+                                    width={96}
+                                    height={96}
+                                    class={dlCover}
+                                />
+                            ) : (
+                                <img class={dlCover} src={d.cover} alt="" loading="lazy" />
+                            )}
                             <span class:list={[dlMiniCoverTag, TAG_CLASS[d.kind]]}>
                                 {d.tag || TAG_TEXT[d.kind]}
                             </span>

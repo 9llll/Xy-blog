@@ -27,6 +27,7 @@ import {
 	dlTitle,
 } from "../utils/download-styles.ts";
 import {
+	DEFAULT_DOWNLOAD_COVER,
 	encodeDownloadUrl,
 	encryptDownloadUrl,
 	hashDownloadPassword,
@@ -90,6 +91,18 @@ function asString(value) {
 const resolveCover = resolveDownloadCover;
 
 /**
+ * 封面取值优先级：显式 cover（走 /public 规则）→ 自动封面（文章第一张图，原样交给 Astro）
+ * → 默认占位图。autocover 由 remark-download-list 挂上来，是内容集合相对路径，
+ * 绝不能用 resolveDownloadCover 处理，否则会被补成 /images/xxx 而 404。
+ */
+function pickCover(explicit, auto) {
+	const v = asString(explicit).trim();
+	if (v) return resolveCover(v);
+	const a = asString(auto).trim();
+	return a || DEFAULT_DOWNLOAD_COVER;
+}
+
+/**
  * 网盘名（元信息行内的小圆点 + 名称）。
  * 仅品牌圆牌 / 自定义文字可展示名称；自定义图片展示小图标；无法识别则不展示。
  */
@@ -115,6 +128,23 @@ function netdiskInline(nd) {
 }
 
 /**
+ * 封面图节点。
+ *
+ * hastscript 会把 `class` 规范化成 className 数组；一旦这张图被 Astro 的
+ * `__ASTRO_IMAGE_` 机制接管（自动封面走的就是这条路），数组会被原样渲染成
+ * `className="a,b,c"` 这种非法属性，样式全丢、图片撑破容器。
+ * 这里直接写字符串 class，两条渲染路径下都是合法的 class 属性。
+ */
+function coverImg(src, cls) {
+	const node = h("img", { src, alt: "", loading: "lazy" });
+	if (node.properties) {
+		delete node.properties.className;
+		node.properties.class = cls;
+	}
+	return node;
+}
+
+/**
  * 卡片外壳：左封面（角标压左上角）+ 右侧标题 / 元信息 + 底部「类型 + 提取码 + 按钮」。
  * 普通 / 加密 / 付费三种卡片共用，仅传入内容与配色不同。
  *
@@ -137,7 +167,7 @@ function renderShell({
 	return h("div", { id, class: "not-prose my-4 scroll-mt-24" }, [
 		h("div", { class: dlCard }, [
 			h("div", { class: dlCoverWrap }, [
-				h("img", { class: dlCover, src: cover, alt: "", loading: "lazy" }),
+				coverImg(cover, dlCover),
 				tagText
 					? h("span", { class: `${dlCoverTag} ${tagClass}` }, [tagText])
 					: null,
@@ -185,6 +215,7 @@ function normalizeItem(props) {
 	const hint = asString(props.hint).trim();
 	const icon = asString(props.icon).trim();
 	const cover = asString(props.cover).trim();
+	const autocover = asString(props.autocover).trim();
 	const tag = asString(props.tag).trim();
 	const rawName =
 		asString(props.name).trim() ||
@@ -203,6 +234,7 @@ function normalizeItem(props) {
 		hint,
 		icon,
 		cover,
+		autocover,
 		tag,
 		hash: password ? hashDownloadPassword(password) : "",
 		// 有访问密码时，用密码派生的密钥加密地址：页面源码里连 Base64 都没有，
@@ -232,7 +264,7 @@ function renderPayCard(props) {
 		asString(props.source).trim();
 	const name = stripMdEmphasis(rawName) || LABEL_PAY_RES;
 	const price = asString(props.price).trim();
-	const cover = resolveCover(asString(props.cover).trim());
+	const cover = pickCover(props.cover, props.autocover);
 	const buyText = asString(props.buyText).trim() || "获取或购买";
 	// 付费 / 加密双模式：只判断「有没有设密码」，密码本身绝不输出
 	const hasPassword = Boolean(
@@ -378,7 +410,7 @@ export function DownloadComponent(props, children) {
 
 	return renderShell({
 		id: uuid,
-		cover: resolveCover(item.cover),
+		cover: pickCover(item.cover, item.autocover),
 		tagText,
 		tagClass,
 		name: item.name,
