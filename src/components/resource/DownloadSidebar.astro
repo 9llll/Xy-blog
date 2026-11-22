@@ -1,12 +1,38 @@
 ---
 import { Icon } from "astro-icon/components";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
 import type { DownloadListItem } from "../../utils/download-anchor";
+import {
+	dlCover,
+	dlMiniBody,
+	dlMiniBtn,
+	dlMiniCard,
+	dlMiniCode,
+	dlMiniCoverTag,
+	dlMiniCoverWrap,
+	dlMiniFoot,
+	dlMiniMeta,
+	dlMiniTitle,
+	dlMiniTop,
+	dlNdDot,
+	dlNdImg,
+	dlTagFree,
+	dlTagLock,
+	dlTagPay,
+} from "../../utils/download-styles";
 
 /**
  * 文章页右侧栏「下载地址」卡
  *
- * 阅读到文章任意位置都能随手跳转到资源，不需要滚回去找卡片。
- * 与正文卡片通过 #锚点 联动，同样不含任何真实地址 / 密码。
+ * 与正文里的 ::download 卡片是**同一个卡片**（同一套 download-styles 类名与视觉语言），
+ * 但右栏不持有任何地址 / 密码哈希 / 提取码：
+ * 点「下载」时通过 data-dl-target 把动作托给正文对应卡片，
+ * 由那张卡片完成解密与跳转，效果与直接点正文卡完全一致
+ * （免费资源直接下载，加密资源弹密码框）。
+ * 所以密钥材料全站只有一份，也不会随 /api/articles.json 的 metadata 外泄。
+ *
+ * 交互脚本是全站唯一的 DownloadSupport（事件委托），本组件不需要额外 JS。
  */
 interface Props {
 	downloads: DownloadListItem[];
@@ -14,18 +40,19 @@ interface Props {
 
 const { downloads } = Astro.props;
 
-const KIND_DOT: Record<string, string> = {
-	free: "#22c55e",
-	lock: "var(--primary)",
-	pay: "#f59e0b",
-};
-
-const KIND_TEXT: Record<string, string> = {
+const TAG_TEXT: Record<string, string> = {
 	free: "免费",
 	lock: "加密",
 	pay: "付费",
 };
+
+const TAG_CLASS: Record<string, string> = {
+	free: dlTagFree,
+	lock: dlTagLock,
+	pay: dlTagPay,
+};
 ---
+
 <div class="dl-side overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
     <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
         <Icon name="material-symbols:download-for-offline-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
@@ -35,60 +62,86 @@ const KIND_TEXT: Record<string, string> = {
         </span>
     </div>
 
-    <ul class="py-1">
+    <ul class="space-y-2 p-2">
         {downloads.map((d) => (
             <li>
-                {d.kind === "pay" && d.buy ? (
-                    <a
-                        href={d.buy}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="group flex items-start gap-2 px-3.5 py-2 transition-colors hover:bg-[var(--btn-regular-bg)]"
-                    >
-                        <span class="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={`background:${KIND_DOT[d.kind]}`}></span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block truncate text-[12.5px] font-medium text-black/75 dark:text-white/75 group-hover:text-[var(--primary)] transition-colors">
-                                {d.name}
-                            </span>
-                            <span class="mt-0.5 flex items-center gap-1.5 text-[10.5px] text-black/40 dark:text-white/40">
-                                <span class="rounded bg-[#f59e0b]/12 px-1 py-[1px] font-bold text-[#b45309] dark:text-[#fbbf24]">{KIND_TEXT[d.kind]}</span>
-                                {d.price && <span class="font-semibold text-[#d97706] dark:text-[#fbbf24]">¥{d.price}</span>}
-                                {d.size && <span>{d.size}</span>}
+                <div class={dlMiniCard}>
+                    <!-- 信息行：点击跳到正文卡片 -->
+                    <a href={`#${d.key}`} class={dlMiniTop} title={d.name}>
+                        <span class={dlMiniCoverWrap}>
+                            <img class={dlCover} src={d.cover} alt="" loading="lazy" />
+                            <span class:list={[dlMiniCoverTag, TAG_CLASS[d.kind]]}>
+                                {d.tag || TAG_TEXT[d.kind]}
                             </span>
                         </span>
-                        <Icon name="material-symbols:open-in-new-rounded" class="mt-0.5 shrink-0 text-[0.85rem] text-black/20 dark:text-white/25 group-hover:text-[var(--primary)] transition-colors" />
-                    </a>
-                ) : (
-                    <a
-                        href={`#${d.key}`}
-                        class="group flex items-start gap-2 px-3.5 py-2 transition-colors hover:bg-[var(--btn-regular-bg)]"
-                    >
-                        <span class="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={`background:${KIND_DOT[d.kind]}`}></span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block truncate text-[12.5px] font-medium text-black/75 dark:text-white/75 group-hover:text-[var(--primary)] transition-colors">
-                                {d.name}
-                            </span>
-                            <span class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] text-black/40 dark:text-white/40">
-                                <span
-                                    class:list={[
-                                        "rounded px-1 py-[1px] font-bold",
-                                        d.kind === "lock"
-                                            ? "bg-[var(--primary-soft)] text-[var(--primary)]"
-                                            : "bg-[#22c55e]/12 text-[#16a34a] dark:text-[#4ade80]",
-                                    ]}
-                                >{d.tag || KIND_TEXT[d.kind]}</span>
-                                {d.netdisk?.label && <span>{d.netdisk.label}</span>}
-                                {d.size && <span>{d.size}</span>}
+                        <span class={dlMiniBody}>
+                            <span class={dlMiniTitle}>{d.name}</span>
+                            <span class={dlMiniMeta}>
+                                {d.netdisk?.kind === "img" && d.netdisk.src ? (
+                                    <img class={dlNdImg} src={d.netdisk.src} alt="" loading="lazy" />
+                                ) : d.netdisk?.label ? (
+                                    <span class="inline-flex items-center gap-1 min-w-0">
+                                        <span class={dlNdDot} style={`background:${d.netdisk.color || "var(--primary)"}`}></span>
+                                        <span class="truncate">{d.netdisk.label}</span>
+                                    </span>
+                                ) : null}
+                                {d.kind === "pay" && d.price && (
+                                    <span class="font-semibold text-[#d97706] dark:text-[#fbbf24]">¥{d.price}</span>
+                                )}
+                                {d.size && <span class="shrink-0">{d.size}</span>}
                             </span>
                         </span>
-                        <Icon name="material-symbols:subdirectory-arrow-right-rounded" class="mt-0.5 shrink-0 text-[0.9rem] text-black/20 dark:text-white/25 group-hover:text-[var(--primary)] transition-colors" />
                     </a>
-                )}
+
+                    <!-- 操作行：提取码 + 下载/购买 -->
+                    <div class={dlMiniFoot}>
+                        {d.hasCode ? (
+                            <button
+                                type="button"
+                                class={dlMiniCode}
+                                data-dl-copy-target={d.key}
+                                data-dl-copied-label={i18n(I18nKey.downloadCodeCopied)}
+                                title={i18n(I18nKey.downloadCode)}
+                            >
+                                <Icon name="material-symbols:key-rounded" class="shrink-0 text-[0.8rem]" />
+                                <span class="truncate" data-dl-code-text>
+                                    {i18n(I18nKey.downloadCode)}
+                                </span>
+                            </button>
+                        ) : (
+                            <span class="min-w-0 flex-1 truncate text-[0.65rem] text-black/40 dark:text-white/40">
+                                {d.desc}
+                            </span>
+                        )}
+
+                        {d.kind === "pay" && d.buy ? (
+                            <a
+                                href={d.buy}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class={dlMiniBtn}
+                                data-dl-pay="1"
+                            >
+                                购买
+                            </a>
+                        ) : (
+                            <button
+                                type="button"
+                                class={dlMiniBtn}
+                                data-dl-target={d.key}
+                                title={d.name}
+                            >
+                                <Icon name="material-symbols:download-rounded" class="text-[0.85rem]" />
+                                {i18n(I18nKey.downloadAction)}
+                            </button>
+                        )}
+                    </div>
+                </div>
             </li>
         ))}
     </ul>
 
     <div class="border-t border-[var(--line-divider)] px-3.5 py-2 text-[10.5px] leading-relaxed text-black/35 dark:text-white/35">
-        点击条目跳转到资源卡片；加密资源需输入密码。
+        点「下载」即可获取；加密资源需输入密码。点名称可跳到正文卡片。
     </div>
 </div>

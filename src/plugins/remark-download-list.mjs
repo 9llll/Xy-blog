@@ -1,17 +1,21 @@
 import { visit } from "unist-util-visit";
 import { dlAnchorId } from "../utils/download-anchor.ts";
+import { resolveDownloadCover } from "../utils/download-utils.ts";
 import { resolveNetdisk } from "../utils/netdisk.ts";
 
 /**
  * 收集文章内的下载资源清单
  *
  * 遍历 Markdown AST 中的 `::download{}` 指令，把「可公开展示」的元信息
- * （资源名、大小、网盘、类型、价格、封面）写进
- * `frontmatter.downloads`，供文章页顶部资源卡与右侧栏「下载地址」卡使用。
+ * （资源名、大小、网盘、类型、价格、封面、是否有提取码）写进
+ * `frontmatter.downloads`，供顶部资源总览卡与右侧栏「下载地址」卡使用。
  *
- * 安全性：这里**刻意不输出** url / password / code 以及加密密文。
- * 真实地址仍只存在于正文卡片（加密时是密文）与发卡平台，
- * 侧栏卡片只做锚点跳转或外链购买页，避免多一条泄露面。
+ * 安全性（重要）：
+ *   - 这里**刻意不输出** url / password / code / 密文 / 密码哈希。
+ *     右栏卡片通过 `data-dl-target` 把点击「托」给正文对应卡片，
+ *     由那张卡片完成解密与下载，因此密钥材料全站只存在一份。
+ *   - `remarkPluginFrontmatter` 会被 `/api/articles.json` 序列化成
+ *     `rendered.metadata.frontmatter`，任何写进这里的字段都是公开的。
  *
  * 用 AST 而不是正则匹配原文，可以天然排除代码块里的示例写法
  * （download-guide.md 里的 ```::download{...}``` 不会被统计）。
@@ -42,6 +46,7 @@ export function remarkDownloadList() {
 			const buy = str("buy");
 			const isPay = Boolean(str("pay")) || Boolean(buy);
 			const password = str("password");
+			const code = str("code");
 
 			// 非法指令（既没有 url 也没有 buy）由 rehype 阶段渲染成提示，这里跳过
 			if (!isPay && !url) return;
@@ -71,10 +76,12 @@ export function remarkDownloadList() {
 				netdisk: nd
 					? { label: nd.label ?? "", color: nd.color ?? "", src: nd.src ?? "", kind: nd.kind }
 					: null,
-				/** 仅当作者显式指定封面时才带出，避免侧栏加载一堆默认图 */
-				cover: cover || "",
+				/** 规范化后的封面（与正文卡同一规则，含默认图兜底） */
+				cover: resolveDownloadCover(cover),
 				/** 付费资源的外链购买页（本身就是公开页面） */
 				buy: isPay ? buy : "",
+				/** 是否带网盘提取码：只给「复制提取码」按钮做显隐，本身不是秘密 */
+				hasCode: !isPay && Boolean(code),
 			});
 		});
 

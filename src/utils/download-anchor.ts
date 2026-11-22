@@ -20,7 +20,11 @@ export interface DownloadNetdiskInfo {
 
 /**
  * remark-download-list 收集出的单条资源
- * （与正文卡片通过 key 锚点对应；刻意不含 url / password / code）
+ *
+ * 与正文卡片通过 key 锚点对应；**不含任何地址 / 密码 / 提取码**。
+ * 右栏「下载地址」卡点击时把动作托给正文卡片（data-dl-target），
+ * 因此密钥材料全站只有一份（正文卡），且不会随
+ * `/api/articles.json` 的 rendered.metadata 外泄。
  */
 export interface DownloadListItem {
 	key: string;
@@ -31,8 +35,11 @@ export interface DownloadListItem {
 	tag?: string;
 	kind: "free" | "lock" | "pay";
 	netdisk?: DownloadNetdiskInfo | null;
+	/** 已规范化（含 /images/ 兜底）的封面地址 */
 	cover?: string;
 	buy?: string;
+	/** 是否带网盘提取码（决定右栏「复制提取码」按钮是否显示，本身不是秘密） */
+	hasCode?: boolean;
 }
 
 export function dlAnchorId(rawName: string): string {

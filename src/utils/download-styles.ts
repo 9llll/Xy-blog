@@ -94,6 +94,55 @@ export const dlNowBtn =
 	"text-[0.85rem] sm:text-[0.9rem] font-semibold text-white bg-[var(--primary)] shadow-sm " +
 	"hover:brightness-110 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
 
+/* ===== 右栏紧凑卡片（与正文卡同一套视觉语言，只是宽度只有 264px） ===== */
+
+/** 紧凑卡容器：两行结构（信息行 + 操作行） */
+export const dlMiniCard =
+	"dl-mini flex flex-col gap-2 rounded-xl border border-[var(--line-divider)] " +
+	"bg-[var(--card-bg)] p-2.5 transition-all hover:border-[var(--primary-border-soft)] hover:shadow-sm";
+
+/** 信息行：封面 + 标题/元信息 */
+export const dlMiniTop = "dl-mini-top flex items-start gap-2.5 min-w-0";
+
+/** 紧凑封面 */
+export const dlMiniCoverWrap =
+	"dl-cover-wrap relative shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-[var(--btn-regular-bg)]";
+
+/** 紧凑封面上的角标 */
+export const dlMiniCoverTag =
+	"dl-cover-tag absolute left-0.5 top-0.5 rounded px-1 py-[1px] " +
+	"text-[0.5rem] font-bold leading-tight shadow-sm";
+
+/** 紧凑信息列 */
+export const dlMiniBody = "dl-mini-body min-w-0 flex-1 flex flex-col gap-0.5";
+
+/** 紧凑标题（最多两行） */
+export const dlMiniTitle =
+	"dl-mini-title text-[0.8rem] font-bold leading-snug line-clamp-2 " +
+	"text-black/90 dark:text-white/90";
+
+/** 紧凑元信息行 */
+export const dlMiniMeta =
+	"dl-mini-meta flex flex-wrap items-center gap-x-1.5 gap-y-0.5 " +
+	"text-[0.65rem] leading-none text-black/45 dark:text-white/45";
+
+/** 操作行 */
+export const dlMiniFoot =
+	"dl-mini-foot flex items-center justify-between gap-1.5 min-w-0";
+
+/** 紧凑提取码（可点击复制） */
+export const dlMiniCode =
+	"dl-code inline-flex min-w-0 items-center gap-0.5 rounded-md px-1.5 py-1 " +
+	"text-[0.65rem] text-[var(--primary)] bg-[var(--primary-soft)] " +
+	"cursor-pointer select-none hover:bg-[var(--primary-soft-hover)] transition-colors";
+
+/** 紧凑下载按钮 */
+export const dlMiniBtn =
+	"dl-now shrink-0 inline-flex items-center justify-center gap-1 rounded-full " +
+	"px-2.5 py-1.5 text-[0.7rem] font-semibold text-white bg-[var(--primary)] " +
+	"hover:brightness-110 active:scale-[0.95] transition-all cursor-pointer " +
+	"select-none whitespace-nowrap";
+
 /* ===== 付费卡片（复用同一外壳，仅角标/价格区分） ===== */
 
 export const dlPayBadge =

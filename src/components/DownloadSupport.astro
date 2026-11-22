@@ -265,6 +265,50 @@ async function copyCode(btn: HTMLElement) {
 	}, 1600);
 }
 
+/**
+ * 右栏卡片 → 正文卡片的「动作委托」
+ *
+ * 右侧栏与正文用的是同一个卡片，但右栏**不持有**任何地址 / 密码哈希 / 提取码
+ * （避免这些字段被写进 frontmatter 后随 /api/articles.json 外泄）。
+ * 点击时找到正文对应卡片里的真实按钮再触发一次，行为与直接点正文卡完全一致：
+ * 免费资源直接下载，加密资源照旧弹密码框。
+ */
+document.addEventListener("click", (e) => {
+	const target = e.target as HTMLElement | null;
+	if (!target || typeof target.closest !== "function") return;
+	const trigger = target.closest<HTMLElement>(
+		"[data-dl-target], [data-dl-copy-target]",
+	);
+	if (!trigger) return;
+	e.preventDefault();
+
+	const isCopy = trigger.hasAttribute("data-dl-copy-target");
+	const id = trigger.dataset.dlCopyTarget || trigger.dataset.dlTarget || "";
+	const card = id ? document.getElementById(id) : null;
+	const real = card?.querySelector<HTMLElement>(
+		isCopy ? "[data-dl-code]" : "[data-dl-url]",
+	);
+
+	if (real) {
+		real.click();
+		if (isCopy) flashCopied(trigger);
+		return;
+	}
+	// 找不到正文卡片时退化为滚动到锚点（理论上不会发生）
+	card?.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+/** 委托复制时，右栏按钮自己也要给出「已复制」反馈 */
+function flashCopied(el: HTMLElement) {
+	const text = el.querySelector<HTMLElement>("[data-dl-code-text]");
+	if (!text) return;
+	const original = text.textContent ?? "";
+	text.textContent = el.dataset.dlCopiedLabel || original;
+	setTimeout(() => {
+		text.textContent = original;
+	}, 1600);
+}
+
 // 提取码复制（与下载按钮分开处理）
 document.addEventListener("click", (e) => {
 	const target = e.target as HTMLElement | null;

@@ -29,6 +29,7 @@ import {
 	encodeDownloadUrl,
 	encryptDownloadUrl,
 	hashDownloadPassword,
+	resolveDownloadCover,
 } from "../utils/download-utils.ts";
 import { dlAnchorId } from "../utils/download-anchor.ts";
 import { resolveNetdisk } from "../utils/netdisk.ts";
@@ -44,9 +45,6 @@ const ICON_PATHS = {
 	arrow: "M13 5l7 7-7 7v-4.5H4v-5h9V5z",
 	key: "M12 2a5 5 0 0 1 4.6 3h-2.2A2.8 2.8 0 1 0 12 5c.6 0 1.2.2 1.7.5l-2 2H9.6l-1 1H7v1.6l-1.6 1.6H3v-3.5l6.3-6.3A5 5 0 0 1 12 2z",
 };
-
-/** 封面兜底图（public/images 下） */
-const DEFAULT_COVER = "/images/default-download.png";
 
 /** 资源类型文案（站点以中文为主，此处不做多语言展开） */
 const LABEL_FREE = "免费";
@@ -84,15 +82,8 @@ function asString(value) {
 	return "";
 }
 
-/** 规范化封面地址：支持 http(s)、站内绝对路径、裸文件名（默认落在 /images/） */
-function resolveCover(raw) {
-	const v = (raw ?? "").trim();
-	if (!v) return DEFAULT_COVER;
-	if (/^https?:\/\//i.test(v) || v.startsWith("data:")) return v;
-	if (v.startsWith("/")) return v;
-	if (v.includes("/")) return `/${v}`;
-	return `/images/${v}`;
-}
+/** 规范化封面地址（与右栏卡片共用同一实现，避免两处规则漂移） */
+const resolveCover = resolveDownloadCover;
 
 /**
  * 网盘名（元信息行内的小圆点 + 名称）。

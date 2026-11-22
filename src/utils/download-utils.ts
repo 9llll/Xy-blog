@@ -69,3 +69,20 @@ export function encryptDownloadUrl(url: string, password: string): string {
 
 	return Buffer.concat([salt, iv, tag, ciphertext]).toString("base64");
 }
+
+/** 默认封面（public/images 下），正文卡片与右栏卡片共用 */
+export const DEFAULT_DOWNLOAD_COVER = "/images/default-download.png";
+
+/**
+ * 规范化封面地址：支持 http(s) / data: / 站内绝对路径 / 裸文件名（默认落在 /images/）。
+ * 正文卡片（rehype）与右栏卡片（Astro 组件）必须走同一套规则，否则同一资源
+ * 在两处会显示不同的封面。
+ */
+export function resolveDownloadCover(raw?: string): string {
+	const v = String(raw ?? "").trim();
+	if (!v) return DEFAULT_DOWNLOAD_COVER;
+	if (/^https?:\/\//i.test(v) || v.startsWith("data:")) return v;
+	if (v.startsWith("/")) return v;
+	if (v.includes("/")) return `/${v}`;
+	return `/images/${v}`;
+}
