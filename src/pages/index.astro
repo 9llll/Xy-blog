@@ -4,14 +4,19 @@ import SiteAside from "@components/resource/SiteAside.astro";
 import ThreadList from "@components/resource/ThreadList.astro";
 import ResourceLayout from "@layouts/ResourceLayout.astro";
 import { siteConfig } from "../config";
+import { getHomePosts, getTotalPages, slicePage } from "../utils/home-posts";
 
 /**
  * 首页：资源站三栏版式
- *   左：分类导航 ｜ 中：最新发布列表 ｜ 右：作者卡 / 快捷导航 / 热门标签
+ *   左：分类导航 ｜ 中：最新发布列表（每页 10 篇） ｜ 右：作者卡 / 快捷导航 / 热门标签
  * 三个栏目全部为真实数据（文章集合 + profile.json），不含任何模拟积分/等级/排行。
  * 版式外壳与归档 / 关于 / 友链 / 文章页共用 ResourceLayout。
+ * 第 2 页起由 src/pages/page/[...page].astro 生成。
  */
+const allPosts = await getHomePosts();
+const totalPages = getTotalPages(allPosts.length);
 ---
+
 <ResourceLayout
     title={siteConfig.title}
     description={siteConfig.description}
@@ -19,7 +24,12 @@ import { siteConfig } from "../config";
 >
     <BoardNav slot="left" />
 
-    <ThreadList />
+    <ThreadList
+        posts={slicePage(allPosts, 1)}
+        currentPage={1}
+        totalPages={totalPages}
+        totalCount={allPosts.length}
+    />
 
     <SiteAside slot="right" />
 </ResourceLayout>

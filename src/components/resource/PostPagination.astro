@@ -1,0 +1,73 @@
+---
+import { Icon } from "astro-icon/components";
+import { getPageUrl } from "../../utils/home-posts";
+
+interface Props {
+	currentPage: number;
+	totalPages: number;
+}
+
+const { currentPage, totalPages } = Astro.props;
+
+/**
+ * 页码序列：首末页 + 当前页前后各一页，中间折叠成省略号。
+ * 页数不多时（<= 7）直接全展示，避免出现「1 … 3 … 4」这种反而更难读的排布。
+ */
+const items: (number | "ellipsis")[] = [];
+if (totalPages <= 7) {
+	for (let p = 1; p <= totalPages; p++) items.push(p);
+} else {
+	for (let p = 1; p <= totalPages; p++) {
+		if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1) {
+			items.push(p);
+		} else if (items[items.length - 1] !== "ellipsis") {
+			items.push("ellipsis");
+		}
+	}
+}
+
+const prevPage = currentPage - 1;
+const nextPage = currentPage + 1;
+
+const btn =
+	"inline-flex h-8 min-w-[2rem] items-center justify-center rounded-lg px-2 text-[13px] font-semibold leading-none transition-colors";
+---
+
+<nav
+	aria-label="分页导航"
+	class="flex items-center justify-center gap-1.5 px-4 py-4 border-t border-[var(--line-divider)]"
+>
+	{currentPage > 1 ? (
+		<a href={getPageUrl(prevPage)} rel="prev" class={`${btn} text-black/65 dark:text-white/65 hover:bg-[var(--btn-regular-bg)]`} aria-label="上一页">
+			<Icon name="material-symbols:chevron-left-rounded" class="text-[1.1rem]" />
+		</a>
+	) : (
+		<span class={`${btn} text-black/20 dark:text-white/20`} aria-hidden="true">
+			<Icon name="material-symbols:chevron-left-rounded" class="text-[1.1rem]" />
+		</span>
+	)}
+
+	{items.map((it) =>
+		it === "ellipsis" ? (
+			<span class="px-1 text-[13px] text-black/35 dark:text-white/35 select-none">…</span>
+		) : it === currentPage ? (
+			<span class={`${btn} bg-[var(--primary)] text-white`} aria-current="page">{it}</span>
+		) : (
+			<a
+				href={getPageUrl(it)}
+				class={`${btn} text-black/65 dark:text-white/65 hover:bg-[var(--btn-regular-bg)]`}
+				aria-label={`第 ${it} 页`}
+			>{it}</a>
+		),
+	)}
+
+	{currentPage < totalPages ? (
+		<a href={getPageUrl(nextPage)} rel="next" class={`${btn} text-black/65 dark:text-white/65 hover:bg-[var(--btn-regular-bg)]`} aria-label="下一页">
+			<Icon name="material-symbols:chevron-right-rounded" class="text-[1.1rem]" />
+		</a>
+	) : (
+		<span class={`${btn} text-black/20 dark:text-white/20`} aria-hidden="true">
+			<Icon name="material-symbols:chevron-right-rounded" class="text-[1.1rem]" />
+		</span>
+	)}
+</nav>

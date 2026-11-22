@@ -1,33 +1,60 @@
 ---
 import type { GetStaticPaths } from "astro";
-import PostPage from "../../components/PostPage.astro";
 import BoardNav from "../../components/resource/BoardNav.astro";
 import SiteAside from "../../components/resource/SiteAside.astro";
+import ThreadList from "../../components/resource/ThreadList.astro";
 import ResourceLayout from "../../layouts/ResourceLayout.astro";
-import { getSortedPosts } from "../../utils/content-utils";
+import { siteConfig } from "../../config";
+import { getHomePosts, getTotalPages, slicePage } from "../../utils/home-posts";
+import type { PostForList } from "../../utils/content-utils";
+
+interface Props {
+	pageNum: number;
+	totalPages: number;
+	totalCount: number;
+	posts: PostForList[];
+}
 
 /**
- * 兼容旧的分页路由。
+ * 首页分页：/page/2/、/page/3/ …
  *
- * 首页（/）现在直接展示全部文章，因此 /page/N/ 也展示同样的全部内容，
- * 避免同一篇文章在两处重复出现，同时保留旧链接可访问。
+ * 首页只放 10 篇，第 2 页起由本路由生成。第 1 页就是 /，
+ * /page/1/ 走 301 跳转，避免同一批文章出现两个可收录地址。
  */
 export const getStaticPaths = (async () => {
-	// 仅保留 /page/2/ 兼容历史链接；/page/1/ 由 page/1.astro 301 跳转到首页
-	return [{ params: { page: "2" } }];
+	const posts = await getHomePosts();
+	const totalPages = getTotalPages(posts.length);
+
+	return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => {
+		const pageNum = i + 2;
+		return {
+			params: { page: String(pageNum) },
+			props: {
+				pageNum,
+				totalPages,
+				totalCount: posts.length,
+				posts: slicePage(posts, pageNum),
+			} satisfies Props,
+		};
+	});
 }) satisfies GetStaticPaths;
 
-const allBlogPosts = await getSortedPosts();
-
-const page = {
-	data: allBlogPosts,
-};
+const { pageNum, totalPages, totalCount, posts } = Astro.props as Props;
 ---
 
-<ResourceLayout>
+<ResourceLayout
+    title={`最新发布 · 第 ${pageNum} 页`}
+    description={`${siteConfig.description}（第 ${pageNum} 页）`}
+    keywords={siteConfig.keywords}
+>
     <BoardNav slot="left" />
 
-    <PostPage page={page}></PostPage>
+    <ThreadList
+        posts={posts}
+        currentPage={pageNum}
+        totalPages={totalPages}
+        totalCount={totalCount}
+    />
 
     <SiteAside slot="right" />
 </ResourceLayout>
