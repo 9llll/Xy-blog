@@ -1,5 +1,5 @@
 ---
-title: 【单机】2026年最新【物集大话西游】最新150位超变版本、免虚拟机解压即玩
+title: 【单机】2026年物集大话西游150位超变版本、免虚拟机解压即玩
 description: 超多地图 超多玩法 超多宝宝 技能秒10 超变150位
 published: 2026-11-06
 updated: 2026-11-06
@@ -19,7 +19,7 @@ series: 回合制
 seriesOrder: 0
 ogImage: https://x.3x3.top/images/xy2.avif
 draft: false
-pinned: false
+pinned: true
 comment: true
 ---
 ::download{name="【🔒加密资源】**2026年最新【物集大话西游】**" url="https://pan.baidu.com/s/1l7gDhrBEX8zelswdWrb93g" desc="**最新150位超变版本、免虚拟机解压即玩**。" size="15 GB" code="8888" password="19651" hint="闲鱼：墨此资源"}
