@@ -21,6 +21,7 @@ ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
+kind: news
 ---
 ::github{repo="9llll/pagecms"}
 

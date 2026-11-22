@@ -19,6 +19,7 @@ ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
+kind: news
 ---
 在文章正文里用 `::download{...}` 指令即可插入下载按钮，**可以放在文章任意位置**（标题下、正文中间、末尾都行）。
 

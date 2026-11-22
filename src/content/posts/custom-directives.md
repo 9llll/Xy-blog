@@ -20,6 +20,7 @@ ogImage: https://www.3x3.top/images/xy2.avif
 draft: false
 pinned: false
 comment: true
+kind: news
 ---
 本文介绍 `::btn`（链接按钮）与 `::video`（视频播放器）两个自定义指令的用法。所有示例都是真实可用的，直接照抄即可。
 

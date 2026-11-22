@@ -79,6 +79,21 @@ content:
         list: true
         optional: true
 
+      - name: kind
+        label: 列表类型徽章（留空 = 自动判断：有 password 算加密，否则算免费）
+        type: select
+        optional: true
+        options:
+          values:
+            - label: 免费资源（绿）
+              value: free
+            - label: 加密资源（红）
+              value: locked
+            - label: 资讯博文（紫）
+              value: news
+            - label: 开源项目（黑）
+              value: oss
+
       - name: image
         label: 封面图（留空 = 用正文第一张图，正文也没图则用随机封面 API）
         type: image

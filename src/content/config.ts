@@ -77,6 +77,12 @@ const postsCollection = defineCollection({
 
 		lang: z.string().optional().default(""),
 		pinned: z.boolean().optional().default(false),
+
+		/**
+		 * 列表类型徽章：free 免费资源 / locked 加密资源 / news 资讯博文 / oss 开源项目
+		 * 留空时按正文自动判定（有 password 才算加密）；填了则以手动为准。
+		 */
+		kind: z.enum(["free", "locked", "news", "oss"]).optional(),
 		/** 是否开启评论（保留字段，兼容其他来源的写法） */
 		comment: z.boolean().optional().default(true),
 
