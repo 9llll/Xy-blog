@@ -8,5 +8,10 @@
     "name": "友情链接",
     "url": "/friends/",
     "external": false
+  },
+  {
+    "name": "论坛",
+    "url": "https://www.3x3.top/",
+    "external": true
   }
 ]
