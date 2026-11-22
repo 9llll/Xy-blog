@@ -4,6 +4,8 @@ export type SiteConfig = {
 	title: string;
 	keywords: string;
 	description: string;
+	/** 导航栏 logo 图片（public 下的路径）；留空则用内置的房子图标 */
+	logo: string;
 	
 	lang:
 		| "en"

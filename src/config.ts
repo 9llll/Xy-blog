@@ -27,6 +27,19 @@ function str(value: unknown, fallback: string): string {
 	return typeof value === "string" && value.trim() !== "" ? value : fallback;
 }
 
+/**
+ * 导航栏 logo 路径规范化
+ * - 留空 → 空串（组件回落到内置图标）
+ * - http(s) 或 / 开头 → 原样使用
+ * - 其余（Pages CMS 的 image 字段常输出 `images/site/xxx.avif` 这种相对仓库根的路径）→ 补根斜杠
+ */
+function resolveLogo(value: unknown): string {
+	const raw = str(value, "").trim();
+	if (raw === "") return "";
+	if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
+	return `/${raw.replace(/^\.\//, "")}`;
+}
+
 /** 取布尔值 */
 function bool(value: unknown, fallback: boolean): boolean {
 	return typeof value === "boolean" ? value : fallback;
@@ -63,6 +76,7 @@ const tocData = (site.toc ?? {}) as Record<string, any>;
 
 export const siteConfig: SiteConfig = {
 	title: str(site.title, siteDefaults.title),
+	logo: resolveLogo(site.logo),
 	keywords: str(site.keywords, siteDefaults.keywords),
 	description: str(site.description, siteDefaults.description),
 	lang: str(site.lang, siteDefaults.lang) as SiteConfig["lang"],

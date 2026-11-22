@@ -189,6 +189,12 @@ content:
                 - tr
                 - id
 
+          - name: logo
+            label: 站点 Logo（导航栏左侧图片，留空则显示默认房子图标）
+            type: image
+            options:
+              media: site-images
+
           - name: themeColor
             label: 主题色
             type: object

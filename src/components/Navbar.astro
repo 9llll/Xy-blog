@@ -37,7 +37,19 @@ let links: NavBarLink[] = navBarConfig.links.map(
         </button>
         <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div class="flex flex-row items-center text-md text-black/85 dark:text-white/85">
-                <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
+                {/* logo 在 src/data/site.json 的 logo 字段配置；留空则用内置图标 */}
+                {siteConfig.logo ? (
+                    <img
+                        src={siteConfig.logo}
+                        alt={siteConfig.title}
+                        width="28"
+                        height="28"
+                        decoding="async"
+                        class="h-7 w-7 mr-2 object-contain"
+                    />
+                ) : (
+                    <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
+                )}
                 {siteConfig.title}
             </div>
         </a>
