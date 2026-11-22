@@ -86,3 +86,19 @@ export function resolveDownloadCover(raw?: string): string {
 	if (v.includes("/")) return `/${v}`;
 	return `/images/${v}`;
 }
+
+/**
+ * 去掉标题 / 简介里的 Markdown 强调符号。
+ *
+ * `::download{name="**某资源**"}` 里的 `**` 是作者手写的粗体语法，
+ * 但卡片标题是按纯文本渲染的，符号会原样露出来（"**某资源**"）。
+ * 卡片不做富文本解析，这里直接剥掉成对的 `**` / `__` / 行内反引号。
+ * 只影响展示文案，锚点 id 仍用原始名称推导，不会破坏已有链接。
+ */
+export function stripMdEmphasis(raw?: string): string {
+	return String(raw ?? "")
+		.replace(/\*\*(.+?)\*\*/g, "$1")
+		.replace(/__(.+?)__/g, "$1")
+		.replace(/`([^`]+)`/g, "$1")
+		.trim();
+}

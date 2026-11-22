@@ -4,8 +4,10 @@
  * 与 rehype-component-download.mjs（正文 ::download 指令）共用，
  * 避免样式在多处渲染路径上漂移。
  *
- * 新版为「封面式」卡片（左封面 + 标题/元信息 + 右侧胶囊按钮），
- * 普通下载 / 加密下载 / 付费下载共用同一外壳，仅配色与文案区分。
+ * 版式：左封面（渐变角标压在封面左上角）+ 右侧标题/简介/元信息 + 底部
+ * 「价格或类型」与操作按钮，与资源站常见卡片一致：
+ *   - 免费 / 加密：底部左侧是资源类型，右侧是「立即下载」
+ *   - 付费：底部左侧是 ¥ 价格 + 「付费 / 密码」，右侧是渐变「获取或购买」
  *
  * 注意：Fuwari 使用 Tailwind v3，CSS 变量写法是 bg-[var(--primary)]，
  * 不能用 Tailwind v4 的 bg-(--primary) 简写。
@@ -13,46 +15,55 @@
 
 /* ===== 卡片外壳 ===== */
 
-/** 整行卡片容器 */
+/** 整张卡片 */
 export const dlCard =
-	"dl-card flex items-center gap-3 sm:gap-4 rounded-2xl px-3 py-3 sm:px-4 sm:py-3.5 " +
+	"dl-card flex items-stretch gap-3 sm:gap-4 rounded-2xl p-2.5 sm:p-3.5 " +
 	"bg-[var(--card-bg)] border border-[var(--line-divider)] shadow-sm " +
 	"hover:border-[var(--primary-border-soft)] hover:shadow-md transition-all duration-200";
 
-/** 左侧封面容器 */
+/** 左侧封面容器（桌面更高，接近 4:3） */
 export const dlCoverWrap =
-	"dl-cover-wrap relative shrink-0 w-[88px] h-[64px] sm:w-[108px] sm:h-[76px] " +
+	"dl-cover-wrap relative shrink-0 w-[94px] h-[94px] sm:w-[168px] sm:h-[118px] " +
 	"rounded-xl overflow-hidden bg-[var(--btn-regular-bg)]";
 
 /** 封面图 */
 export const dlCover = "dl-cover w-full h-full object-cover";
 
-/** 封面左上角标签（通用） */
+/** 封面左上角标签：贴角形状（左下 + 右上圆角），像贴在封面上的色带 */
 export const dlCoverTag =
-	"dl-cover-tag absolute left-1 top-1 rounded-full px-2 py-[1px] " +
-	"text-[0.62rem] font-bold leading-tight shadow-sm";
+	"dl-cover-tag absolute left-0 top-0 z-10 px-2.5 py-1 " +
+	"rounded-br-xl rounded-tl-xl text-[0.68rem] font-bold leading-tight " +
+	"text-white shadow-sm whitespace-nowrap";
 
-/** 免费标签（绿） */
-export const dlTagFree = "bg-[#22c55e] text-white";
+/** 免费标签（绿色渐变） */
+export const dlTagFree =
+	"bg-gradient-to-br from-[#34d399] to-[#16a34a] text-white";
 
-/** 加密标签（主题色） */
-export const dlTagLock = "bg-[var(--primary)] text-white";
+/** 加密标签（靛蓝→紫渐变） */
+export const dlTagLock =
+	"bg-gradient-to-br from-[#818cf8] to-[#7c3aed] text-white";
 
-/** 付费标签（琥珀色，和普通卡片同风格，不突兀） */
-export const dlTagPay = "bg-[#f59e0b] text-white";
+/** 付费标签（橙→玫红渐变，和购买按钮同色系） */
+export const dlTagPay =
+	"bg-gradient-to-br from-[#ff8a5b] to-[#ff4d6d] text-white";
 
 /** 右侧信息列 */
-export const dlBody = "dl-body flex-1 min-w-0 flex flex-col gap-1";
+export const dlBody = "dl-body min-w-0 flex-1 flex flex-col";
 
 /** 资源名称 */
 export const dlTitle =
-	"dl-title text-[0.95rem] sm:text-[1rem] font-bold leading-tight " +
-	"text-black/90 dark:text-white/90 min-w-0";
+	"dl-title text-[0.9rem] sm:text-[1.05rem] font-bold leading-snug " +
+	"text-black/90 dark:text-white/90 line-clamp-2";
 
-/** 元信息行（网盘 / 提取码 / 大小） */
+/** 简介（手机端隐藏，避免卡片过高） */
+export const dlDesc =
+	"dl-desc mt-1 hidden sm:block truncate text-[0.76rem] leading-relaxed " +
+	"text-black/40 dark:text-white/40";
+
+/** 元信息行（网盘 / 提取码 / 需密码 / 大小） */
 export const dlMetaRow =
-	"dl-meta-row flex flex-wrap items-center gap-x-3 gap-y-1 " +
-	"text-[0.75rem] leading-none text-black/50 dark:text-white/50";
+	"dl-meta-row mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 " +
+	"text-[0.73rem] leading-none text-black/45 dark:text-white/45";
 
 /** 网盘小圆点 */
 export const dlNdDot =
@@ -63,36 +74,55 @@ export const dlNdImg = "dl-nd-img w-3.5 h-3.5 rounded object-contain shrink-0";
 
 /** 提取码胶囊（可点击复制） */
 export const dlCodeChip =
-	"dl-code inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 " +
+	"dl-code inline-flex items-center gap-1 rounded-md px-2 py-1 " +
 	"text-[0.72rem] text-[var(--primary)] bg-[var(--primary-soft)] " +
 	"cursor-pointer select-none hover:bg-[var(--primary-soft-hover)] transition-colors";
 
-/** 底部信息行（资源类型 + 简介） */
+/** 底部行：左侧价格/类型 + 右侧按钮 */
 export const dlFoot =
-	"dl-foot flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.72rem] leading-none";
+	"dl-foot mt-auto pt-2.5 flex items-end justify-between gap-2";
+
+/** 价格行 */
+export const dlPriceRow = "dl-price-row flex items-baseline gap-1.5 min-w-0";
+
+/** 价格数字 */
+export const dlPrice =
+	"dl-price text-[1.2rem] sm:text-[1.45rem] font-extrabold leading-none " +
+	"text-[#f5482f] dark:text-[#ff6b52] tracking-tight";
+
+/** 价格后缀（付费 / 密码） */
+export const dlPriceLabel =
+	"dl-price-label hidden sm:inline text-[0.72rem] text-black/40 dark:text-white/40 truncate";
 
 /** 免费资源（绿） */
-export const dlFootFree = "dl-foot-free font-semibold text-[#22c55e]";
+export const dlFootFree = "dl-foot-free font-semibold text-[#16a34a] dark:text-[#4ade80]";
 
-/** 加密资源（主题色） */
-export const dlFootLock = "dl-foot-lock font-semibold text-[var(--primary)]";
+/** 加密资源（靛蓝） */
+export const dlFootLock = "dl-foot-lock font-semibold text-[#7c3aed] dark:text-[#a78bfa]";
 
-/** 付费资源（琥珀色） */
-export const dlFootPay =
-	"dl-foot-pay font-semibold text-[#d97706] dark:text-[#fbbf24]";
-
-/** 简介 / 大小 */
-export const dlFootDesc =
-	"dl-foot-desc min-w-0 flex-1 truncate text-black/45 dark:text-white/45";
+/** 类型文案的通用字号 */
+export const dlFootKind = "dl-foot-kind inline-flex items-center gap-1 text-[0.75rem]";
 
 /** 右侧操作区 */
 export const dlAction = "dl-action shrink-0";
 
-/** 立即下载按钮（主题色胶囊） */
+/** 立即下载 / 解锁下载按钮（主题色胶囊） */
 export const dlNowBtn =
 	"dl-now inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
-	"text-[0.85rem] sm:text-[0.9rem] font-semibold text-white bg-[var(--primary)] shadow-sm " +
+	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white bg-[var(--primary)] shadow-sm " +
 	"hover:brightness-110 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
+
+/** 付费购买按钮（橙色渐变胶囊，与价格同色系）
+ *
+ * 注意必须带 `no-styling`：正文容器 `.custom-md a:not(.no-styling)` 会把
+ * 链接的 background-image 重置为 none，渐变会被吃掉，按钮变成白底白字。
+ */
+export const dlBuyBtn =
+	"dl-buy no-styling inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
+	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white " +
+	"bg-gradient-to-r from-[#ff9f43] to-[#ff5533] " +
+	"shadow-[0_6px_16px_-8px_rgba(255,85,51,0.9)] " +
+	"hover:brightness-105 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
 
 /* ===== 右栏紧凑卡片（与正文卡同一套视觉语言，只是宽度只有 264px） ===== */
 
@@ -110,8 +140,8 @@ export const dlMiniCoverWrap =
 
 /** 紧凑封面上的角标 */
 export const dlMiniCoverTag =
-	"dl-cover-tag absolute left-0.5 top-0.5 rounded px-1 py-[1px] " +
-	"text-[0.5rem] font-bold leading-tight shadow-sm";
+	"dl-cover-tag absolute left-0 top-0 z-10 rounded-br-md rounded-tl-md px-1 py-[1px] " +
+	"text-[0.5rem] font-bold leading-tight text-white shadow-sm";
 
 /** 紧凑信息列 */
 export const dlMiniBody = "dl-mini-body min-w-0 flex-1 flex flex-col gap-0.5";
@@ -142,20 +172,3 @@ export const dlMiniBtn =
 	"px-2.5 py-1.5 text-[0.7rem] font-semibold text-white bg-[var(--primary)] " +
 	"hover:brightness-110 active:scale-[0.95] transition-all cursor-pointer " +
 	"select-none whitespace-nowrap";
-
-/* ===== 付费卡片（复用同一外壳，仅角标/价格区分） ===== */
-
-export const dlPayBadge =
-	"dl-pay-badge shrink-0 grid place-items-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl " +
-	"bg-[#f59e0b] text-white shadow-sm";
-
-export const dlPayLock =
-	"dl-pay-lock inline-flex items-center gap-0.5 rounded-md " +
-	"bg-[#f59e0b]/15 px-1.5 py-0.5 text-[0.65rem] font-bold " +
-	"text-[#b45309] dark:text-[#fbbf24] border border-[#f59e0b]/30 shrink-0 align-middle";
-
-export const dlPayBtn =
-	"dl-pay-btn inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
-	"text-[0.85rem] sm:text-[0.9rem] font-bold text-white " +
-	"bg-[var(--primary)] shadow-sm hover:brightness-110 active:scale-[0.97] " +
-	"transition-all cursor-pointer select-none whitespace-nowrap";

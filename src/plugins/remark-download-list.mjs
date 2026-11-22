@@ -1,6 +1,9 @@
 import { visit } from "unist-util-visit";
 import { dlAnchorId } from "../utils/download-anchor.ts";
-import { resolveDownloadCover } from "../utils/download-utils.ts";
+import {
+	resolveDownloadCover,
+	stripMdEmphasis,
+} from "../utils/download-utils.ts";
 import { resolveNetdisk } from "../utils/netdisk.ts";
 
 /**
@@ -52,10 +55,12 @@ export function remarkDownloadList() {
 			if (!isPay && !url) return;
 
 			const rawName = str("name") || str("title") || str("source");
-			const name = rawName || (isPay ? "付费资源" : "下载资源");
+			// 与正文卡片一致：标题按纯文本渲染，剥掉手写的 ** 粗体符号
+			const name =
+				stripMdEmphasis(rawName) || (isPay ? "付费资源" : "下载资源");
 			const size = str("size");
 			const price = str("price");
-			const desc = str("desc") || str("source");
+			const desc = stripMdEmphasis(str("desc") || str("source"));
 			const icon = str("icon");
 			const cover = str("cover");
 			const tag = str("tag");

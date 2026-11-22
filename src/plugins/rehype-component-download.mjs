@@ -4,22 +4,24 @@ import { i18n } from "../i18n/translation.ts";
 import {
 	dlAction,
 	dlBody,
+	dlBuyBtn,
 	dlCard,
 	dlCodeChip,
 	dlCover,
 	dlCoverTag,
 	dlCoverWrap,
+	dlDesc,
 	dlFoot,
-	dlFootDesc,
 	dlFootFree,
+	dlFootKind,
 	dlFootLock,
-	dlFootPay,
 	dlMetaRow,
 	dlNdDot,
 	dlNdImg,
 	dlNowBtn,
-	dlPayBtn,
-	dlPayLock,
+	dlPrice,
+	dlPriceLabel,
+	dlPriceRow,
 	dlTagFree,
 	dlTagLock,
 	dlTagPay,
@@ -30,6 +32,7 @@ import {
 	encryptDownloadUrl,
 	hashDownloadPassword,
 	resolveDownloadCover,
+	stripMdEmphasis,
 } from "../utils/download-utils.ts";
 import { dlAnchorId } from "../utils/download-anchor.ts";
 import { resolveNetdisk } from "../utils/netdisk.ts";
@@ -50,6 +53,8 @@ const ICON_PATHS = {
 const LABEL_FREE = "免费";
 const LABEL_FREE_RES = "免费资源";
 const LABEL_LOCK_RES = "加密资源";
+const LABEL_PAY_RES = "付费资源";
+const LABEL_NEED_PASSWORD = "需访问密码";
 
 function svgIcon(name, size = 20) {
 	return h(
@@ -111,10 +116,20 @@ function netdiskInline(nd) {
 }
 
 /**
- * 卡片外壳：左封面（带角标）+ 右侧标题/元信息/底部信息 + 最右操作按钮。
+ * 卡片外壳：左封面（角标压左上角）+ 右侧标题 / 简介 / 元信息 + 底部「价格或类型 + 按钮」。
  * 普通 / 加密 / 付费三种卡片共用，仅传入内容与配色不同。
  */
-function renderShell({ id, cover, tagText, tagClass, name, meta, foot, action }) {
+function renderShell({
+	id,
+	cover,
+	tagText,
+	tagClass,
+	name,
+	desc,
+	meta,
+	footLeft,
+	action,
+}) {
 	// 显式写 id 属性，而不是 "div#id" 选择器：锚点里可能含中文，
 	// hastscript 的 CSS 选择器解析只认 ASCII，中文会解析失败。
 	return h("div", { id, class: "not-prose my-4 scroll-mt-24" }, [
@@ -126,13 +141,14 @@ function renderShell({ id, cover, tagText, tagClass, name, meta, foot, action })
 					: null,
 			]),
 			h("div", { class: dlBody }, [
-				h("div", { class: dlTitle }, [
-					h("span", { class: "truncate block" }, [name]),
-				]),
+				h("div", { class: dlTitle, title: name }, [name]),
+				desc ? h("div", { class: dlDesc, title: desc }, [desc]) : null,
 				meta && meta.length ? h("div", { class: dlMetaRow }, meta) : null,
-				foot && foot.length ? h("div", { class: dlFoot }, foot) : null,
+				h("div", { class: dlFoot }, [
+					h("div", { class: "min-w-0" }, [footLeft]),
+					h("div", { class: dlAction }, [action]),
+				]),
 			]),
-			h("div", { class: dlAction }, [action]),
 		]),
 	]);
 }
@@ -173,13 +189,14 @@ function normalizeItem(props) {
 		asString(props.name).trim() ||
 		asString(props.title).trim() ||
 		asString(props.source).trim();
-	const name = rawName || i18n(I18nKey.downloadAction);
+	// 卡片标题按纯文本渲染，剥掉作者手写的 ** 粗体符号
+	const name = stripMdEmphasis(rawName) || i18n(I18nKey.downloadAction);
 
 	return {
 		name,
 		rawName,
 		url,
-		desc: desc || source,
+		desc: stripMdEmphasis(desc || source),
 		size,
 		code,
 		hint,
@@ -208,52 +225,71 @@ function renderPayCard(props) {
 		);
 	}
 
-	const name =
-		asString(props.title).trim() ||
+	const rawName =
 		asString(props.name).trim() ||
-		"付费资源";
-	const desc = asString(props.desc).trim() || asString(props.source).trim();
+		asString(props.title).trim() ||
+		asString(props.source).trim();
+	const name = stripMdEmphasis(rawName) || LABEL_PAY_RES;
+	const desc = stripMdEmphasis(
+		asString(props.desc).trim() || asString(props.source).trim(),
+	);
 	const size = asString(props.size).trim();
 	const price = asString(props.price).trim();
 	const cover = resolveCover(asString(props.cover).trim());
-	const buyText =
-		asString(props.buyText).trim() ||
-		(price ? `立即购买 · ¥${price}` : "立即购买");
-
-	const id = dlAnchorId(
-		asString(props.name).trim() ||
-			asString(props.title).trim() ||
-			asString(props.source).trim(),
+	const buyText = asString(props.buyText).trim() || "获取或购买";
+	// 付费 / 加密双模式：只判断「有没有设密码」，密码本身绝不输出
+	const hasPassword = Boolean(
+		asString(props.password).trim() || asString(props.hint).trim(),
 	);
 
-	const meta = [h("span", { class: dlPayLock }, [svgIcon("lock", 12), "付费资源"])];
+	const id = dlAnchorId(rawName);
+
+	/* 元信息行：网盘（可选）· 需访问密码 · 大小 */
+	const meta = [];
+	const ndEl = netdiskInline(resolveNetdisk(asString(props.icon).trim(), ""));
+	if (ndEl) meta.push(ndEl);
+	if (hasPassword) {
+		meta.push(
+			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
+				svgIcon("lock", 12),
+				LABEL_NEED_PASSWORD,
+			]),
+		);
+	}
 	if (size) meta.push(h("span", { class: "shrink-0" }, [size]));
 
-	const foot = [h("span", { class: dlFootPay }, ["付费资源"])];
-	if (desc) {
-		foot.push(h("span", { class: dlFootDesc, title: desc }, [desc]));
-	}
+	/* 底部左侧：价格 + 「付费 / 密码」 */
+	const footLeft = h("div", { class: dlPriceRow }, [
+		price ? h("span", { class: dlPrice }, [`¥${price}`]) : null,
+		h("span", { class: dlPriceLabel }, [
+			hasPassword ? "付费 / 密码" : LABEL_PAY_RES,
+		]),
+	]);
 
 	const action = h(
 		"a",
 		{
-			class: dlPayBtn,
+			class: dlBuyBtn,
 			href: buy,
 			target: "_blank",
 			rel: "noopener noreferrer",
+			// .prose a 会把正文链接染色并加下划线（权重高于 text-white），
+			// 这里用内联样式压住，保证渐变按钮上是白字
+			style: "color:#fff;text-decoration:none",
 			"data-dl-pay": asString(props.pay).trim() || "1",
 		},
-		[svgIcon("arrow", 16), h("span", {}, [buyText])],
+		[svgIcon("download", 15), h("span", {}, [buyText])],
 	);
 
 	return renderShell({
 		id,
 		cover,
-		tagText: "付费",
+		tagText: hasPassword ? "付费/加密" : "付费",
 		tagClass: dlTagPay,
 		name,
+		desc,
 		meta,
-		foot,
+		footLeft,
 		action,
 	});
 }
@@ -306,16 +342,19 @@ export function DownloadComponent(props, children) {
 		);
 	}
 	if (item.size) meta.push(h("span", { class: "shrink-0" }, [item.size]));
-
-	/* 底部行：资源类型（免费/加密）+ 简介 */
-	const foot = [
-		h("span", { class: lock ? dlFootLock : dlFootFree }, [
-			lock ? LABEL_LOCK_RES : LABEL_FREE_RES,
-		]),
-	];
-	if (item.desc) {
-		foot.push(h("span", { class: dlFootDesc, title: item.desc }, [item.desc]));
+	if (lock) {
+		meta.push(
+			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
+				svgIcon("lock", 12),
+				LABEL_NEED_PASSWORD,
+			]),
+		);
 	}
+
+	/* 底部左侧：资源类型（免费 / 加密 / 付费） */
+	const footLeft = h("span", { class: `${dlFootKind} ${lock ? dlFootLock : dlFootFree}` }, [
+		lock ? LABEL_LOCK_RES : LABEL_FREE_RES,
+	]);
 
 	/* 右侧：立即下载（加密时点击弹出密码框，由 DownloadSupport 接管） */
 	const action = h(
@@ -349,8 +388,9 @@ export function DownloadComponent(props, children) {
 		tagText,
 		tagClass,
 		name: item.name,
+		desc: item.desc,
 		meta,
-		foot,
+		footLeft,
 		action,
 	});
 }
