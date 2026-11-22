@@ -1,8 +1,11 @@
 ---
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
+import NavMenuPanel from "@components/widget/NavMenuPanel.astro";
 import Layout from "@layouts/Layout.astro";
-import { siteConfig } from "../config";
+import { navBarConfig, siteConfig } from "../config";
+import { LinkPresets } from "../constants/link-presets";
+import { LinkPreset, type NavBarLink } from "../types/config";
 
 /**
  * 资源站三栏外壳（首页 / 归档 / 分类 / 关于 / 友链 / 文章页共用）
@@ -36,6 +39,23 @@ const {
 
 const hasLeft = Astro.slots.has("left");
 const hasRight = Astro.slots.has("right");
+
+/**
+ * 移动端抽屉需要的导航链接（与 Navbar 桌面端同源）。
+ *
+ * 注意：抽屉面板 NavMenuPanel 不只是「一块 UI」——它同时注册了
+ * window.openNavMenu / closeNavMenu。Navbar 的汉堡按钮点击时调用的正是
+ * window.openNavMenu，所以这个组件**必须**在本布局里渲染，
+ * 否则移动端菜单按钮点了没有任何反应。
+ */
+let links: NavBarLink[] = navBarConfig.links.map(
+	(item: NavBarLink | LinkPreset): NavBarLink => {
+		if (typeof item === "number") {
+			return LinkPresets[item];
+		}
+		return item;
+	},
+);
 ---
 <Layout
     title={title || siteConfig.title}
@@ -93,4 +113,7 @@ const hasRight = Astro.slots.has("right");
     <div class="mx-auto w-full max-w-[var(--page-width)] px-4 pb-6">
         <Footer />
     </div>
+
+    <!-- 移动端抽屉：同时注册 window.openNavMenu / closeNavMenu，供 Navbar 汉堡按钮调用 -->
+    <NavMenuPanel links={links} />
 </Layout>
