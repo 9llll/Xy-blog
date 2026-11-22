@@ -15,7 +15,7 @@ keywords:
 author: 羡鱼
 series: 指令
 seriesOrder: 0
-ogImage: https://www.3x3.top/images/fenxiang.avif
+ogImage: https://x.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
@@ -92,7 +92,7 @@ comment: true
 
 ::download{title="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
 
-::download{title="自定义图片图标" icon="https://www.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
+::download{title="自定义图片图标" icon="https://x.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
 
 ## 付费下载（卡密 / 发卡平台）
 

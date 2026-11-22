@@ -14,7 +14,7 @@ image: images/hong/hong.avif
 author: 羡鱼
 series: 单机游戏
 seriesOrder: 0
-ogImage: https://www.3x3.top/images/fenxiang.avif
+ogImage: https://x.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true

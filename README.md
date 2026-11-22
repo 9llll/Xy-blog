@@ -1,6 +1,6 @@
 # Xy-Blog
 
-基于 [Fuwari](https://github.com/saicaca/fuwari) 深度魔改的静态博客，站点为 **羡鱼资源**（<https://www.3x3.top>）。
+基于 [Fuwari](https://github.com/saicaca/fuwari) 深度魔改的静态博客，站点为 **羡鱼资源**（<https://x.3x3.top>）。
 
 在原版基础上补齐了中文博客常用但 Fuwari 缺失的能力：分类体系、下载按钮、文章引用卡片、链接按钮、视频播放器、随机封面等，并针对中文排版做了若干适配。
 
@@ -296,7 +296,7 @@ src/
 ## 📄 说明
 
 - 上游项目：[saicaca/fuwari](https://github.com/saicaca/fuwari)
-- 生产站点部署在 Cloudflare：<https://www.3x3.top>
+- 生产站点部署在 Cloudflare：<https://x.3x3.top>
 - 许可协议：见 [LICENSE](./LICENSE)
 
 部分代码由 AI 辅助构建。

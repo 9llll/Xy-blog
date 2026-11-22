@@ -15,7 +15,7 @@ image: images/wj345/wuji4.avif
 author: 羡鱼
 series: 回合制
 seriesOrder: 0
-ogImage: https://www.3x3.top/images/fenxiang.avif
+ogImage: https://x.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
