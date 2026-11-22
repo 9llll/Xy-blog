@@ -8,13 +8,29 @@ import ResourceLayout from "@layouts/ResourceLayout.astro";
 import { getSortedPostsList } from "../utils/content-utils";
 
 const sortedPostsList = await getSortedPostsList();
+
+/**
+ * 筛选条件在服务端解析后作为 props 传入，组件内不再读 window。
+ * 这样归档页可以用 client:load：首屏 HTML 自带完整列表（对爬虫可见），
+ * 之前用 client:only 时源码里一个字都没有。
+ */
+const searchParams = Astro.url.searchParams;
+const filterTags = searchParams.getAll("tag");
+const filterCategories = searchParams.getAll("category");
+const onlyUncategorized = searchParams.has("uncategorized");
 ---
 
 <ResourceLayout title={i18n(I18nKey.archive)}>
     <BoardNav slot="left" />
 
     <div class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
-        <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
+        <ArchivePanel
+            sortedPosts={sortedPostsList}
+            filterTags={filterTags}
+            filterCategories={filterCategories}
+            onlyUncategorized={onlyUncategorized}
+            client:load
+        ></ArchivePanel>
     </div>
 
     <SiteAside slot="right" />

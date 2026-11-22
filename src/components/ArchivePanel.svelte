@@ -5,14 +5,13 @@ import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
 
-export let tags: string[];
-export let categories: string[];
+/* 筛选条件由 archive.astro 从服务端 URL 传入。
+   组件内不再读 window——原来在模块顶层调用 new URLSearchParams(window.location.search)，
+   导致它只能 client:only 渲染，归档页对爬虫是一片空白。 */
+export let filterTags: string[] = [];
+export let filterCategories: string[] = [];
+export let onlyUncategorized = false;
 export let sortedPosts: Post[] = [];
-
-const params = new URLSearchParams(window.location.search);
-tags = params.has("tag") ? params.getAll("tag") : [];
-categories = params.has("category") ? params.getAll("category") : [];
-const uncategorized = params.get("uncategorized");
 
 interface Post {
 	slug: string;
@@ -29,20 +28,24 @@ interface Group {
 	posts: Post[];
 }
 
-let groups: Group[] = [];
-
-function getTitle(): string {
-	if (uncategorized) {
+/**
+ * 标题必须写成响应式派生值（`$:`），不能在模板里调函数。
+ * Svelte 编译器只追踪模板中直接引用的顶层变量，
+ * 函数内部读到的 activeTags / activeCategories 不在依赖图里，
+ * 结果就是筛选列表变了、标题还停在「归档」。
+ */
+$: panelTitle = (() => {
+	if (activeUncategorized) {
 		return i18n(I18nKey.uncategorized);
 	}
-	if (categories.length > 0) {
-		return categories.join(", ");
+	if (activeCategories.length > 0) {
+		return activeCategories.join(", ");
 	}
-	if (tags.length > 0) {
-		return tags.map(tag => `#${tag}`).join(" ");
+	if (activeTags.length > 0) {
+		return activeTags.map((tag) => `#${tag}`).join(" ");
 	}
 	return i18n(I18nKey.archive);
-}
+})();
 
 function formatDate(date: Date) {
 	const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -54,32 +57,44 @@ function formatTag(tagList: string[]) {
 	return tagList.map((t) => `#${t}`).join(" ");
 }
 
-onMount(async () => {
-	let filteredPosts: Post[] = sortedPosts;
+/**
+ * 筛选 + 按年份分组。
+ * 纯同步函数并在模块顶层直接调用一次：Svelte 服务端渲染会执行顶层代码，
+ * 于是 <ArchivePanel client:load /> 的首屏 HTML 里就有完整列表，
+ * 爬虫与「禁用 JS」的访客都能看到归档内容。
+ */
+function buildGroups(
+	posts: Post[],
+	tagList: string[],
+	categoryList: string[],
+	uncategorizedOnly: boolean,
+): Group[] {
+	let filteredPosts: Post[] = posts;
 
-	if (tags.length > 0) {
+	if (tagList.length > 0) {
 		filteredPosts = filteredPosts.filter(
 			(post) =>
 				Array.isArray(post.data.tags) &&
-				post.data.tags.some((tag) => tags.includes(tag)),
+				post.data.tags.some((tag) => tagList.includes(tag)),
 		);
 	}
 
-	if (categories.length > 0) {
+	if (categoryList.length > 0) {
 		filteredPosts = filteredPosts.filter(
-			(post) => 
-            Array.isArray(post.data.category) &&
-            post.data.category.some((cat) => categories.includes(cat))
+			(post) =>
+				Array.isArray(post.data.category) &&
+				post.data.category.some((cat) => categoryList.includes(cat)),
 		);
 	}
 
-	if (uncategorized) {
+	if (uncategorizedOnly) {
 		filteredPosts = filteredPosts.filter((post) => !post.data.category);
 	}
 
 	const grouped = filteredPosts.reduce(
 		(acc, post) => {
-			const year = post.data.published.getFullYear();
+			// props 经过序列化后可能是字符串，统一用 Date 包一层
+			const year = new Date(post.data.published).getFullYear();
 			if (!acc[year]) {
 				acc[year] = [];
 			}
@@ -95,14 +110,36 @@ onMount(async () => {
 	}));
 
 	groupedPostsArray.sort((a, b) => b.year - a.year);
+	return groupedPostsArray;
+}
 
-	groups = groupedPostsArray;
+/* 生效中的筛选条件。
+   初始取 props（将来切成 SSR 时有效）；静态部署下 props 恒为空，
+   由 onMount 从真实 URL 补齐。两者共用同一份状态，
+   保证「SSR 首屏是全量列表」与「带参访问能正确筛选」同时成立。 */
+let activeTags: string[] = filterTags;
+let activeCategories: string[] = filterCategories;
+let activeUncategorized: boolean = onlyUncategorized;
+
+let groups: Group[] = [];
+$: groups = buildGroups(sortedPosts, activeTags, activeCategories, activeUncategorized);
+
+onMount(() => {
+	const params = new URLSearchParams(window.location.search);
+	const tags = params.getAll("tag");
+	const categories = params.getAll("category");
+	const uncategorized = params.has("uncategorized");
+	if (tags.length || categories.length || uncategorized) {
+		activeTags = tags;
+		activeCategories = categories;
+		activeUncategorized = uncategorized;
+	}
 });
 </script>
 
 <div class="card-base px-8 py-6">
 	<div class="mb-6">
-		<h1 class="text-2xl font-bold text-75">{getTitle()}</h1>
+		<h1 class="text-2xl font-bold text-75">{panelTitle}</h1>
 	</div>
 	
     {#each groups as group}

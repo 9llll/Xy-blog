@@ -49,12 +49,54 @@ banner = siteConfig.banner.src;
 
 const enableBanner = siteConfig.banner.enable;
 
+/**
+ * 标题：页面标题与站点名相同时不再重复拼接。
+ * 首页曾传入 title=站点名，结果输出「羡鱼资源 - 羡鱼资源」。
+ */
+const siteTitle = siteConfig.title;
+const trimmedTitle = title?.trim();
 let pageTitle: string;
-if (title) {
-	pageTitle = `${title} - ${siteConfig.title}`;
+if (trimmedTitle && trimmedTitle !== siteTitle) {
+	pageTitle = `${trimmedTitle} - ${siteTitle}`;
 } else {
-	pageTitle = `${siteConfig.title}`;
+	pageTitle = siteTitle;
 }
+
+/**
+ * canonical：去掉 query 与 hash，路径统一带尾斜杠。
+ * 归档 / 搜索 / 标签筛选都是 `?tag=` 参数页，内容与 /archive/ 高度重复，
+ * 没有 canonical 会被搜索引擎当成多份重复页面。
+ */
+const canonicalHref = (() => {
+	const path = Astro.url.pathname.replace(/\/+$/, "");
+	const origin = Astro.site?.href ?? Astro.url.origin;
+	return new URL(path ? `${path}/` : "/", origin).href;
+})();
+
+/** 站点级结构化数据（仅首页输出一次）：站名 + 站内搜索入口 */
+const siteJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "WebSite",
+	name: siteTitle,
+	url: Astro.site?.href ?? Astro.url.origin,
+	description: siteConfig.description,
+	publisher: {
+		"@type": "Organization",
+		name: siteTitle,
+		logo: {
+			"@type": "ImageObject",
+			url: new URL("/favicon.ico", Astro.site ?? Astro.url).href,
+		},
+	},
+	potentialAction: {
+		"@type": "SearchAction",
+		target: {
+			"@type": "EntryPoint",
+			urlTemplate: `${new URL("/search/", Astro.site ?? Astro.url).href}?q={search_term_string}`,
+		},
+		"query-input": "required name=search_term_string",
+	},
+};
 
 const favicons: Favicon[] =
 	siteConfig.favicon.length > 0 ? siteConfig.favicon : defaultFavicons;
@@ -81,6 +123,11 @@ const bannerOffset =
 	<head>
 
 		<title>{pageTitle}</title>
+		<link rel="canonical" href={canonicalHref} />
+
+		{isHomePage && (
+			<script is:inline type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
+		)}
 
 		<meta charset="UTF-8" />
 		<meta name="keywords" content={keywords || pageTitle}>
@@ -88,7 +135,7 @@ const bannerOffset =
 		<meta name="author" content={profileConfig.name}>
 
 		<meta property="og:site_name" content={siteConfig.title}>
-		<meta property="og:url" content={Astro.url}>
+		<meta property="og:url" content={canonicalHref}>
 		<meta property="og:title" content={pageTitle}>
 		<meta property="og:description" content={description || pageTitle}>
 		{setOGTypeArticle ? (
@@ -159,7 +206,17 @@ const bannerOffset =
 	<body class=" min-h-screen transition outline-none" class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
 	>
+		{/*
+			原自定义字体 Maple UI 已停用：maple-ui.ttf 19.6 MB + maple-ui-bold.ttf 14.8 MB，
+			是全量 TTF（非子集），挂在根元素上会导致首屏强制下载一个 34 MB 的字体文件
+			（线上实测 60 秒仅下载 800 KB），长时间占用连接、挤占图片与 CSS 带宽。
+			字体加载不完时浏览器用 font-display: swap 回落到系统字体，所以访客实际看到的
+			本来就是系统字体——停用后视觉几乎无变化，但省掉 34 MB 请求。
+			恢复方式：取消下面两段 @font-face 的注释，并把 tailwind.config.cjs 里
+			fontFamily.sans 的 "Maple UI" 加回首位。
+		*/}
 		<style is:global>
+			/*
 			@font-face {
 				font-family: "Maple UI";
 				src: url("/fonts/maple-ui.ttf") format("truetype");
@@ -175,6 +232,7 @@ const bannerOffset =
 				font-style: normal;
 				font-display: swap;
 			}
+			*/
 		</style>
 		<ConfigCarrier></ConfigCarrier>
 		<slot />

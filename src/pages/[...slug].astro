@@ -61,6 +61,9 @@ if (seriesName) {
 	if (idx >= 0 && idx < siblings.length - 1) seriesNext = siblings[idx + 1];
 }
 
+const postUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+const siteUrl = (Astro.site ?? Astro.url).href;
+
 const jsonLd = {
 	"@context": "https://schema.org",
 	"@type": "BlogPosting",
@@ -72,11 +75,35 @@ const jsonLd = {
 		name: entry.data.author?.trim() || profileConfig.name,
 		url: Astro.site,
 	},
+	/* publisher 缺失时无法进入富媒体结果，必须带 logo */
+	publisher: {
+		"@type": "Organization",
+		name: siteConfig.title,
+		logo: {
+			"@type": "ImageObject",
+			url: new URL("/favicon.ico", siteUrl).href,
+		},
+	},
+	mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
 	datePublished: formatDateToYYYYMMDD(entry.data.published),
+	...(entry.data.updated
+		? { dateModified: formatDateToYYYYMMDD(entry.data.updated) }
+		: {}),
+	...(categoryName ? { articleSection: categoryName } : {}),
 	inLanguage: entry.data.lang
 		? entry.data.lang.replace("_", "-")
 		: siteConfig.lang.replace("_", "-"),
 	...(ogImageFinal ? { image: ogImageFinal } : {}),
+};
+
+/* 面包屑：让搜索结果展示「x.3x3.top › 文章标题」的层级路径 */
+const breadcrumbJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{ "@type": "ListItem", position: 1, name: "首页", item: siteUrl },
+		{ "@type": "ListItem", position: 2, name: entry.data.title, item: postUrl },
+	],
 };
 ---
 <ResourceLayout
@@ -87,7 +114,16 @@ const jsonLd = {
     setOGTypeArticle={true}
     ogImage={ogImageFinal}
 >
-    <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    <Fragment slot="head">
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
+        <meta property="article:published_time" content={new Date(entry.data.published).toISOString()} />
+        {entry.data.updated && (
+            <meta property="article:modified_time" content={new Date(entry.data.updated).toISOString()} />
+        )}
+        {categoryName && <meta property="article:section" content={categoryName} />}
+        {entry.data.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
+    </Fragment>
 
     <!--
       左栏：有层级标题时显示文章目录；没有小标题的文章改显示「文章分类」。

@@ -97,7 +97,10 @@ export default defineConfig({
 			},
 		}),
 		svelte(),
-		sitemap(),
+		sitemap({
+			// 404 页不应出现在站点地图里
+			filter: (page) => !page.includes("/404"),
+		}),
 	],
 
 	// 全站图片统一输出 AVIF 格式（覆盖 Astro 默认的 WebP）
