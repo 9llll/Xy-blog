@@ -5,7 +5,6 @@ import Markdown from "@components/misc/Markdown.astro";
 import PostBadge from "@components/PostBadge.astro";
 import PostMetadata from "@components/PostMeta.astro";
 import BoardNav from "@components/resource/BoardNav.astro";
-import DownloadHero from "@components/resource/DownloadHero.astro";
 import DownloadSidebar from "@components/resource/DownloadSidebar.astro";
 import LatestList from "@components/resource/LatestList.astro";
 import UserCard from "@components/resource/UserCard.astro";
@@ -185,9 +184,8 @@ const jsonLd = {
                 <div class="mb-5 border-b border-dashed border-[var(--line-divider)]"></div>
             </div>
 
-            <!-- 资源总览卡：含下载指令的文章才会出现 -->
-            {hasDownloads && <DownloadHero downloads={downloads} />}
-
+            <!-- 下载卡片直接出现在正文里，右栏另有一份同款可操作卡片；
+                 顶部的「资源下载 N 个」总览卡已移除，避免与正文卡片重复。 -->
             <Markdown class="markdown-content">
                 <Content />
             </Markdown>
