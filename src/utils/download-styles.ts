@@ -73,16 +73,16 @@ export const dlNdImg = "dl-nd-img w-3.5 h-3.5 rounded object-contain shrink-0";
 
 /** 提取码胶囊（放在下载按钮左边，点击即复制）
  *
- * 用琥珀色而不是主题色：紧挨着红色下载按钮时，同色系会糊成一片，
+ * 外形对齐站内标签：小圆角实心色块 + 白字，不用浅底描边。
+ * 用深琥珀而不是主题色：紧挨着红色下载按钮时，同色系会糊成一片，
  * 用户最容易漏看的就是这一块，必须靠对比度把它顶出来。
  */
 export const dlCodeChip =
-	"dl-code inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-2 " +
+	"dl-code inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 " +
 	"text-[0.76rem] sm:text-[0.8rem] font-bold leading-none whitespace-nowrap " +
-	"text-[#9a3412] bg-[#ffedd5] border border-[#fdba74] " +
-	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
+	"text-white bg-[#b45309] dark:bg-[#c2670b] " +
 	"self-start sm:self-auto " +
-	"cursor-pointer select-none hover:brightness-95 active:scale-[0.97] transition-all";
+	"cursor-pointer select-none hover:brightness-110 active:scale-[0.97] transition-all";
 
 /** 底部行：左侧价格/类型 + 右侧「提取码 + 按钮」，窄屏自动换行 */
 export const dlFoot =
@@ -119,25 +119,23 @@ export const dlAction =
 	"dl-action flex w-full flex-col items-stretch gap-2 " +
 	"sm:ml-auto sm:w-auto sm:shrink-0 sm:flex-row sm:items-center";
 
-/** 立即下载 / 解锁下载按钮（红色渐变胶囊） */
+/** 立即下载 / 解锁下载按钮（实心红色小圆角标签） */
 export const dlNowBtn =
-	"dl-now inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
+	"dl-now inline-flex w-full items-center justify-center gap-1.5 rounded-md px-4 py-2.5 " +
 	"text-[0.82rem] sm:w-auto sm:text-[0.88rem] font-bold text-white " +
-	"bg-gradient-to-r from-[#ff5b4a] to-[#e01b32] " +
-	"shadow-[0_6px_16px_-8px_rgba(224,27,50,0.85)] " +
-	"hover:brightness-110 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
+	"bg-[#e01b32] hover:bg-[#c8152a] " +
+	"active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
 
-/** 付费购买按钮（橙色渐变胶囊，与价格同色系）
+/** 付费购买按钮（实心橙红小圆角标签，与价格同色系）
  *
  * 注意必须带 `no-styling`：正文容器 `.custom-md a:not(.no-styling)` 会把
- * 链接的 background-image 重置为 none，渐变会被吃掉，按钮变成白底白字。
+ * 链接的 background 重置，按钮会变成白底白字。
  */
 export const dlBuyBtn =
-	"dl-buy no-styling inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
+	"dl-buy no-styling inline-flex w-full items-center justify-center gap-1.5 rounded-md px-4 py-2.5 " +
 	"text-[0.82rem] sm:w-auto sm:text-[0.88rem] font-bold text-white " +
-	"bg-gradient-to-r from-[#ff9f43] to-[#ff5533] " +
-	"shadow-[0_6px_16px_-8px_rgba(255,85,51,0.9)] " +
-	"hover:brightness-105 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
+	"bg-[#f5482f] hover:bg-[#dd3a22] " +
+	"active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
 
 /* ===== 右栏紧凑卡片（与正文卡同一套视觉语言，只是宽度只有 264px） ===== */
 
@@ -183,10 +181,10 @@ export const dlMiniCode =
 	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
 	"cursor-pointer select-none hover:brightness-95 transition-all";
 
-/** 紧凑下载按钮（红色渐变，与正文卡同色） */
+/** 紧凑下载按钮（实心红，与正文卡同色） */
 export const dlMiniBtn =
-	"dl-now shrink-0 inline-flex items-center justify-center gap-1 rounded-full " +
-	"px-2.5 py-1.5 text-[0.7rem] font-semibold text-white " +
-	"bg-gradient-to-r from-[#ff5b4a] to-[#e01b32] " +
-	"hover:brightness-110 active:scale-[0.95] transition-all cursor-pointer " +
+	"dl-now shrink-0 inline-flex items-center justify-center gap-1 rounded-md " +
+	"px-2.5 py-1.5 text-[0.7rem] font-bold text-white " +
+	"bg-[#e01b32] hover:bg-[#c8152a] " +
+	"active:scale-[0.95] transition-all cursor-pointer " +
 	"select-none whitespace-nowrap";

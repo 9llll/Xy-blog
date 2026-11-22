@@ -3,7 +3,6 @@ import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
-import ButtonTag from "./control/ButtonTag.astro";
 
 interface Props {
 	class?: string;
@@ -50,18 +49,19 @@ const visibleTags = (tags || []).filter((t) => t && t.trim() !== "");
         </div>
     </div>
 
-    <!-- tags -->
+    <!-- tags：实心小圆角标签，与列表徽章同一套外形 -->
     {showTags && visibleTags.length > 0 && (
         <div class="flex items-center">
             <div class="flex flex-row flex-wrap items-center gap-1.5">
                 {visibleTags.map((tag) => (
-                    <ButtonTag
+                    <a
                         href={getTagUrl(tag)}
-                        label={`View all posts with the ${tag.trim()} tag`}
-                        class="text-xs"
+                        aria-label={`View all posts with the ${tag.trim()} tag`}
+                        class="inline-flex h-7 items-center rounded-md px-2.5 text-[0.78rem] font-bold text-white transition hover:brightness-110 active:scale-[0.97]"
+                        style="background:#0ea5e9"
                     >
                         {tag.trim()}
-                    </ButtonTag>
+                    </a>
                 ))}
             </div>
         </div>
