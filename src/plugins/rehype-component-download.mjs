@@ -369,7 +369,6 @@ export function DownloadComponent(props, children) {
 					title: `${i18n(I18nKey.downloadCode)}: ${item.code}`,
 				},
 				[
-					svgIcon("key", 13),
 					h("span", { "data-dl-code-text": true }, [
 						`${i18n(I18nKey.downloadCode)}：${item.code}`,
 					]),

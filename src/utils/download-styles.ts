@@ -73,14 +73,13 @@ export const dlNdImg = "dl-nd-img w-3.5 h-3.5 rounded object-contain shrink-0";
 
 /** 提取码胶囊（放在下载按钮左边，点击即复制）
  *
- * 外形对齐站内标签：小圆角实心色块 + 白字，不用浅底描边。
- * 用深琥珀而不是主题色：紧挨着红色下载按钮时，同色系会糊成一片，
- * 用户最容易漏看的就是这一块，必须靠对比度把它顶出来。
+ * 外形对齐站内标签：小圆角实心色块 + 白字，不用浅底描边、不带图标。
+ * 底色用天蓝，紧挨红色下载按钮时蓝红反差明显，不会被当成按钮的一部分。
  */
 export const dlCodeChip =
 	"dl-code inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-2 " +
 	"text-[0.76rem] sm:text-[0.8rem] font-bold leading-none whitespace-nowrap " +
-	"text-white bg-[#b45309] dark:bg-[#c2670b] " +
+	"text-white bg-[#0ea5e9] dark:bg-[#0284c7] " +
 	"self-start sm:self-auto " +
 	"cursor-pointer select-none hover:brightness-110 active:scale-[0.97] transition-all";
 
@@ -173,11 +172,11 @@ export const dlMiniMeta =
 export const dlMiniFoot =
 	"dl-mini-foot flex items-center justify-end gap-1.5 min-w-0";
 
-/** 紧凑提取码（可点击复制，深琥珀实心，与正文卡一致） */
+/** 紧凑提取码（可点击复制，天蓝实心，与正文卡一致） */
 export const dlMiniCode =
 	"dl-code inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 " +
 	"text-[0.66rem] font-bold leading-none whitespace-nowrap " +
-	"text-white bg-[#b45309] dark:bg-[#c2670b] " +
+	"text-white bg-[#0ea5e9] dark:bg-[#0284c7] " +
 	"cursor-pointer select-none hover:brightness-110 transition-all";
 
 /** 紧凑下载按钮（实心红，与正文卡同色） */
