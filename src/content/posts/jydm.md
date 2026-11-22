@@ -25,7 +25,7 @@ comment: true
 九鱼斗魔为 GEE 引擎打造的单职业传奇版本，内置智能假人系统，假人可自动上线、打怪、攻城，模拟真实玩家行为，单机体验也拥有充足游戏氛围。
 ```
 
-::download{name="【🔒加密资源】大话西游2单机一键端" url="https://pan.baidu.com/s/1VZ0vf7L_h5I_0OZbN28dqA" code="8888" icon="zip"}
+::download{name="大话西游2单机一键端" url="https://pan.baidu.com/s/1VZ0vf7L_h5I_0OZbN28dqA" code="8888"}
 
 ![版本截图三](images/jydm/jydm.avif)
 
