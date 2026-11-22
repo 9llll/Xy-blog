@@ -1,8 +1,9 @@
 {
   "title": "羡鱼资源",
-  "avatar": "assets/images/avatar.png",
+  "avatar": "/images/site/avatar1-2.avif",
   "name": "羡鱼",
   "bio": "夫唯不争\n故天下莫能与之争。",
+  "icp": "陕ICP备2025081382号",
   "links": [
     {
       "name": "Home",
@@ -24,6 +25,5 @@
       "icon": "fa6-brands:github",
       "url": "https://github.com/9llll"
     }
-  ],
-  "icp": "陕ICP备2025081382号"
+  ]
 }
