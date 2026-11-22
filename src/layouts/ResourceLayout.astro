@@ -1,0 +1,96 @@
+---
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import Layout from "@layouts/Layout.astro";
+import { siteConfig } from "../config";
+
+/**
+ * 资源站三栏外壳（首页 / 归档 / 分类 / 关于 / 友链 / 文章页共用）
+ *
+ * 左栏：分类导航或文章目录
+ * 中栏：页面主体
+ * 右栏：作者卡 / 快捷导航 / 热门标签 / 下载地址
+ *
+ * 与旧的 MainGridLayout 区别：不再有 Banner 叠加与大卡片浮层，
+ * 版式与首页完全一致，保证全站观感统一。
+ */
+interface Props {
+	title?: string;
+	description?: string;
+	keywords?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	ogImage?: string;
+	/** 左栏最大宽度：目录用窄一点，分类导航用默认 */
+	class?: string;
+}
+
+const {
+	title,
+	description,
+	keywords,
+	lang,
+	setOGTypeArticle,
+	ogImage,
+} = Astro.props;
+
+const hasLeft = Astro.slots.has("left");
+const hasRight = Astro.slots.has("right");
+---
+<Layout
+    title={title || siteConfig.title}
+    description={description || siteConfig.description}
+    keywords={keywords || siteConfig.keywords}
+    lang={lang}
+    setOGTypeArticle={setOGTypeArticle}
+    ogImage={ogImage}
+>
+    <!-- 把页面自己的 <script slot="head"> 等头部内容透传给 Layout -->
+    <slot slot="head" name="head" />
+
+    <div class="sticky top-0 z-50">
+        <div class="pt-3">
+            <Navbar />
+        </div>
+    </div>
+
+    <div class="mx-auto w-full max-w-[var(--page-width)] px-4 pt-4 pb-8">
+        <div
+            class:list={[
+                // 必须显式 grid-cols-1：否则隐式列宽是 auto，内容会把栏撑出视口
+                "grid grid-cols-1 gap-4",
+                hasLeft && hasRight
+                    ? "lg:grid-cols-[200px_minmax(0,1fr)_264px]"
+                    : hasRight
+                      ? "lg:grid-cols-[minmax(0,1fr)_264px]"
+                      : hasLeft
+                        ? "lg:grid-cols-[200px_minmax(0,1fr)]"
+                        : "",
+            ]}
+        >
+            {hasLeft && (
+                <aside class="hidden lg:block">
+                    <div class="sticky top-[5.5rem] space-y-4">
+                        <slot name="left" />
+                    </div>
+                </aside>
+            )}
+
+            <main class="min-w-0">
+                <slot />
+            </main>
+
+            {hasRight && (
+                <aside class="hidden lg:block">
+                    <div class="sticky top-[5.5rem] max-h-[calc(100vh-7rem)] space-y-4 overflow-y-auto">
+                        <slot name="right" />
+                    </div>
+                </aside>
+            )}
+        </div>
+    </div>
+
+    <div class="mx-auto w-full max-w-[var(--page-width)] px-4 pb-6">
+        <Footer />
+    </div>
+</Layout>

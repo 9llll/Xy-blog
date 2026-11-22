@@ -1,21 +1,25 @@
 ---
 import DownloadSupport from "@components/DownloadSupport.astro";
-// import path from "node:path";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import PostBadge from "@components/PostBadge.astro";
+import PostMetadata from "@components/PostMeta.astro";
+import DownloadHero from "@components/resource/DownloadHero.astro";
+import DownloadSidebar from "@components/resource/DownloadSidebar.astro";
+import LatestList from "@components/resource/LatestList.astro";
+import UserCard from "@components/resource/UserCard.astro";
+import TOC from "@components/widget/TOC.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import ResourceLayout from "@layouts/ResourceLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
 import { DEFAULT_OG_IMAGE, toAbsoluteOgImage } from "@utils/og-image";
-import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { getCategoryUrl, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
-// import ImageWrapper from "../components/misc/ImageWrapper.astro";
-import PostMetadata from "../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../config";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
+import type { DownloadListItem } from "../utils/download-anchor";
 
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
@@ -29,6 +33,13 @@ const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
 
 const { remarkPluginFrontmatter } = await entry.render();
+
+// 文章内的下载资源清单（由 remark-download-list 写入，只含展示字段）
+const downloads = (remarkPluginFrontmatter?.downloads ?? []) as DownloadListItem[];
+const hasDownloads = downloads.length > 0;
+const hasHeadings = headings.length > 0;
+
+const categoryName = entry.data.category?.[0] ?? "";
 
 // SEO：社交分享图统一转成同域名绝对地址。
 // 注意：文章封面 / 正文图片是内容集合相对路径（images/xxx.avif），构建后会被
@@ -55,9 +66,7 @@ const jsonLd = {
 	"@type": "BlogPosting",
 	headline: entry.data.title,
 	description: entry.data.description || entry.data.title,
-	keywords: entry.data.keywords?.length
-		? entry.data.keywords
-		: entry.data.tags,
+	keywords: entry.data.keywords?.length ? entry.data.keywords : entry.data.tags,
 	author: {
 		"@type": "Person",
 		name: entry.data.author?.trim() || profileConfig.name,
@@ -70,116 +79,194 @@ const jsonLd = {
 	...(ogImageFinal ? { image: ogImageFinal } : {}),
 };
 ---
-<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} keywords={entry.data.keywords?.join(", ")} ogImage={ogImageFinal}>
-    <!-- 评论区尚未接入（评论后端待定），相关前端与后端待补充 -->
+<ResourceLayout
+    title={entry.data.title}
+    description={entry.data.description}
+    keywords={entry.data.keywords?.join(", ")}
+    lang={entry.data.lang}
+    setOGTypeArticle={true}
+    ogImage={ogImageFinal}
+>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
 
-<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
-        <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
-            {}
-        ]}>
-            <!-- word count and reading time -->
-            <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
+    <!-- 左栏：文章目录（无标题时不占位，避免出现空栏） -->
+    {hasHeadings && (
+        <div slot="left" class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+            <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
+                <Icon name="material-symbols:list-alt-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
+                <span class="font-bold text-[13.5px] text-black/85 dark:text-white/85">{i18n(I18nKey.tableOfContents)}</span>
+            </div>
+            <div class="max-h-[calc(100vh-12rem)] overflow-y-auto p-2">
+                <TOC headings={headings} />
+            </div>
+        </div>
+    )}
+
+    <!-- 右栏：作者卡 / 下载地址 / 最新发布 -->
+    <div slot="right">
+        <UserCard />
+        {hasDownloads && (
+            <div class="mt-4">
+                <DownloadSidebar downloads={downloads} />
+            </div>
+        )}
+        <div class="mt-4">
+            <LatestList excludeSlug={entry.slug} />
+        </div>
+    </div>
+
+    <!-- 面包屑 -->
+    <nav class="mb-3 flex flex-wrap items-center gap-1.5 text-[12px] text-black/40 dark:text-white/40" aria-label="面包屑">
+        <a href="/" class="transition-colors hover:text-[var(--primary)]">首页</a>
+        {categoryName && (
+            <>
+                <Icon name="material-symbols:chevron-right-rounded" class="text-[0.9rem] text-black/20 dark:text-white/25" />
+                <a href={getCategoryUrl(entry.data.category)} class="transition-colors hover:text-[var(--primary)]">{categoryName}</a>
+            </>
+        )}
+        <Icon name="material-symbols:chevron-right-rounded" class="text-[0.9rem] text-black/20 dark:text-white/25" />
+        <span class="line-clamp-1 text-black/55 dark:text-white/55">{entry.data.title}</span>
+    </nav>
+
+    <!-- 帖子主体 -->
+    <article id="post-container" class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+        <div class="px-5 pb-5 pt-5 md:px-8 md:pb-6 md:pt-6">
+            <!-- 字数 / 阅读时长 -->
+            <div class="mb-3 flex flex-row gap-5 text-black/30 dark:text-white/30">
                 <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                    <div class="mr-2 flex h-6 w-6 items-center justify-center rounded-md bg-black/5 text-black/50 dark:bg-white/10 dark:text-white/50">
                         <Icon name="material-symbols:notes-rounded"></Icon>
                     </div>
                     <div class="text-sm">{remarkPluginFrontmatter.words} {" " + i18n(I18nKey.wordsCount)}</div>
                 </div>
                 <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                    <div class="mr-2 flex h-6 w-6 items-center justify-center rounded-md bg-black/5 text-black/50 dark:bg-white/10 dark:text-white/50">
                         <Icon name="material-symbols:schedule-outline-rounded"></Icon>
                     </div>
                     <div class="text-sm">
-                        {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                        {remarkPluginFrontmatter.minutes}
+                        {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
                     </div>
                 </div>
             </div>
 
-            <!-- title -->
-            <div class="relative onload-animation flex items-start justify-between gap-3">
-                <div
-                    data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title"
-                    class="transition w-full block font-bold mb-3
-                    text-3xl md:text-[2.25rem]/[2.75rem]
-                    text-black/90 dark:text-white/90
-                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
-                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
-                ">
+            <!-- 标题 + 角标 -->
+            <div class="relative flex items-start justify-between gap-3">
+                <h1
+                    data-pagefind-body
+                    data-pagefind-weight="10"
+                    data-pagefind-meta="title"
+                    class="mb-3 block w-full text-2xl font-bold leading-snug text-black/90 dark:text-white/90 md:text-[2rem]"
+                >
                     {entry.data.title}
-                </div>
-                <!-- 文章角标：加密下载 / 免费下载 / 教程文章（由 remark 自动识别） -->
-                <PostBadge type={remarkPluginFrontmatter.badgeType} class="shrink-0 mt-1.5" />
+                </h1>
+                <PostBadge type={remarkPluginFrontmatter.badgeType} class="mt-1.5 shrink-0" />
             </div>
 
-            <!-- metadata -->
-            <div class="onload-animation">
+            <!-- 元信息 -->
+            <div>
                 <PostMetadata
-                        class="mb-5"
-                        published={entry.data.published}
-                        updated={entry.data.updated}
-                        tags={entry.data.tags}
-                        category={entry.data.category || []}
-                        showTags={true}
-                ></PostMetadata>
-                {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
+                    class="mb-4"
+                    published={entry.data.published}
+                    updated={entry.data.updated}
+                    tags={entry.data.tags}
+                    category={entry.data.category || []}
+                    showTags={true}
+                />
+                <div class="mb-5 border-b border-dashed border-[var(--line-divider)]"></div>
             </div>
 
-            <!-- always show cover as long as it has one -->
+            <!-- 资源总览卡：含下载指令的文章才会出现 -->
+            {hasDownloads && <DownloadHero downloads={downloads} />}
 
-            <Markdown class="mb-6 markdown-content onload-animation">
+            <Markdown class="markdown-content">
                 <Content />
             </Markdown>
-            {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mt-6 mb-6 rounded-xl license-container onload-animation"></License>}
 
+            {licenseConfig.enable && (
+                <License
+                    title={entry.data.title}
+                    slug={entry.slug}
+                    pubDate={entry.data.published}
+                    class="license-container mt-6 rounded-xl"
+                />
+            )}
         </div>
-    </div>
+    </article>
 
-    <div class="flex flex-row justify-between mb-4 gap-4 overflow-hidden w-full">
-        <a href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
-           class:list={["w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.nextSlug}]}>
-            {entry.data.nextSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4" >
-                <Icon name="material-symbols:chevron-left-rounded" class="text-[2rem] text-[var(--primary)]" />
-                <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75">
-                    {entry.data.nextTitle}
+    <!-- 上一篇 / 下一篇 -->
+    <div class="mt-4 flex w-full flex-row justify-between gap-4 overflow-hidden">
+        <a
+            href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
+            class:list={[
+                "w-full overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] font-bold transition hover:border-[var(--primary-border-soft)] active:scale-[0.99]",
+                { "pointer-events-none opacity-40": !entry.data.nextSlug },
+            ]}
+        >
+            {entry.data.nextSlug && (
+                <div class="flex h-[3.5rem] max-w-full items-center gap-3 px-4">
+                    <Icon name="material-symbols:chevron-left-rounded" class="text-[1.75rem] text-[var(--primary)]" />
+                    <div class="max-w-[calc(100%_-_2.5rem)] truncate text-[13.5px] text-black/75 dark:text-white/75">
+                        {entry.data.nextTitle}
+                    </div>
                 </div>
-            </div>}
+            )}
         </a>
 
-        <a href={entry.data.prevSlug ? getPostUrlBySlug(entry.data.prevSlug) : "#"}
-           class:list={["w-full font-bold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.prevSlug}]}>
-            {entry.data.prevSlug && <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-end gap-4">
-                <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75">
-                    {entry.data.prevTitle}
+        <a
+            href={entry.data.prevSlug ? getPostUrlBySlug(entry.data.prevSlug) : "#"}
+            class:list={[
+                "w-full overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] font-bold transition hover:border-[var(--primary-border-soft)] active:scale-[0.99]",
+                { "pointer-events-none opacity-40": !entry.data.prevSlug },
+            ]}
+        >
+            {entry.data.prevSlug && (
+                <div class="flex h-[3.5rem] max-w-full items-center justify-end gap-3 px-4">
+                    <div class="max-w-[calc(100%_-_2.5rem)] truncate text-[13.5px] text-black/75 dark:text-white/75">
+                        {entry.data.prevTitle}
+                    </div>
+                    <Icon name="material-symbols:chevron-right-rounded" class="text-[1.75rem] text-[var(--primary)]" />
                 </div>
-                <Icon name="material-symbols:chevron-right-rounded" class="text-[2rem] text-[var(--primary)]" />
-            </div>}
-    </a>
-</div>
-
-<!-- 系列文章导航 -->
-{seriesName && (
-    <div class="mt-6 rounded-2xl bg-[var(--card-bg)] p-5">
-        <div class="mb-3 flex items-center gap-2 text-black/70 dark:text-white/70">
-            <Icon name="material-symbols:auto-stories-rounded" class="text-[1.35rem] text-[var(--primary)]" />
-            <span class="font-bold">系列文章 · {seriesName}</span>
-        </div>
-        <div class="flex flex-col gap-2">
-            <a href={seriesPrev ? getPostUrlBySlug(seriesPrev.slug) : "#"}
-               class:list={["flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-black/5 dark:hover:bg-white/10", {"pointer-events-none opacity-40": !seriesPrev}]}>
-                <Icon name="material-symbols:arrow-upward-rounded" class="shrink-0 text-[var(--primary)]" />
-                <span class="overflow-hidden text-ellipsis whitespace-nowrap">{seriesPrev ? seriesPrev.data.title : "已经是第一篇"}</span>
-            </a>
-            <a href={seriesNext ? getPostUrlBySlug(seriesNext.slug) : "#"}
-               class:list={["flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-black/5 dark:hover:bg-white/10", {"pointer-events-none opacity-40": !seriesNext}]}>
-                <Icon name="material-symbols:arrow-downward-rounded" class="shrink-0 text-[var(--primary)]" />
-                <span class="overflow-hidden text-ellipsis whitespace-nowrap">{seriesNext ? seriesNext.data.title : "已经是最后一篇"}</span>
-            </a>
-        </div>
+            )}
+        </a>
     </div>
-)}
+
+    <!-- 系列文章导航 -->
+    {seriesName && (
+        <div class="mt-4 rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] p-5 shadow-sm">
+            <div class="mb-3 flex items-center gap-2 text-black/70 dark:text-white/70">
+                <Icon name="material-symbols:auto-stories-rounded" class="text-[1.35rem] text-[var(--primary)]" />
+                <span class="font-bold">系列文章 · {seriesName}</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <a
+                    href={seriesPrev ? getPostUrlBySlug(seriesPrev.slug) : "#"}
+                    class:list={[
+                        "flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-[var(--btn-regular-bg)]",
+                        { "pointer-events-none opacity-40": !seriesPrev },
+                    ]}
+                >
+                    <Icon name="material-symbols:arrow-upward-rounded" class="shrink-0 text-[var(--primary)]" />
+                    <span class="overflow-hidden text-ellipsis whitespace-nowrap">
+                        {seriesPrev ? seriesPrev.data.title : "已经是第一篇"}
+                    </span>
+                </a>
+                <a
+                    href={seriesNext ? getPostUrlBySlug(seriesNext.slug) : "#"}
+                    class:list={[
+                        "flex items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-[var(--btn-regular-bg)]",
+                        { "pointer-events-none opacity-40": !seriesNext },
+                    ]}
+                >
+                    <Icon name="material-symbols:arrow-downward-rounded" class="shrink-0 text-[var(--primary)]" />
+                    <span class="overflow-hidden text-ellipsis whitespace-nowrap">
+                        {seriesNext ? seriesNext.data.title : "已经是最后一篇"}
+                    </span>
+                </a>
+            </div>
+        </div>
+    )}
 
     <!-- 下载按钮交互脚本（事件委托，全页只需一份） -->
     <DownloadSupport />
-
-</MainGridLayout>
+</ResourceLayout>

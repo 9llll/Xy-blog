@@ -1,14 +1,21 @@
 ---
 import ArchivePanel from "@components/ArchivePanel.svelte";
+import BoardNav from "@components/resource/BoardNav.astro";
+import SiteAside from "@components/resource/SiteAside.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
-import MainGridLayout from "@layouts/MainGridLayout.astro";
+import ResourceLayout from "@layouts/ResourceLayout.astro";
 import { getSortedPostsList } from "../utils/content-utils";
 
 const sortedPostsList = await getSortedPostsList();
 ---
 
-<MainGridLayout title={i18n(I18nKey.archive)}>
-    <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
-</MainGridLayout>
+<ResourceLayout title={i18n(I18nKey.archive)}>
+    <BoardNav slot="left" />
 
+    <div class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+        <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
+    </div>
+
+    <SiteAside slot="right" />
+</ResourceLayout>

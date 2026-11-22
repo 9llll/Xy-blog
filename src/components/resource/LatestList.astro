@@ -1,0 +1,59 @@
+---
+import { Icon } from "astro-icon/components";
+import { getSortedPosts } from "../../utils/content-utils";
+import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+import { getPostUrlBySlug } from "../../utils/url-utils";
+
+/**
+ * 右侧栏「最新发布」
+ *
+ * 只按发布时间排序（真实数据），不做任何虚构的「热度 / 周排行」。
+ * 用于文章页右栏，让读者看完当前这篇能顺手点开下一篇。
+ */
+interface Props {
+	/** 排除当前文章 */
+	excludeSlug?: string;
+	limit?: number;
+	title?: string;
+}
+
+const { excludeSlug = "", limit = 8, title = "最新发布" } = Astro.props;
+
+const posts = (await getSortedPosts())
+	.filter((p) => p.slug !== excludeSlug)
+	.slice(0, limit);
+
+const RANK_COLOR = ["#ef4444", "#f59e0b", "#10b981"];
+---
+<div class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+    <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
+        <Icon name="material-symbols:new-releases" class="text-[1.15rem] text-[var(--primary)]" />
+        <span class="font-bold text-[13.5px] text-black/85 dark:text-white/85">{title}</span>
+    </div>
+    <ol class="py-1">
+        {posts.map((p, i) => (
+            <li>
+                <a
+                    href={getPostUrlBySlug(p.slug)}
+                    class="group flex items-start gap-2 px-3.5 py-2 transition-colors hover:bg-[var(--btn-regular-bg)]"
+                >
+                    <span
+                        class:list={[
+                            "mt-[1px] grid h-4 w-4 shrink-0 place-items-center rounded text-[10px] font-bold",
+                            i < 3 ? "text-white" : "bg-[var(--btn-regular-bg)] text-black/40 dark:text-white/40",
+                        ]}
+                        style={i < 3 ? `background:${RANK_COLOR[i]}` : undefined}
+                    >{i + 1}</span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-[12.5px] text-black/70 dark:text-white/70 transition-colors group-hover:text-[var(--primary)]">
+                            {p.data.title}
+                        </span>
+                        <span class="mt-0.5 block text-[10.5px] text-black/35 dark:text-white/35">
+                            {formatDateToYYYYMMDD(p.data.published)}
+                        </span>
+                    </span>
+                </a>
+            </li>
+        ))}
+    </ol>
+</div>

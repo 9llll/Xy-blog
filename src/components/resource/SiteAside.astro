@@ -1,0 +1,17 @@
+---
+import QuickActions from "./QuickActions.astro";
+import TagCloud from "./TagCloud.astro";
+import UserCard from "./UserCard.astro";
+
+/**
+ * 全站统一的右侧栏组合：作者卡 + 快捷导航 + 热门标签。
+ * 首页 / 归档 / 关于 / 友链共用，避免每个页面各写一遍导致版式漂移。
+ *
+ * 传入 Slot 时，会在标签卡之前插入额外内容（例如文章页的「下载地址」）。
+ */
+const hasExtra = Astro.slots.has("extra");
+---
+<UserCard />
+{hasExtra && <slot name="extra" />}
+<QuickActions />
+<TagCloud />

@@ -39,3 +39,5 @@ dist-verify/
 
 # 临时截图
 .tmp-*.png
+.tmp-*
+.workbuddy/

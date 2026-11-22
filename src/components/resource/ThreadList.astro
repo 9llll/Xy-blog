@@ -54,7 +54,7 @@ const sorted = [...posts].sort((a, b) => {
                                 class="shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold text-white leading-none"
                                 style={`background:${color}`}
                             >{cat}</span>
-                            <span class="truncate font-semibold text-[15px] text-black/85 dark:text-white/85 group-hover:text-[var(--primary)] transition-colors">
+                            <span class="min-w-0 flex-1 truncate font-semibold text-[15px] text-black/85 dark:text-white/85 group-hover:text-[var(--primary)] transition-colors">
                                 {p.data.title}
                             </span>
                             {p.data.pinned && (

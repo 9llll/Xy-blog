@@ -1,7 +1,9 @@
 ---
 import type { GetStaticPaths } from "astro";
 import PostPage from "../../components/PostPage.astro";
-import MainGridLayout from "../../layouts/MainGridLayout.astro";
+import BoardNav from "../../components/resource/BoardNav.astro";
+import SiteAside from "../../components/resource/SiteAside.astro";
+import ResourceLayout from "../../layouts/ResourceLayout.astro";
 import { getSortedPosts } from "../../utils/content-utils";
 
 /**
@@ -22,6 +24,10 @@ const page = {
 };
 ---
 
-<MainGridLayout>
+<ResourceLayout>
+    <BoardNav slot="left" />
+
     <PostPage page={page}></PostPage>
-</MainGridLayout>
+
+    <SiteAside slot="right" />
+</ResourceLayout>
