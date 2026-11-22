@@ -38,6 +38,7 @@ export const id: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "Unduh",
+	[Key.downloadNow]: "Unduh sekarang",
 	[Key.downloadSource]: "Sumber",
 	[Key.downloadLocked]: "Terenkripsi",
 	[Key.downloadCode]: "Kode",

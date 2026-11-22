@@ -38,6 +38,7 @@ export const zh_TW: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "下載",
+	[Key.downloadNow]: "立即下載",
 	[Key.downloadSource]: "來源",
 	[Key.downloadLocked]: "加密",
 	[Key.downloadCode]: "提取碼",

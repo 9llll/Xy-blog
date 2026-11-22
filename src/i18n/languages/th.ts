@@ -38,6 +38,7 @@ export const th: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "ดาวน์โหลด",
+	[Key.downloadNow]: "ดาวน์โหลดเลย",
 	[Key.downloadSource]: "แหล่งที่มา",
 	[Key.downloadLocked]: "เข้ารหัส",
 	[Key.downloadCode]: "รหัส",

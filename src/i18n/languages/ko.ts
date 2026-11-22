@@ -38,6 +38,7 @@ export const ko: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "다운로드",
+	[Key.downloadNow]: "지금 다운로드",
 	[Key.downloadSource]: "출처",
 	[Key.downloadLocked]: "암호화됨",
 	[Key.downloadCode]: "추출 코드",

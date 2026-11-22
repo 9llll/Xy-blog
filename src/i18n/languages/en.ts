@@ -38,6 +38,7 @@ export const en: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "Download",
+	[Key.downloadNow]: "Download now",
 	[Key.downloadSource]: "Source",
 	[Key.downloadLocked]: "Encrypted",
 	[Key.downloadCode]: "Code",

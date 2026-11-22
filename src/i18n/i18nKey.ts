@@ -35,6 +35,7 @@ enum I18nKey {
 
 	/* Download widget */
 	downloadAction = "downloadAction",
+	downloadNow = "downloadNow",
 	downloadSource = "downloadSource",
 	downloadLocked = "downloadLocked",
 	downloadCode = "downloadCode",

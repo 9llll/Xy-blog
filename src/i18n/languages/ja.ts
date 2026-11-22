@@ -38,6 +38,7 @@ export const ja: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "ダウンロード",
+	[Key.downloadNow]: "今すぐダウンロード",
 	[Key.downloadSource]: "出所",
 	[Key.downloadLocked]: "暗号化",
 	[Key.downloadCode]: "提取コード",

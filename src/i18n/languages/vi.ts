@@ -38,6 +38,7 @@ export const vi: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "Tải xuống",
+	[Key.downloadNow]: "Tải ngay",
 	[Key.downloadSource]: "Nguồn",
 	[Key.downloadLocked]: "Đã mã hóa",
 	[Key.downloadCode]: "Mã trích xuất",

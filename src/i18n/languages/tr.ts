@@ -38,6 +38,7 @@ export const tr: Translation = {
 
 	/* Download widget */
 	[Key.downloadAction]: "İndir",
+	[Key.downloadNow]: "Hemen indir",
 	[Key.downloadSource]: "Kaynak",
 	[Key.downloadLocked]: "Şifrelenmiş",
 	[Key.downloadCode]: "Kod",
