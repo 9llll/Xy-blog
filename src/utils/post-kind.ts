@@ -29,9 +29,6 @@ export const POST_KIND_META: Record<PostKind, PostKindMeta> = {
 	oss: { label: "开源项目", color: "#111827" },
 };
 
-/** 分类标签统一天蓝色底白字 */
-export const CATEGORY_BADGE_COLOR = "#0ea5e9";
-
 const DOWNLOAD_DIRECTIVE = /::download\{([^}]*)\}/g;
 /** 只认具体仓库地址（github.com/owner/repo），避免误判单纯提到 GitHub 的文字 */
 const GITHUB_REPO = /https?:\/\/github\.com\/[\w.-]+\/[\w.-]+/i;
