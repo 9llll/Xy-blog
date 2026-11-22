@@ -173,13 +173,12 @@ export const dlMiniMeta =
 export const dlMiniFoot =
 	"dl-mini-foot flex items-center justify-end gap-1.5 min-w-0";
 
-/** 紧凑提取码（可点击复制，琥珀色与正文卡一致） */
+/** 紧凑提取码（可点击复制，深琥珀实心，与正文卡一致） */
 export const dlMiniCode =
 	"dl-code inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 " +
 	"text-[0.66rem] font-bold leading-none whitespace-nowrap " +
-	"text-[#9a3412] bg-[#ffedd5] border border-[#fdba74] " +
-	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
-	"cursor-pointer select-none hover:brightness-95 transition-all";
+	"text-white bg-[#b45309] dark:bg-[#c2670b] " +
+	"cursor-pointer select-none hover:brightness-110 transition-all";
 
 /** 紧凑下载按钮（实心红，与正文卡同色） */
 export const dlMiniBtn =
