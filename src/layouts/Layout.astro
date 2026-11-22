@@ -202,18 +202,18 @@ const bannerOffset =
 
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
-	</head>
-	<body class=" min-h-screen transition outline-none" class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
-		  data-overlayscrollbars-initialize
-	>
 		{/*
-			Maple UI 是全量 TTF（19.6 MB + 14.8 MB），文件较大，首屏会请求它。
-			若改回系统字体，需同时移除 tailwind.config.cjs 里 fontFamily.sans 的 "Maple UI"。
+			Maple UI 子集字体：
+			源文件是全量 TTF（maple-ui 19.6 MB / maple-ui-bold 14.8 MB），直接给浏览器会让字体
+			长期加载不出来（font-display: swap 一直用系统字体兜底，观感就是“字体不对”）。
+			这里改用 font-src/ 里的 TTF 生成 woff2 子集（GB2312 一级字库 + 站内实际用字，约 740 KB/字重）。
+			重新生成：python scripts/build-fonts.py
 		*/}
+		<link rel="preload" href="/fonts/maple-ui.woff2" as="font" type="font/woff2" crossorigin />
 		<style is:global>
 			@font-face {
 				font-family: "Maple UI";
-				src: url("/fonts/maple-ui.ttf") format("truetype");
+				src: url("/fonts/maple-ui.woff2") format("woff2");
 				font-weight: 400;
 				font-style: normal;
 				font-display: swap;
@@ -221,12 +221,52 @@ const bannerOffset =
 
 			@font-face {
 				font-family: "Maple UI";
-				src: url("/fonts/maple-ui-bold.ttf") format("truetype");
+				src: url("/fonts/maple-ui-bold.woff2") format("woff2");
 				font-weight: 700;
 				font-style: normal;
 				font-display: swap;
 			}
+
+			/*
+				原生滚动条兜底：OverlayScrollbars 未接管时（部分 Windows Chrome 会被 cancel），
+				浏览器会画出带上下箭头的粗灰条压在白面板右侧，很难看。
+				这里统一改成细窄、透明轨道、无箭头。
+			*/
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			::-webkit-scrollbar-track,
+			::-webkit-scrollbar-corner {
+				background: transparent;
+			}
+			::-webkit-scrollbar-thumb {
+				background-color: rgba(0, 0, 0, 0.22);
+				border-radius: 9999px;
+				border: 2px solid transparent;
+				background-clip: content-box;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background-color: rgba(0, 0, 0, 0.4);
+			}
+			::-webkit-scrollbar-button {
+				display: none;
+				width: 0;
+				height: 0;
+			}
+			:global(.dark) ::-webkit-scrollbar-thumb {
+				background-color: rgba(255, 255, 255, 0.26);
+			}
+			:global(.dark) ::-webkit-scrollbar-thumb:hover {
+				background-color: rgba(255, 255, 255, 0.44);
+			}
 		</style>
+
+	</head>
+	<body class=" min-h-screen transition outline-none" class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+		  data-overlayscrollbars-initialize
+	>
+		{/* @font-face 已移到 <head>，字体用 woff2 子集（见上方注释） */}
 		<ConfigCarrier></ConfigCarrier>
 		<slot />
 
