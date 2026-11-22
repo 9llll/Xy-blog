@@ -17,7 +17,7 @@ keywords:
 author: 羡鱼
 series: 指令
 seriesOrder: 0
-ogImage: https://x.3x3.top/images/fenxiang.avif
+ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true

@@ -26,7 +26,7 @@ export function toAbsoluteOgImage(
 	if (/^https?:\/\//i.test(value)) return value;
 	if (value.startsWith("//")) return `https:${value}`;
 
-	const base = site ?? "https://x.3x3.top/";
+	const base = site ?? "https://www.3x3.top/";
 	try {
 		return new URL(value.replace(/^\/+/, ""), base).href;
 	} catch {
