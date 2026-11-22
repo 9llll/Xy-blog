@@ -21,9 +21,13 @@ export const dlCard =
 	"bg-[var(--card-bg)] border border-[var(--line-divider)] shadow-sm " +
 	"hover:border-[var(--primary-border-soft)] hover:shadow-md transition-all duration-200";
 
-/** 左侧封面容器（桌面更高，接近 4:3） */
+/** 左侧封面容器
+ *
+ * 手机端内容区两行排布后卡片变高，封面固定 94px 会在底部留白；
+ * 用 self-stretch + 不定高让它跟着卡片高度走（图片 object-cover 裁切填充）。
+ */
 export const dlCoverWrap =
-	"dl-cover-wrap relative shrink-0 w-[94px] h-[94px] sm:w-[168px] sm:h-[118px] " +
+	"dl-cover-wrap relative shrink-0 w-[94px] self-stretch sm:self-auto sm:w-[168px] sm:h-[118px] " +
 	"rounded-xl overflow-hidden bg-[var(--btn-regular-bg)]";
 
 /** 封面图 */
@@ -77,6 +81,7 @@ export const dlCodeChip =
 	"text-[0.76rem] sm:text-[0.8rem] font-bold leading-none whitespace-nowrap " +
 	"text-[#9a3412] bg-[#ffedd5] border border-[#fdba74] " +
 	"dark:text-[#fdba74] dark:bg-[#3f2312] dark:border-[#8a4b1d] " +
+	"self-start sm:self-auto " +
 	"cursor-pointer select-none hover:brightness-95 active:scale-[0.97] transition-all";
 
 /** 底部行：左侧价格/类型 + 右侧「提取码 + 按钮」，窄屏自动换行 */
@@ -104,13 +109,20 @@ export const dlFootLock = "dl-foot-lock font-semibold text-[#7c3aed] dark:text-[
 /** 类型文案的通用字号 */
 export const dlFootKind = "dl-foot-kind inline-flex items-center gap-1 text-[0.75rem]";
 
-/** 右侧操作区（提取码 + 按钮并排） */
-export const dlAction = "dl-action ml-auto flex items-center gap-2 shrink-0";
+/** 右侧操作区
+ *
+ * 手机端卡片内容区只有 ~200px（卡片宽 - 封面 94px - 间距），提取码 + 按钮
+ * 并排会溢出到卡片外（按钮被裁掉）。所以 <sm 竖排：提取码一行、按钮整行撑满；
+ * sm 起恢复「提取码 + 按钮」同一行右对齐。
+ */
+export const dlAction =
+	"dl-action flex w-full flex-col items-stretch gap-2 " +
+	"sm:ml-auto sm:w-auto sm:shrink-0 sm:flex-row sm:items-center";
 
 /** 立即下载 / 解锁下载按钮（红色渐变胶囊） */
 export const dlNowBtn =
-	"dl-now inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
-	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white " +
+	"dl-now inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
+	"text-[0.82rem] sm:w-auto sm:text-[0.88rem] font-bold text-white " +
 	"bg-gradient-to-r from-[#ff5b4a] to-[#e01b32] " +
 	"shadow-[0_6px_16px_-8px_rgba(224,27,50,0.85)] " +
 	"hover:brightness-110 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
@@ -121,8 +133,8 @@ export const dlNowBtn =
  * 链接的 background-image 重置为 none，渐变会被吃掉，按钮变成白底白字。
  */
 export const dlBuyBtn =
-	"dl-buy no-styling inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
-	"text-[0.82rem] sm:text-[0.88rem] font-bold text-white " +
+	"dl-buy no-styling inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 " +
+	"text-[0.82rem] sm:w-auto sm:text-[0.88rem] font-bold text-white " +
 	"bg-gradient-to-r from-[#ff9f43] to-[#ff5533] " +
 	"shadow-[0_6px_16px_-8px_rgba(255,85,51,0.9)] " +
 	"hover:brightness-105 active:scale-[0.97] transition-all cursor-pointer select-none whitespace-nowrap";
