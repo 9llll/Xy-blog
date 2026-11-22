@@ -30,6 +30,7 @@ import {
 	encryptDownloadUrl,
 	hashDownloadPassword,
 } from "../utils/download-utils.ts";
+import { dlAnchorId } from "../utils/download-anchor.ts";
 import { resolveNetdisk } from "../utils/netdisk.ts";
 
 /** 内联 SVG 图标（hast 环境无法使用 astro-icon，这里用轻量路径集） */
@@ -123,7 +124,9 @@ function netdiskInline(nd) {
  * 普通 / 加密 / 付费三种卡片共用，仅传入内容与配色不同。
  */
 function renderShell({ id, cover, tagText, tagClass, name, meta, foot, action }) {
-	return h(`div#${id}`, { class: "not-prose my-4" }, [
+	// 显式写 id 属性，而不是 "div#id" 选择器：锚点里可能含中文，
+	// hastscript 的 CSS 选择器解析只认 ASCII，中文会解析失败。
+	return h("div", { id, class: "not-prose my-4 scroll-mt-24" }, [
 		h("div", { class: dlCard }, [
 			h("div", { class: dlCoverWrap }, [
 				h("img", { class: dlCover, src: cover, alt: "", loading: "lazy" }),
@@ -175,14 +178,15 @@ function normalizeItem(props) {
 	const icon = asString(props.icon).trim();
 	const cover = asString(props.cover).trim();
 	const tag = asString(props.tag).trim();
-	const name =
+	const rawName =
 		asString(props.name).trim() ||
 		asString(props.title).trim() ||
-		asString(props.source).trim() ||
-		i18n(I18nKey.downloadAction);
+		asString(props.source).trim();
+	const name = rawName || i18n(I18nKey.downloadAction);
 
 	return {
 		name,
+		rawName,
 		url,
 		desc: desc || source,
 		size,
@@ -225,7 +229,11 @@ function renderPayCard(props) {
 		asString(props.buyText).trim() ||
 		(price ? `立即购买 · ¥${price}` : "立即购买");
 
-	const id = `DL${Math.random().toString(36).slice(-6)}`;
+	const id = dlAnchorId(
+		asString(props.name).trim() ||
+			asString(props.title).trim() ||
+			asString(props.source).trim(),
+	);
 
 	const meta = [h("span", { class: dlPayLock }, [svgIcon("lock", 12), "付费资源"])];
 	if (size) meta.push(h("span", { class: "shrink-0" }, [size]));
@@ -278,7 +286,7 @@ export function DownloadComponent(props, children) {
 		);
 	}
 
-	const uuid = `DL${Math.random().toString(36).slice(-6)}`;
+	const uuid = dlAnchorId(item.rawName);
 	const lock = Boolean(item.hash);
 	const nd = resolveNetdisk(item.icon, item.url);
 

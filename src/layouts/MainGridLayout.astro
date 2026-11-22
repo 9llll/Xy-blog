@@ -27,9 +27,18 @@ interface Props {
 	headings?: MarkdownHeading[];
 	keywords?: string;
 	ogImage?: string;
+	/** 是否启用右侧栏（由页面显式传入，避免依赖插槽探测的不确定性） */
+	sidebarRight?: boolean;
 }
 
-const { title, banner, description, lang, setOGTypeArticle, headings = [], keywords, ogImage } = Astro.props;
+const { title, banner, description, lang, setOGTypeArticle, headings = [], keywords, ogImage, sidebarRight = false } = Astro.props;
+
+/**
+ * 可选右侧栏：只有页面显式声明 sidebarRight 时才启用第三栏，
+ * 并只在 xl（≥1280px）展开——75rem 版心放三栏，lg 宽度下正文会被压得过窄。
+ * 其它页面（归档 / 关于 / 友链等）布局完全不变。
+ */
+const hasRightSidebar = sidebarRight;
 const hasBannerCredit =
 	siteConfig.banner.enable && siteConfig.banner.credit.enable;
 const hasBannerLink = !!siteConfig.banner.credit.url;
@@ -103,8 +112,12 @@ let links: NavBarLink[] = navBarConfig.links.map(
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="transition duration-700 w-full grid grid-cols-[1fr_2.5fr] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
-    mx-auto gap-4 px-4"
+        <div id="main-grid" class:list={[
+            "transition duration-700 w-full grid grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 px-4",
+            hasRightSidebar
+                ? "grid-cols-[1fr_2.5fr] xl:grid-cols-[14rem_minmax(0,1fr)_15rem]"
+                : "grid-cols-[1fr_2.5fr]",
+        ]}
         >
             <!-- Banner image credit -->
             {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
@@ -131,6 +144,13 @@ let links: NavBarLink[] = navBarConfig.links.map(
                 </div>
             </main>
 
+            {hasRightSidebar && (
+                <aside class="hidden xl:block xl:col-start-3 xl:row-start-1 mb-4 onload-animation">
+                    <div class="sticky top-[5.5rem] max-h-[calc(100vh-7rem)] overflow-y-auto pr-0.5">
+                        <slot name="right-sidebar" />
+                    </div>
+                </aside>
+            )}
 
         </div>
         <div class="footer col-span-2 onload-animation block lg:hidden">

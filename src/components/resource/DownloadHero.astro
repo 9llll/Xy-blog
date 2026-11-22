@@ -1,0 +1,127 @@
+---
+import { Icon } from "astro-icon/components";
+import type { DownloadListItem } from "../../utils/download-anchor";
+
+/**
+ * 文章页顶部「资源下载」总览卡
+ *
+ * 数据来自 remark-download-list 插件写入的 frontmatter.downloads，
+ * 只做展示与锚点跳转：不含真实地址 / 密码 / 提取码，避免多一条泄露面。
+ * 每一项的「下载」按钮跳到正文对应卡片（#锚点），由那张卡片完成实际交互。
+ */
+interface Props {
+	downloads: DownloadListItem[];
+}
+
+const { downloads } = Astro.props;
+
+const total = downloads.length;
+const hasLock = downloads.some((d) => d.kind === "lock");
+const hasPay = downloads.some((d) => d.kind === "pay");
+
+const KIND_LABEL: Record<string, string> = {
+	free: "免费",
+	lock: "加密",
+	pay: "付费",
+};
+
+const KIND_CHIP: Record<string, string> = {
+	free: "bg-[#22c55e]/12 text-[#16a34a] dark:text-[#4ade80] border-[#22c55e]/30",
+	lock: "bg-[var(--primary-soft)] text-[var(--primary)] border-[var(--primary-border-soft)]",
+	pay: "bg-[#f59e0b]/12 text-[#b45309] dark:text-[#fbbf24] border-[#f59e0b]/35",
+};
+
+const ACTION_TEXT: Record<string, string> = {
+	free: "下载",
+	lock: "解锁下载",
+	pay: "立即购买",
+};
+---
+<section
+    class="dl-hero not-prose mb-6 overflow-hidden rounded-2xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm"
+    aria-label="资源下载"
+>
+    <!-- 顶部渐变条：区分于正文卡片，一眼能认出这是资源概要 -->
+    <div class="h-1 w-full bg-gradient-to-r from-[var(--primary)] via-[#38bdf8] to-[#a78bfa]"></div>
+
+    <div class="flex items-center gap-3 border-b border-[var(--line-divider)] px-4 py-3">
+        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--primary-soft)] text-[var(--primary)]">
+            <Icon name="material-symbols:cloud-download-outline-rounded" class="text-[1.25rem]" />
+        </span>
+        <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-[15px] text-black/85 dark:text-white/85">资源下载</span>
+                <span class="rounded-full bg-[var(--btn-regular-bg)] px-2 py-0.5 text-[11px] font-semibold text-black/45 dark:text-white/45">
+                    {total} 个
+                </span>
+            </div>
+            <div class="mt-0.5 flex items-center gap-1.5 text-[11.5px] text-black/40 dark:text-white/40">
+                {hasLock && <span>含加密资源</span>}
+                {hasLock && hasPay && <span class="text-black/20 dark:text-white/20">·</span>}
+                {hasPay && <span>含付费资源</span>}
+                {!hasLock && !hasPay && <span>全部免费下载</span>}
+            </div>
+        </div>
+    </div>
+
+    <ul class="divide-y divide-[var(--line-divider)]">
+        {downloads.map((d, i) => (
+            <li class="dl-hero-row group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--btn-regular-bg)]">
+                <span class="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[var(--btn-regular-bg)] text-[11px] font-bold text-black/45 dark:text-white/45 group-hover:bg-[var(--primary-soft)] group-hover:text-[var(--primary)] transition-colors">
+                    {i + 1}
+                </span>
+
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <span class="truncate text-[13.5px] font-semibold text-black/85 dark:text-white/85">{d.name}</span>
+                        <span
+                            class:list={[
+                                "shrink-0 rounded border px-1.5 py-[1px] text-[10.5px] font-bold leading-tight",
+                                KIND_CHIP[d.kind],
+                            ]}
+                        >{d.tag || KIND_LABEL[d.kind]}</span>
+                    </div>
+                    <div class="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-black/45 dark:text-white/45">
+                        {d.netdisk?.label ? (
+                            <span class="inline-flex items-center gap-1">
+                                <span class="inline-block h-1.5 w-1.5 rounded-full" style={`background:${d.netdisk.color || "var(--primary)"}`}></span>
+                                {d.netdisk.label}
+                            </span>
+                        ) : d.netdisk?.src ? (
+                            <img src={d.netdisk.src} alt="" class="h-3.5 w-3.5 rounded object-contain" loading="lazy" />
+                        ) : null}
+                        {d.size && <span>{d.size}</span>}
+                        {d.kind === "pay" && d.price && (
+                            <span class="font-semibold text-[#d97706] dark:text-[#fbbf24]">¥{d.price}</span>
+                        )}
+                    </div>
+                </div>
+
+                {d.kind === "pay" && d.buy ? (
+                    <a
+                        href={d.buy}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="shrink-0 inline-flex items-center gap-1 rounded-full bg-[#f59e0b] px-3 py-1.5 text-[12px] font-bold text-white shadow-sm transition hover:brightness-110 active:scale-95"
+                    >
+                        <Icon name="material-symbols:shopping-cart-outline-rounded" class="text-[0.95rem]" />
+                        {ACTION_TEXT[d.kind]}
+                    </a>
+                ) : (
+                    <a
+                        href={`#${d.key}`}
+                        class="shrink-0 inline-flex items-center gap-1 rounded-full border border-[var(--primary-border-soft)] bg-[var(--primary-soft)] px-3 py-1.5 text-[12px] font-bold text-[var(--primary)] transition hover:brightness-105 active:scale-95"
+                    >
+                        <Icon name="material-symbols:download-rounded" class="text-[0.95rem]" />
+                        {ACTION_TEXT[d.kind]}
+                    </a>
+                )}
+            </li>
+        ))}
+    </ul>
+
+    <div class="flex items-center gap-1.5 bg-[var(--btn-regular-bg)]/40 px-4 py-2.5 text-[11px] text-black/40 dark:text-white/40">
+        <Icon name="material-symbols:info-outline-rounded" class="shrink-0 text-[0.9rem]" />
+        <span>提取码 / 解压密码以下方资源卡片为准，资源失效请在「关于」页反馈。</span>
+    </div>
+</section>

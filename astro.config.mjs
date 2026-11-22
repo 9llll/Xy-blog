@@ -26,6 +26,7 @@ import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.
 import { PostCardComponent } from "./src/plugins/rehype-component-post-card.mjs";
 import { rehypeVideoFacade } from "./src/plugins/rehype-video-facade.mjs";
 import { remarkDirectiveHName } from "./src/plugins/remark-directive-hname.mjs";
+import { remarkDownloadList } from "./src/plugins/remark-download-list.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkPostBadge } from "./src/plugins/remark-post-badge.mjs";
@@ -119,6 +120,7 @@ export default defineConfig({
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
 			remarkPostBadge,
+			remarkDownloadList,
 			remarkSectionize,
 			parseDirectiveNode,
 			remarkDirectiveHName,

@@ -1,0 +1,94 @@
+---
+import { Icon } from "astro-icon/components";
+import type { DownloadListItem } from "../../utils/download-anchor";
+
+/**
+ * 文章页右侧栏「下载地址」卡
+ *
+ * 阅读到文章任意位置都能随手跳转到资源，不需要滚回去找卡片。
+ * 与正文卡片通过 #锚点 联动，同样不含任何真实地址 / 密码。
+ */
+interface Props {
+	downloads: DownloadListItem[];
+}
+
+const { downloads } = Astro.props;
+
+const KIND_DOT: Record<string, string> = {
+	free: "#22c55e",
+	lock: "var(--primary)",
+	pay: "#f59e0b",
+};
+
+const KIND_TEXT: Record<string, string> = {
+	free: "免费",
+	lock: "加密",
+	pay: "付费",
+};
+---
+<div class="dl-side overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+    <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
+        <Icon name="material-symbols:download-for-offline-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
+        <span class="font-bold text-[13.5px] text-black/85 dark:text-white/85">下载地址</span>
+        <span class="ml-auto rounded-full bg-[var(--btn-regular-bg)] px-1.5 py-0.5 text-[10.5px] font-semibold text-black/40 dark:text-white/40">
+            {downloads.length}
+        </span>
+    </div>
+
+    <ul class="py-1">
+        {downloads.map((d) => (
+            <li>
+                {d.kind === "pay" && d.buy ? (
+                    <a
+                        href={d.buy}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="group flex items-start gap-2 px-3.5 py-2 transition-colors hover:bg-[var(--btn-regular-bg)]"
+                    >
+                        <span class="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={`background:${KIND_DOT[d.kind]}`}></span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block truncate text-[12.5px] font-medium text-black/75 dark:text-white/75 group-hover:text-[var(--primary)] transition-colors">
+                                {d.name}
+                            </span>
+                            <span class="mt-0.5 flex items-center gap-1.5 text-[10.5px] text-black/40 dark:text-white/40">
+                                <span class="rounded bg-[#f59e0b]/12 px-1 py-[1px] font-bold text-[#b45309] dark:text-[#fbbf24]">{KIND_TEXT[d.kind]}</span>
+                                {d.price && <span class="font-semibold text-[#d97706] dark:text-[#fbbf24]">¥{d.price}</span>}
+                                {d.size && <span>{d.size}</span>}
+                            </span>
+                        </span>
+                        <Icon name="material-symbols:open-in-new-rounded" class="mt-0.5 shrink-0 text-[0.85rem] text-black/20 dark:text-white/25 group-hover:text-[var(--primary)] transition-colors" />
+                    </a>
+                ) : (
+                    <a
+                        href={`#${d.key}`}
+                        class="group flex items-start gap-2 px-3.5 py-2 transition-colors hover:bg-[var(--btn-regular-bg)]"
+                    >
+                        <span class="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={`background:${KIND_DOT[d.kind]}`}></span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block truncate text-[12.5px] font-medium text-black/75 dark:text-white/75 group-hover:text-[var(--primary)] transition-colors">
+                                {d.name}
+                            </span>
+                            <span class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] text-black/40 dark:text-white/40">
+                                <span
+                                    class:list={[
+                                        "rounded px-1 py-[1px] font-bold",
+                                        d.kind === "lock"
+                                            ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+                                            : "bg-[#22c55e]/12 text-[#16a34a] dark:text-[#4ade80]",
+                                    ]}
+                                >{d.tag || KIND_TEXT[d.kind]}</span>
+                                {d.netdisk?.label && <span>{d.netdisk.label}</span>}
+                                {d.size && <span>{d.size}</span>}
+                            </span>
+                        </span>
+                        <Icon name="material-symbols:subdirectory-arrow-right-rounded" class="mt-0.5 shrink-0 text-[0.9rem] text-black/20 dark:text-white/25 group-hover:text-[var(--primary)] transition-colors" />
+                    </a>
+                )}
+            </li>
+        ))}
+    </ul>
+
+    <div class="border-t border-[var(--line-divider)] px-3.5 py-2 text-[10.5px] leading-relaxed text-black/35 dark:text-white/35">
+        点击条目跳转到资源卡片；加密资源需输入密码。
+    </div>
+</div>
