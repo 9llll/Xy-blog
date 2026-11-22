@@ -6,12 +6,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // 取消 "Maple UI" 排在首位：它是 19.6 MB / 14.8 MB 的全量 TTF，
-        // 挂在 html 上等于首屏必然拉一个 34 MB 的字体（实测 60 秒只能下 800 KB），
-        // 会长期占用 HTTP 连接、拖慢同域图片与 CSS。
-        // 中文字形本身由系统字体渲染质量更好，视觉差异极小。
-        // 如需恢复，把 "Maple UI" 加回数组首位，并还原 Layout.astro 里的 @font-face。
-        sans: ["PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", "WenQuanYi Micro Hei", ...defaultTheme.fontFamily.sans],
+        // "Maple UI" 是全量 TTF（maple-ui.ttf 19.6 MB / maple-ui-bold.ttf 14.8 MB），
+        // 挂在根元素上意味着首屏会请求该字体。换系统字体更省流量，
+        // 但会改变全站字体的观感，如需切换请同时删掉 Layout.astro 里的 @font-face。
+        sans: ["Maple UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", "WenQuanYi Micro Hei", ...defaultTheme.fontFamily.sans],
       },
     },
   },

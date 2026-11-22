@@ -207,16 +207,10 @@ const bannerOffset =
 		  data-overlayscrollbars-initialize
 	>
 		{/*
-			原自定义字体 Maple UI 已停用：maple-ui.ttf 19.6 MB + maple-ui-bold.ttf 14.8 MB，
-			是全量 TTF（非子集），挂在根元素上会导致首屏强制下载一个 34 MB 的字体文件
-			（线上实测 60 秒仅下载 800 KB），长时间占用连接、挤占图片与 CSS 带宽。
-			字体加载不完时浏览器用 font-display: swap 回落到系统字体，所以访客实际看到的
-			本来就是系统字体——停用后视觉几乎无变化，但省掉 34 MB 请求。
-			恢复方式：取消下面两段 @font-face 的注释，并把 tailwind.config.cjs 里
-			fontFamily.sans 的 "Maple UI" 加回首位。
+			Maple UI 是全量 TTF（19.6 MB + 14.8 MB），文件较大，首屏会请求它。
+			若改回系统字体，需同时移除 tailwind.config.cjs 里 fontFamily.sans 的 "Maple UI"。
 		*/}
 		<style is:global>
-			/*
 			@font-face {
 				font-family: "Maple UI";
 				src: url("/fonts/maple-ui.ttf") format("truetype");
@@ -232,7 +226,6 @@ const bannerOffset =
 				font-style: normal;
 				font-display: swap;
 			}
-			*/
 		</style>
 		<ConfigCarrier></ConfigCarrier>
 		<slot />
