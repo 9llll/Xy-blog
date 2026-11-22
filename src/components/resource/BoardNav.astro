@@ -1,0 +1,45 @@
+---
+import { Icon } from "astro-icon/components";
+import { getCategoryList } from "../../utils/content-utils";
+
+/**
+ * 首页左侧「板块导航」
+ * 直接用现有文章分类（getCategoryList）渲染，点进去是该分类归档。
+ */
+const categories = await getCategoryList();
+
+const PALETTE = [
+	"#f59e0b",
+	"#3b82f6",
+	"#10b981",
+	"#8b5cf6",
+	"#ef4444",
+	"#06b6d4",
+	"#ec4899",
+	"#84cc16",
+];
+---
+<div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
+    <div class="flex items-center gap-2 h-12 px-4 border-b border-[var(--line-divider)]">
+        <Icon name="material-symbols:grid-view-rounded" class="text-[1.2rem] text-[var(--primary)]" />
+        <span class="font-bold text-[15px] text-black/85 dark:text-white/85">文章分类</span>
+    </div>
+    <nav class="py-2">
+        {categories.length === 0 && (
+            <div class="px-4 py-6 text-center text-[13px] text-black/40 dark:text-white/40">暂无板块</div>
+        )}
+        {categories.map((c, i) => (
+            <a
+                href={c.url}
+                class="group flex items-center gap-2.5 px-4 py-2.5 text-[13.5px] text-black/70 dark:text-white/70 hover:bg-[var(--btn-regular-bg)] hover:text-[var(--primary)] transition-colors"
+            >
+                <span
+                    class="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={`background:${PALETTE[i % PALETTE.length]}`}
+                ></span>
+                <span class="flex-1 truncate">{c.name}</span>
+                <span class="text-[11px] text-black/30 dark:text-white/30 group-hover:text-[var(--primary)]">{c.count}</span>
+            </a>
+        ))}
+    </nav>
+</div>

@@ -1,0 +1,42 @@
+---
+import { profileConfig } from "../../config";
+import { getCategoryList, getSortedPosts, getTagList } from "../../utils/content-utils";
+import ImageWrapper from "../misc/ImageWrapper.astro";
+
+/**
+ * 右侧「作者卡片」
+ * 全部为真实数据：头像/昵称/简介取自 profile.json，
+ * 统计项来自现有文章集合（文章数 / 分类数 / 标签数）。
+ */
+const posts = await getSortedPosts();
+const categories = await getCategoryList();
+const tags = await getTagList();
+
+const STATS = [
+	{ label: "文章", value: posts.length, href: "/archive/" },
+	{ label: "分类", value: categories.length, href: "/archive/" },
+	{ label: "标签", value: tags.length, href: "/archive/" },
+];
+---
+<div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
+    <div class="h-20 bg-gradient-to-r from-[var(--primary)] to-[#38bdf8]"></div>
+    <div class="px-4 pb-4 -mt-10 text-center">
+        <a href="/about/" class="mx-auto block w-16 h-16 rounded-full overflow-hidden ring-4 ring-[var(--card-bg)] bg-[var(--btn-regular-bg)]">
+            <ImageWrapper src={profileConfig.avatar || ""} alt={profileConfig.name} class="w-full h-full object-cover" />
+        </a>
+        <div class="mt-2 font-bold text-[15px] text-black/85 dark:text-white/85">{profileConfig.name}</div>
+        {profileConfig.bio && (
+            <p class="mt-1 whitespace-pre-line text-[11.5px] leading-relaxed text-black/45 dark:text-white/45 line-clamp-2">
+                {profileConfig.bio}
+            </p>
+        )}
+        <div class="mt-3 grid grid-cols-3 gap-1">
+            {STATS.map((s) => (
+                <a href={s.href} class="flex flex-col items-center rounded-lg py-1 hover:bg-[var(--btn-regular-bg)] transition-colors">
+                    <span class="text-[15px] font-bold text-black/80 dark:text-white/80">{s.value}</span>
+                    <span class="text-[11px] text-black/40 dark:text-white/40">{s.label}</span>
+                </a>
+            ))}
+        </div>
+    </div>
+</div>

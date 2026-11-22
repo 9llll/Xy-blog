@@ -1,0 +1,32 @@
+---
+import { Icon } from "astro-icon/components";
+import { getTagList } from "../../utils/content-utils";
+import { getTagUrl } from "../../utils/url-utils";
+
+/**
+ * 右侧「热门标签」
+ * 标签与出现次数均来自现有文章的 frontmatter.tags（真实数据），
+ * 点击进入归档页的标签筛选。
+ */
+const tags = await getTagList();
+const top = [...tags].sort((a, b) => b.count - a.count).slice(0, 24);
+---
+<div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
+    <div class="flex items-center gap-2 h-11 px-4 border-b border-[var(--line-divider)]">
+        <Icon name="material-symbols:tag-rounded" class="text-[1.2rem] text-[var(--primary)]" />
+        <span class="font-bold text-[14.5px] text-black/85 dark:text-white/85">热门标签</span>
+        <span class="ml-auto text-[11px] text-black/30 dark:text-white/30">{tags.length} 个</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 p-3">
+        {top.length === 0 && <span class="px-1 py-2 text-[12.5px] text-black/40 dark:text-white/40">暂无标签</span>}
+        {top.map((t) => (
+            <a
+                href={getTagUrl(t.name)}
+                class="inline-flex items-center gap-1 rounded-full bg-[var(--btn-regular-bg)] px-2.5 py-1 text-[12px] text-black/60 dark:text-white/60 hover:bg-[var(--primary-soft)] hover:text-[var(--primary)] transition-colors"
+            >
+                <span class="max-w-[7.5rem] truncate">{t.name}</span>
+                <span class="text-[10.5px] text-black/30 dark:text-white/30">{t.count}</span>
+            </a>
+        ))}
+    </div>
+</div>

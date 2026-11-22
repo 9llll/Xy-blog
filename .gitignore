@@ -36,3 +36,6 @@ dist-verify/
 
 # 本地验证用构建目录
 dist-verify/
+
+# 临时截图
+.tmp-*.png

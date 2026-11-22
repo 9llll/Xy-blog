@@ -1,18 +1,58 @@
 ---
-import PostPage from "../components/PostPage.astro";
-import MainGridLayout from "../layouts/MainGridLayout.astro";
-import { getSortedPosts } from "../utils/content-utils";
+import Footer from "@components/Footer.astro";
+import Navbar from "@components/Navbar.astro";
+import BoardNav from "@components/resource/BoardNav.astro";
+import QuickActions from "@components/resource/QuickActions.astro";
+import TagCloud from "@components/resource/TagCloud.astro";
+import ThreadList from "@components/resource/ThreadList.astro";
+import UserCard from "@components/resource/UserCard.astro";
+import Layout from "@layouts/Layout.astro";
+import { siteConfig } from "../config";
 
-// 首页展示全部文章（不分页）。
-// /page/N/ 路由仍然保留，由 page/[...page].astro 用 Astro 原生 paginate() 生成。
-const allBlogPosts = await getSortedPosts();
-
-// 构造一个仅供 PostPage 使用的最小 page 对象（PostPage 只依赖 page.data）
-const page = {
-	data: allBlogPosts,
-};
+/**
+ * 首页：资源站三栏版式
+ *   左：分类导航 ｜ 中：最新发布列表 ｜ 右：作者卡 / 快捷导航 / 热门标签
+ * 三个栏目全部为真实数据（文章集合 + profile.json），不含任何模拟积分/等级/排行。
+ * 其它页面仍沿用原来的 MainGridLayout，互不影响。
+ */
 ---
+<Layout
+    title={siteConfig.title}
+    description={siteConfig.description}
+    keywords={siteConfig.keywords}
+>
+    <div class="sticky top-0 z-50">
+        <div class="pt-3">
+            <Navbar />
+        </div>
+    </div>
 
-<MainGridLayout>
-    <PostPage page={page}></PostPage>
-</MainGridLayout>
+    <div class="mx-auto w-full max-w-[var(--page-width)] px-4 pt-4 pb-8">
+        <div class="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)_264px]">
+            <!-- 左侧分类导航 -->
+            <aside class="hidden lg:block">
+                <div class="sticky top-[5.5rem]">
+                    <BoardNav />
+                </div>
+            </aside>
+
+            <!-- 中部文章列表 -->
+            <main class="min-w-0">
+                <ThreadList />
+            </main>
+
+            <!-- 右侧栏 -->
+            <aside class="hidden lg:block">
+                <div class="sticky top-[5.5rem] space-y-4">
+                    <UserCard />
+                    <QuickActions />
+                    <TagCloud />
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="mx-auto w-full max-w-[var(--page-width)] px-4 pb-6">
+        <Footer />
+    </div>
+</Layout>

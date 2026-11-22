@@ -1,0 +1,24 @@
+---
+import { Icon } from "astro-icon/components";
+
+/** 右侧「快捷导航」：全部指向站点真实存在的页面 */
+const ACTIONS = [
+	{ label: "全部文章", icon: "material-symbols:article-outline-rounded", href: "/archive/", color: "#3b82f6" },
+	{ label: "搜索", icon: "material-symbols:search-rounded", href: "/search/", color: "#f59e0b" },
+	{ label: "订阅", icon: "material-symbols:rss-feed-rounded", href: "/rss.xml", color: "#10b981" },
+	{ label: "关于", icon: "material-symbols:info-outline-rounded", href: "/about/", color: "#8b5cf6" },
+];
+---
+<div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] p-3 grid grid-cols-4 gap-1 shadow-sm">
+    {ACTIONS.map((a) => (
+        <a href={a.href} class="flex flex-col items-center gap-1.5 rounded-lg py-2.5 hover:bg-[var(--btn-regular-bg)] transition-colors">
+            <span
+                class="grid place-items-center w-9 h-9 rounded-full text-white"
+                style={`background:${a.color}`}
+            >
+                <Icon name={a.icon} class="text-[1.15rem]" />
+            </span>
+            <span class="text-[11.5px] text-black/60 dark:text-white/60">{a.label}</span>
+        </a>
+    ))}
+</div>
