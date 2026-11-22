@@ -1,15 +1,15 @@
 ---
 import { Icon } from "astro-icon/components";
 import { profileConfig } from "../../config";
-import { getSortedPostsList, type PostForList } from "../../utils/content-utils";
+import { getHomePosts, type HomePost } from "../../utils/home-posts";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 import { getPostUrlBySlug } from "../../utils/url-utils";
-import { HOME_PAGE_SIZE } from "../../utils/home-posts";
+import { CATEGORY_BADGE_COLOR, POST_KIND_META, getPostKind } from "../../utils/post-kind";
 import PostPagination from "./PostPagination.astro";
 
 interface Props {
 	/** 当前页的文章；不传则取全部（兼容旧用法） */
-	posts?: PostForList[];
+	posts?: HomePost[];
 	currentPage?: number;
 	totalPages?: number;
 	totalCount?: number;
@@ -26,23 +26,11 @@ const {
  * 首页中部「最新帖子」列表（论坛风格）
  * 数据来自现有文章集合，分类取 frontmatter.category[0]。
  * 分页由 index.astro / page/[...page].astro 在服务端切好页再传进来。
+ * 标题前的徽章由正文自动判定：免费资源 / 加密资源 / 资讯博文 / 开源项目。
  */
-const list = pagePosts ?? (await getSortedPostsList());
+const list = pagePosts ?? (await getHomePosts());
 const total = totalCount ?? list.length;
-
-const PALETTE = [
-	"#f59e0b",
-	"#3b82f6",
-	"#10b981",
-	"#8b5cf6",
-	"#ef4444",
-	"#06b6d4",
-	"#ec4899",
-	"#84cc16",
-];
-
-/** 分类色块跨页保持连续，不因翻页而重新从第一个颜色开始 */
-const colorOffset = (currentPage - 1) * HOME_PAGE_SIZE;
+const badgeBase = "shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold text-white leading-none";
 ---
 <div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
     <div class="flex items-center gap-2 h-12 px-4 border-b border-[var(--line-divider)]">
@@ -57,9 +45,9 @@ const colorOffset = (currentPage - 1) * HOME_PAGE_SIZE;
         {list.length === 0 && (
             <div class="px-4 py-12 text-center text-[13px] text-black/40 dark:text-white/40">暂无文章</div>
         )}
-        {list.map((p, i) => {
+        {list.map((p) => {
             const cat = (p.data.category && p.data.category[0]) || "未分类";
-            const color = PALETTE[(colorOffset + i) % PALETTE.length];
+            const kind = POST_KIND_META[getPostKind(p.body)];
 
             return (
                 <a
@@ -68,10 +56,8 @@ const colorOffset = (currentPage - 1) * HOME_PAGE_SIZE;
                 >
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <span
-                                class="shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold text-white leading-none"
-                                style={`background:${color}`}
-                            >{cat}</span>
+                            <span class={badgeBase} style={`background:${kind.color}`}>{kind.label}</span>
+                            <span class={badgeBase} style={`background:${CATEGORY_BADGE_COLOR}`}>{cat}</span>
                             <span class="min-w-0 flex-1 truncate font-semibold text-[15px] text-black/85 dark:text-white/85 group-hover:text-[var(--primary)] transition-colors">
                                 {p.data.title}
                             </span>

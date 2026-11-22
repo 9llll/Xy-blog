@@ -5,14 +5,13 @@ import SiteAside from "../../components/resource/SiteAside.astro";
 import ThreadList from "../../components/resource/ThreadList.astro";
 import ResourceLayout from "../../layouts/ResourceLayout.astro";
 import { siteConfig } from "../../config";
-import { getHomePosts, getTotalPages, slicePage } from "../../utils/home-posts";
-import type { PostForList } from "../../utils/content-utils";
+import { getHomePosts, getTotalPages, slicePage, type HomePost } from "../../utils/home-posts";
 
 interface Props {
 	pageNum: number;
 	totalPages: number;
 	totalCount: number;
-	posts: PostForList[];
+	posts: HomePost[];
 }
 
 /**
