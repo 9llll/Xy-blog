@@ -228,26 +228,50 @@ const bannerOffset =
 			}
 
 			/*
-				原生滚动条兜底：OverlayScrollbars 未接管时（部分 Windows Chrome 会被 cancel），
-				浏览器会画出带上下箭头的粗灰条压在白面板右侧，很难看。
-				这里统一改成细窄、透明轨道、无箭头。
+				页面滚动条：全站隐藏。
+				Windows Chrome 会画一条 17px 粗、带上下箭头的灰色滚动条，正好压在白色面板
+				右边缘，观感像外挂了个杂物条。这里把它彻底去掉——滚轮、触控板、键盘、
+				触屏滑动都照常可用，只是不画那条边。
 			*/
+			html,
+			body {
+				scrollbar-width: none; /* Firefox、Chrome 121+ */
+				-ms-overflow-style: none; /* 旧版 Edge */
+			}
+			html::-webkit-scrollbar,
+			body::-webkit-scrollbar {
+				display: none;
+				width: 0;
+				height: 0;
+			}
+
+			/* OverlayScrollbars 的滚动视口也不能冒出原生条（它的细滚动条由 JS 自己画） */
+			.os-viewport,
+			[data-overlayscrollbars-viewport] {
+				scrollbar-width: none !important;
+			}
+			.os-viewport::-webkit-scrollbar,
+			[data-overlayscrollbars-viewport]::-webkit-scrollbar {
+				display: none !important;
+				width: 0 !important;
+				height: 0 !important;
+			}
+
+			/* 其余内部可滚动区域（代码块、宽表格、标签面板等）保留一条极细的滚动条，避免“看着能滚却不知道在哪” */
 			::-webkit-scrollbar {
-				width: 8px;
-				height: 8px;
+				width: 6px;
+				height: 6px;
 			}
 			::-webkit-scrollbar-track,
 			::-webkit-scrollbar-corner {
 				background: transparent;
 			}
 			::-webkit-scrollbar-thumb {
-				background-color: rgba(0, 0, 0, 0.22);
+				background-color: rgba(0, 0, 0, 0.2);
 				border-radius: 9999px;
-				border: 2px solid transparent;
-				background-clip: content-box;
 			}
 			::-webkit-scrollbar-thumb:hover {
-				background-color: rgba(0, 0, 0, 0.4);
+				background-color: rgba(0, 0, 0, 0.38);
 			}
 			::-webkit-scrollbar-button {
 				display: none;
@@ -255,10 +279,10 @@ const bannerOffset =
 				height: 0;
 			}
 			:global(.dark) ::-webkit-scrollbar-thumb {
-				background-color: rgba(255, 255, 255, 0.26);
+				background-color: rgba(255, 255, 255, 0.24);
 			}
 			:global(.dark) ::-webkit-scrollbar-thumb:hover {
-				background-color: rgba(255, 255, 255, 0.44);
+				background-color: rgba(255, 255, 255, 0.42);
 			}
 		</style>
 
