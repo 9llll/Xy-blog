@@ -146,7 +146,8 @@ let links: NavBarLink[] = navBarConfig.links.map(
 
             {hasRightSidebar && (
                 <aside class="hidden xl:block xl:col-start-3 xl:row-start-1 mb-4 onload-animation">
-                    <div class="sticky top-[5.5rem] max-h-[calc(100vh-7rem)] overflow-y-auto pr-0.5">
+                    {/* 与 ResourceLayout 一致：右栏不内部滚动，内容多长就排多长 */}
+                    <div class="pr-0.5">
                         <slot name="right-sidebar" />
                     </div>
                 </aside>

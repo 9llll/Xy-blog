@@ -102,7 +102,9 @@ let links: NavBarLink[] = navBarConfig.links.map(
 
             {hasRight && (
                 <aside class="hidden lg:block">
-                    <div class="sticky top-[5.5rem] max-h-[calc(100vh-7rem)] space-y-4 overflow-y-auto">
+                    {/* 右栏不做内部滚动：内容有多长就排多长，随整页一起滚。
+                        原来 sticky + max-h + overflow-y-auto 会在栏内出现一条灰滚动条。 */}
+                    <div class="space-y-4">
                         <slot name="right" />
                     </div>
                 </aside>
