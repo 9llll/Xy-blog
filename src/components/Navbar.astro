@@ -37,20 +37,26 @@ let links: NavBarLink[] = navBarConfig.links.map(
         </button>
         <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div class="flex flex-row items-center text-md text-black/85 dark:text-white/85">
-                {/* logo 在 src/data/site.json 的 logo 字段配置；留空则用内置图标 */}
+                {/*
+                    logo 在 src/data/site.json 的 logo 字段配置。
+                    配了图片 → 只显示图片（横向 logo 通常已含站点名，再显示文字会重复）；
+                    留空 → 回落内置图标 + 文字。
+                */}
                 {siteConfig.logo ? (
                     <img
                         src={siteConfig.logo}
                         alt={siteConfig.title}
-                        width="28"
-                        height="28"
+                        width="131"
+                        height="40"
                         decoding="async"
-                        class="h-7 w-7 mr-2 object-contain"
+                        class="h-9 w-auto object-contain sm:h-10"
                     />
                 ) : (
-                    <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
+                    <>
+                        <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
+                        {siteConfig.title}
+                    </>
                 )}
-                {siteConfig.title}
             </div>
         </a>
         <div class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">

@@ -24,20 +24,25 @@ const links = Astro.props.links;
         <!-- 顶部栏：站点名 + 关闭按钮（手机上不必只能点遮罩关闭） -->
         <div class="shrink-0 flex items-center justify-between gap-2 border-b border-[var(--line-divider)] px-4 py-3">
             <div class="flex items-center gap-2 min-w-0">
-                {/* 与桌面导航共用同一个 logo 配置 */}
+                {/*
+                    与桌面导航共用同一个 logo 配置：配了图就只显示图（logo 已含站名），
+                    留空则回落图标 + 文字。
+                */}
                 {siteConfig.logo ? (
                     <img
                         src={siteConfig.logo}
-                        alt=""
-                        width="20"
-                        height="20"
+                        alt={siteConfig.title}
+                        width="115"
+                        height="35"
                         decoding="async"
-                        class="h-5 w-5 shrink-0 object-contain"
+                        class="h-7 w-auto max-w-[168px] object-contain"
                     />
                 ) : (
-                    <Icon name="material-symbols:home-outline-rounded" class="text-[1.25rem] text-[var(--primary)] shrink-0" />
+                    <>
+                        <Icon name="material-symbols:home-outline-rounded" class="text-[1.25rem] text-[var(--primary)] shrink-0" />
+                        <span class="truncate font-bold text-[15px] text-black/85 dark:text-white/85">{siteConfig.title}</span>
+                    </>
                 )}
-                <span class="truncate font-bold text-[15px] text-black/85 dark:text-white/85">{siteConfig.title}</span>
             </div>
             <button
                 type="button"
