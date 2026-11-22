@@ -4,6 +4,7 @@ import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import PostBadge from "@components/PostBadge.astro";
 import PostMetadata from "@components/PostMeta.astro";
+import BoardNav from "@components/resource/BoardNav.astro";
 import DownloadHero from "@components/resource/DownloadHero.astro";
 import DownloadSidebar from "@components/resource/DownloadSidebar.astro";
 import LatestList from "@components/resource/LatestList.astro";
@@ -89,18 +90,26 @@ const jsonLd = {
 >
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
 
-    <!-- 左栏：文章目录（无标题时不占位，避免出现空栏） -->
-    {hasHeadings && (
-        <div slot="left" class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
-            <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
-                <Icon name="material-symbols:list-alt-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
-                <span class="font-bold text-[13.5px] text-black/85 dark:text-white/85">{i18n(I18nKey.tableOfContents)}</span>
+    <!--
+      左栏：有层级标题时显示文章目录；没有小标题的文章改显示「文章分类」。
+      注意不能整体条件渲染 slot——Astro 的 slots.has() 仍会判定左栏存在，
+      结果是一个 200px 的空列把正文挤偏（曾出现过的空白左栏就是这个原因）。
+    -->
+    <div slot="left" class="space-y-4">
+        {hasHeadings ? (
+            <div class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">
+                <div class="flex items-center gap-2 border-b border-[var(--line-divider)] px-3.5 py-2.5">
+                    <Icon name="material-symbols:list-alt-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
+                    <span class="font-bold text-[13.5px] text-black/85 dark:text-white/85">{i18n(I18nKey.tableOfContents)}</span>
+                </div>
+                <div class="max-h-[calc(100vh-12rem)] overflow-y-auto p-2">
+                    <TOC headings={headings} />
+                </div>
             </div>
-            <div class="max-h-[calc(100vh-12rem)] overflow-y-auto p-2">
-                <TOC headings={headings} />
-            </div>
-        </div>
-    )}
+        ) : (
+            <BoardNav />
+        )}
+    </div>
 
     <!-- 右栏：作者卡 / 下载地址 / 最新发布 -->
     <div slot="right">
