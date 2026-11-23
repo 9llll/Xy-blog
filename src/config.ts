@@ -114,24 +114,25 @@ export const siteConfig: SiteConfig = {
  * 三个内置页面（首页 / 归档 / 关于）仍走 LinkPreset，
  * 以保留多语言文案（写死中文会导致切换语言时导航不跟随）。
  *
- * 二级导航写在 `children` 里；带 children 的项不再走 preset，
- * 否则父子结构会被 preset 覆盖掉。父项 url 留空即「只作分组标题」。
+ * 二级导航不写成嵌套数组：PagesCMS 的「列表里再嵌列表」编辑区不渲染，
+ * 改成一级项与子项同处一个列表，子项用 parent 字段填父项名称归位。
+ * 父项 url 留空即「只作分组标题」，点击只展开下拉。
  */
-function toNavLink(item: Record<string, any>): NavBarLink | LinkPreset {
+function toChildLink(item: RawNav): NavBarLink | null {
+	const childUrl = str(item?.url, "").trim();
+	if (childUrl === "") return null;
+	return {
+		name: str(item?.name, "子项"),
+		url: childUrl,
+		external: bool(item?.external, /^https?:\/\//i.test(childUrl)),
+	};
+}
+
+function toNavLink(item: RawNav, childrenRaw: RawNav[] = []): NavBarLink | LinkPreset {
 	const rawUrl = str(item.url, "").trim();
-	const children = Array.isArray(item.children)
-		? item.children
-				.map((child: Record<string, any>) => {
-					const childUrl = str(child?.url, "").trim();
-					if (childUrl === "") return null;
-					return {
-						name: str(child?.name, "子项"),
-						url: childUrl,
-						external: bool(child?.external, /^https?:\/\//i.test(childUrl)),
-					} as NavBarLink;
-				})
-				.filter((child): child is NavBarLink => child !== null)
-		: [];
+	const children = childrenRaw
+		.map(toChildLink)
+		.filter((child): child is NavBarLink => child !== null);
 
 	if (children.length > 0) {
 		return {
@@ -153,10 +154,37 @@ function toNavLink(item: Record<string, any>): NavBarLink | LinkPreset {
 	};
 }
 
+/** CMS 里的导航是一个平铺列表：parent 为空的是一级，非空的是该项的下拉子项 */
+const rawNavItems: RawNav[] = Array.isArray(navData) ? (navData as RawNav[]) : [];
+const navChildGroups = new Map<string, RawNav[]>();
+const navTopItems: RawNav[] = [];
+
+for (const item of rawNavItems) {
+	const parent = str(item?.parent, "").trim();
+	if (parent === "") {
+		navTopItems.push(item);
+		continue;
+	}
+	const bucket = navChildGroups.get(parent) ?? [];
+	bucket.push(item);
+	navChildGroups.set(parent, bucket);
+}
+
+// parent 填错、找不到同名一级项时，子项升为一级，避免整条链接从导航里消失
+const navTopNames = new Set(navTopItems.map((item) => str(item.name, "").trim()));
+for (const [parent, items] of [...navChildGroups]) {
+	if (!navTopNames.has(parent)) {
+		navTopItems.push(...items);
+		navChildGroups.delete(parent);
+	}
+}
+
 export const navBarConfig: NavBarConfig = {
 	links:
-		Array.isArray(navData) && navData.length > 0
-			? navData.map((item) => toNavLink(item as Record<string, any>))
+		navTopItems.length > 0
+			? navTopItems.map((item) =>
+					toNavLink(item, navChildGroups.get(str(item.name, "").trim()) ?? []),
+				)
 			: [LinkPreset.Home, LinkPreset.Archive, LinkPreset.About],
 };
 

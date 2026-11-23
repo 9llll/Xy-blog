@@ -12,29 +12,31 @@
   {
     "name": "资源",
     "url": "",
-    "external": false,
-    "children": [
-      {
-        "name": "网站资源",
-        "url": "https://moci.cc/category/webs/",
-        "external": true
-      },
-      {
-        "name": "游戏资源",
-        "url": "https://moci.cc/category/game/",
-        "external": true
-      },
-      {
-        "name": "软件工具",
-        "url": "https://moci.cc/category/tools/",
-        "external": true
-      },
-      {
-        "name": "教程文档",
-        "url": "https://moci.cc/category/docs/",
-        "external": true
-      }
-    ]
+    "external": false
+  },
+  {
+    "name": "网站资源",
+    "url": "https://moci.cc/category/webs/",
+    "external": true,
+    "parent": "资源"
+  },
+  {
+    "name": "游戏资源",
+    "url": "https://moci.cc/category/game/",
+    "external": true,
+    "parent": "资源"
+  },
+  {
+    "name": "软件工具",
+    "url": "https://moci.cc/category/tools/",
+    "external": true,
+    "parent": "资源"
+  },
+  {
+    "name": "教程文档",
+    "url": "https://moci.cc/category/docs/",
+    "external": true,
+    "parent": "资源"
   },
   {
     "name": "论坛",
