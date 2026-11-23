@@ -1,0 +1,61 @@
+name: SEO Push
+
+# 每次推送 main 后：先等新版本真的上线，再通知搜索引擎来抓。
+# 顺带每天兜底跑一次，防止某次部署失败导致漏推。
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # UTC 00:30 = 北京时间 08:30，赶在早上巡检之前
+    - cron: "30 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seo-push
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 等待新版本上线
+        # 直接推会失败：IndexNow 会去校验 key 文件，站点还没部署完就是 404。
+        # 探到 key 文件可访问，说明这份提交已经生效。
+        run: |
+          KEY=6292379dce0a7882f3563cdf4ffac798
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://www.3x3.top/$KEY.txt")
+            if [ "$code" = "200" ]; then
+              echo "key 文件已可访问，新版本上线"
+              exit 0
+            fi
+            echo "第 $i 次探测：HTTP $code，20 秒后重试"
+            sleep 20
+          done
+          echo "::error::key 文件十分钟内仍不可访问，本次跳过推送"
+          exit 1
+
+      - name: 恢复推送状态
+        uses: actions/cache@v4
+        with:
+          path: .seo-cache
+          key: seo-cache-${{ github.run_id }}
+          restore-keys: |
+            seo-cache-
+
+      - name: 推送收录
+        run: node scripts/seo-push.mjs
+        env:
+          # 在仓库 Settings → Secrets 里加 BAIDU_TOKEN 即可启用百度推送；
+          # 不加也能跑，百度那一步会自动跳过
+          BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}

@@ -37,6 +37,9 @@ dist-verify/
 # 本地验证用构建目录
 dist-verify/
 
+# 收录推送的增量状态（每次运行生成，不入库）
+.seo-cache/
+
 # 临时截图
 .tmp-*.png
 .tmp-*

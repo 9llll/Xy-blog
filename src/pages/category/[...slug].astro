@@ -1,0 +1,170 @@
+---
+import { Icon } from "astro-icon/components";
+import BoardNav from "@components/resource/BoardNav.astro";
+import SiteAside from "@components/resource/SiteAside.astro";
+import ThreadList from "@components/resource/ThreadList.astro";
+import ResourceLayout from "@layouts/ResourceLayout.astro";
+import { siteConfig } from "../../config";
+import {
+	type CategoryNode,
+	getCategoryTree,
+	getPostsByCategory,
+} from "@utils/content-utils";
+import { url } from "@utils/url-utils";
+
+/**
+ * 分类聚合页 /category/父/子/
+ *
+ * 存在的理由：分类是最好的长尾入口（「大话西游 单机版 下载」这类搜索量分散、
+ * 竞争小），但归档页的分类筛选是 `?category=` 参数形式，而全站 canonical 会
+ * 剥掉 query —— 于是所有分类页都被判定为 /archive/ 的重复内容，永远进不了索引。
+ *
+ * 这页给每个分类一个真实路径、独立标题与描述，并且：
+ *   - 父级页面包含全部子级文章（与侧栏计数口径一致）
+ *   - 有子分类时列出子分类入口，形成「父 → 子」内链
+ *   - 面包屑逐级可点，配合 BreadcrumbList 结构化数据
+ */
+export async function getStaticPaths() {
+	const tree = await getCategoryTree();
+
+	// 把树摊平：父级与子级各生成一个页面
+	const flat: CategoryNode[] = [];
+	const walk = (nodes: CategoryNode[]) => {
+		for (const node of nodes) {
+			flat.push(node);
+			walk(node.children);
+		}
+	};
+	walk(tree);
+
+	return flat.map((node) => ({
+		params: { slug: node.fullName },
+		props: { node },
+	}));
+}
+
+const { node } = Astro.props as { node: CategoryNode };
+const posts = await getPostsByCategory(node.fullName);
+
+// 「游戏资源/大话西游」→ ["游戏资源", "大话西游"]
+const segments = node.fullName.split("/");
+
+const pageTitle = segments.length > 1 ? `${node.name} - ${segments[0]}` : node.name;
+
+const description =
+	posts.length > 0
+		? `${node.fullName} 分类共 ${posts.length} 篇资源，包含下载地址、提取码与安装说明，${siteConfig.title} 持续更新。`
+		: `${node.fullName} 分类，${siteConfig.title}。`;
+
+// 关键词跟着分类走，比全站统一关键词更贴合长尾搜索
+const keywords = [node.fullName, segments[0], node.name, siteConfig.keywords]
+	.filter(Boolean)
+	.join(", ");
+
+// 面包屑结构化数据：首页 → 各级分类
+const siteUrl = Astro.site?.href ?? Astro.url.origin;
+const breadcrumbJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BreadcrumbList",
+	itemListElement: [
+		{ "@type": "ListItem", position: 1, name: "首页", item: new URL("/", siteUrl).href },
+		...segments.map((segment, index) => ({
+			"@type": "ListItem",
+			position: index + 2,
+			name: segment,
+			item: new URL(url(`/category/${segments.slice(0, index + 1).join("/")}/`), siteUrl).href,
+		})),
+	],
+};
+
+// 该分类下的文章合集，告诉搜索引擎这是一组资源而非单篇
+const itemListJsonLd = {
+	"@context": "https://schema.org",
+	"@type": "CollectionPage",
+	name: pageTitle,
+	description,
+	url: new URL(Astro.url.pathname, siteUrl).href,
+	isPartOf: { "@type": "WebSite", name: siteConfig.title, url: siteUrl },
+	mainEntity: {
+		"@type": "ItemList",
+		numberOfItems: posts.length,
+		itemListElement: posts.slice(0, 30).map((post, index) => ({
+			"@type": "ListItem",
+			position: index + 1,
+			url: new URL(url(`/${post.slug}/`), siteUrl).href,
+			name: post.data.title,
+		})),
+	},
+};
+
+const crumbLink =
+	"text-[12.5px] text-black/45 dark:text-white/45 transition-colors hover:text-[var(--primary)]";
+const subLink =
+	"inline-flex items-center gap-1 rounded-md bg-[#e0f2fe] px-2.5 py-1.5 text-[12px] font-medium text-[#0369a1] " +
+	"transition-colors hover:bg-[#bae6fd] dark:bg-[#0b3a52] dark:text-[#7dd3fc] dark:hover:bg-[#0e4a68]";
+---
+
+<ResourceLayout title={pageTitle} description={description} keywords={keywords}>
+	<Fragment slot="head">
+		<script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+		<script is:inline type="application/ld+json" set:html={JSON.stringify(itemListJsonLd)} />
+	</Fragment>
+
+	<BoardNav slot="left" />
+
+	<div class="space-y-4">
+		<div class="rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] px-4 py-3">
+			<nav aria-label="面包屑导航" class="flex flex-wrap items-center gap-1.5">
+				<a href={url("/")} class={crumbLink}>首页</a>
+				{segments.map((segment, index) => {
+					const isLast = index === segments.length - 1;
+					return (
+						<>
+							<Icon
+								name="material-symbols:chevron-right-rounded"
+								class="text-[0.85rem] text-black/20 dark:text-white/20"
+							/>
+							{isLast ? (
+								<span
+									class="text-[12.5px] font-semibold text-black/75 dark:text-white/75"
+									aria-current="page"
+								>
+									{segment}
+								</span>
+							) : (
+								<a
+									href={url(`/category/${segments.slice(0, index + 1).join("/")}/`)}
+									class={crumbLink}
+								>
+									{segment}
+								</a>
+							)}
+						</>
+					);
+				})}
+			</nav>
+
+			{node.children.length > 0 && (
+				<div class="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--line-divider)] pt-3">
+					<span class="text-[11.5px] text-black/35 dark:text-white/35">子分类</span>
+					{node.children.map((child) => (
+						<a href={url(`/category/${child.fullName}/`)} class={subLink}>
+							{child.name}
+							<span class="text-[10.5px] text-[#0369a1]/60 dark:text-[#7dd3fc]/60">{child.count}</span>
+						</a>
+					))}
+				</div>
+			)}
+		</div>
+
+		<ThreadList
+			posts={posts}
+			currentPage={1}
+			totalPages={1}
+			totalCount={posts.length}
+			heading={node.name}
+		/>
+	</div>
+
+	<SiteAside slot="right" />
+</ResourceLayout>

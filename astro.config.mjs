@@ -100,8 +100,14 @@ export default defineConfig({
 		}),
 		svelte(),
 		sitemap({
-			// 404 页不应出现在站点地图里
-			filter: (page) => !page.includes("/404"),
+			/**
+			 * 不该进站点地图的三类页面：
+			 *   404        —— 错误页
+			 *   /search/   —— robots 已 Disallow，写进 sitemap 等于给蜘蛛互相矛盾的信号
+			 *   /page/1/   —— 会 301 到首页，提交重定向地址白耗抓取配额
+			 */
+			filter: (page) =>
+				!page.includes("/404") && !page.includes("/search") && !/\/page\/1\/?$/.test(page),
 		}),
 	],
 

@@ -122,6 +122,18 @@ export function matchesCategoryFilter(postCategory: string, filter: string): boo
 	return target === base || target.startsWith(`${base}/`);
 }
 
+/**
+ * 取某个分类（选中父级时含全部子级）下的文章，沿用全站排序。
+ * 供 /category/[...slug] 静态聚合页使用 —— 每篇只出现一次，靠 slug 去重。
+ */
+export async function getPostsByCategory(category: string): Promise<CollectionEntry<"posts">[]> {
+	const posts = await getSortedPosts();
+	return posts.filter((post) => {
+		const categories = Array.isArray(post.data.category) ? post.data.category : [];
+		return categories.some((item) => typeof item === "string" && matchesCategoryFilter(item, category));
+	});
+}
+
 /** 构建分类树，父级计数包含全部子级 */
 export async function getCategoryTree(): Promise<CategoryNode[]> {
 	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
