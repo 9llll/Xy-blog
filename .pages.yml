@@ -2,6 +2,12 @@
 # 仓库根目录放这个文件，Pages CMS 会自动识别。
 # 改动会直接以 commit 形式提交到 GitHub，由部署平台自动触发构建。
 
+# ---------- 全局设置 ----------
+# 开启后可用 Cache 页（/owner/repo/branch/cache）手动同步字段表：
+# 只有该页面会拿 GitHub 上的 .pages.yml 与数据库缓存比对，否则改了字段表可能不生效。
+settings:
+  cache: true
+
 # ---------- 媒体库：文章图片 ----------
 # 注意：Pages CMS 的媒体目录是固定路径，不支持按文章自动分子文件夹；
 # 统一存到 src/content/posts/images，上传时会自动把文件名转成 slug 避免互相覆盖。
@@ -54,7 +60,7 @@ content:
       # 正文里已经手写过指令的文章以正文为准，这里会被忽略。
       - name: downloadLinks
         label: 下载资源（一行一个网盘，多个网盘换行多写几条）
-        type: tex
+        type: text
         optional: true
         description: |-
           每行一条，用竖线 | 分隔，最多五段：名称 | 链接 | 提取码 | 访问密码 | 文件大小。

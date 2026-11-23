@@ -8,6 +8,7 @@
     "check": "astro check",
     "build": "astro build && node scripts/sitemap-lastmod.mjs && pagefind --site dist && node scripts/clean-dist-chunks.mjs",
     "seo:push": "node scripts/seo-push.mjs",
+    "check:cms": "node scripts/cms-check.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
