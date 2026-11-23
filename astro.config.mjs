@@ -32,6 +32,7 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkPostBadge } from "./src/plugins/remark-post-badge.mjs";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { remarkUnwrapPastedCode } from "./src/plugins/remark-unwrap-pasted-code.mjs";
+import { remarkUnwrapBoldDirective } from "./src/plugins/remark-unwrap-bold-directive.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -124,6 +125,7 @@ export default defineConfig({
 			remarkExcerpt,
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
+			remarkUnwrapBoldDirective,
 			remarkPostBadge,
 			remarkDownloadList,
 			remarkSectionize,

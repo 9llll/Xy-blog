@@ -16,15 +16,15 @@ keywords:
 author: 羡鱼
 series: 单机游戏
 seriesOrder: 0
-ogImage: https://raw.githubusercontent.com/9llll/blog/refs/heads/main/public/images/fenxiang.avif
+ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: false
 ---
 **全新改版，支持一账号建5角色多开，或多个账号多开。**  
-**::download{name="【百度网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.baidu.com/s/17RRaPV-mnfCXg9dG7Qsg9w" code="1wau" password="66398"}**
+::download{name="【百度网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.baidu.com/s/17RRaPV-mnfCXg9dG7Qsg9w" code="1wau" password="66398"}
 
-**::download{name="【夸克网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.quark.cn/s/c8910031388d" code="7wVr" password="66398"}**
+::download{name="【夸克网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.quark.cn/s/c8910031388d" code="7wVr" password="66398"}
 
 **功能亮点：**  
 **✅ 灵宝、星盘、灵犀、法门、成圣之路、大黄鸭全都有**  

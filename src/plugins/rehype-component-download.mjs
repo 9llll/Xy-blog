@@ -196,8 +196,29 @@ function renderShell({
  *             / password（访问密码）/ icon（图标类型）/ cover（封面图）
  *             / tag（角标文案）
  */
+/**
+ * 去掉功能字段两端多余的引号与空白
+ *
+ * 从 Word / 微信 / 富文本粘贴时，属性值常带中文弯引号：
+ *   url=“https://pan.baidu.com/s/xxx”  code=“1wau”
+ * 解析后引号会跟着值一起进来，url 通不过 http(s) 校验直接退化成
+ * 「Invalid directive」提示，提取码复制出来也多两个引号。
+ * 这里只清洗地址 / 提取码 / 访问密码这三个功能字段，
+ * 名称与简介里的引号属于正常排版，保持原样。
+ */
+const WRAP_QUOTES = /^[\s"'“”‘’`]+|[\s"'“”‘’`]+$/g;
+
+function cleanField(value) {
+	return asString(value).replace(WRAP_QUOTES, "");
+}
+
+/** 标题只去中文弯引号：弯引号是复制粘贴时带来的分隔符，不该显示在卡片上 */
+function cleanTitle(value) {
+	return asString(value).replace(/^[\s“”‘’]+|[\s“”‘’]+$/g, "");
+}
+
 function normalizeItem(props) {
-	const url = asString(props.url).trim();
+	const url = cleanField(props.url);
 	if (!url) return null;
 
 	const isSafeUrl =
@@ -207,20 +228,20 @@ function normalizeItem(props) {
 		url.startsWith("../");
 	if (!isSafeUrl) return null;
 
-	const password = asString(props.password).trim();
+	const password = cleanField(props.password);
 	const desc = asString(props.desc).trim();
 	const source = asString(props.source).trim();
 	const size = asString(props.size).trim();
-	const code = asString(props.code).trim();
+	const code = cleanField(props.code);
 	const hint = asString(props.hint).trim();
 	const icon = asString(props.icon).trim();
 	const cover = asString(props.cover).trim();
 	const autocover = asString(props.autocover).trim();
 	const tag = asString(props.tag).trim();
 	const rawName =
-		asString(props.name).trim() ||
-		asString(props.title).trim() ||
-		asString(props.source).trim();
+		cleanTitle(props.name) ||
+		cleanTitle(props.title) ||
+		cleanTitle(props.source);
 	// 卡片标题按纯文本渲染，剥掉作者手写的 ** 粗体符号
 	const name = stripMdEmphasis(rawName) || i18n(I18nKey.downloadAction);
 
