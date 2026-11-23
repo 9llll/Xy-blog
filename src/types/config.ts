@@ -66,6 +66,8 @@ export type NavBarLink = {
 	name: string;
 	url: string;
 	external?: boolean;
+	/** 二级导航：有子项时顶部该项渲染为下拉菜单；url 留空表示只作分组标题 */
+	children?: NavBarLink[];
 };
 
 export type NavBarConfig = {

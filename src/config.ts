@@ -113,15 +113,42 @@ export const siteConfig: SiteConfig = {
  * 把 CMS 里填的导航项还原成 NavBarLink。
  * 三个内置页面（首页 / 归档 / 关于）仍走 LinkPreset，
  * 以保留多语言文案（写死中文会导致切换语言时导航不跟随）。
+ *
+ * 二级导航写在 `children` 里；带 children 的项不再走 preset，
+ * 否则父子结构会被 preset 覆盖掉。父项 url 留空即「只作分组标题」。
  */
 function toNavLink(item: Record<string, any>): NavBarLink | LinkPreset {
-	const url = str(item.url, "").replace(/\/+$/, "") || "/";
+	const rawUrl = str(item.url, "").trim();
+	const children = Array.isArray(item.children)
+		? item.children
+				.map((child: Record<string, any>) => {
+					const childUrl = str(child?.url, "").trim();
+					if (childUrl === "") return null;
+					return {
+						name: str(child?.name, "子项"),
+						url: childUrl,
+						external: bool(child?.external, /^https?:\/\//i.test(childUrl)),
+					} as NavBarLink;
+				})
+				.filter((child): child is NavBarLink => child !== null)
+		: [];
+
+	if (children.length > 0) {
+		return {
+			name: str(item.name, "导航"),
+			url: rawUrl,
+			external: bool(item.external, /^https?:\/\//i.test(rawUrl)),
+			children,
+		};
+	}
+
+	const url = rawUrl.replace(/\/+$/, "") || "/";
 	if (url === "/") return LinkPreset.Home;
 	if (url === "/about") return LinkPreset.About;
 	if (url === "/archive") return LinkPreset.Archive;
 	return {
 		name: str(item.name, "链接"),
-		url: str(item.url, "/"),
+		url: rawUrl,
 		external: bool(item.external, false),
 	};
 }

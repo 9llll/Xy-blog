@@ -64,7 +64,48 @@ const links = Astro.props.links;
                 <div class="border-t border-[var(--line-divider)]"></div>
                 <!-- 导航链接 -->
                 <div class="flex flex-col gap-2 mb-6">
-                    {links.map((link) => (
+                    {links.map((link) => {
+                        const children = link.children ?? [];
+                        // 有子项：父项作为分组标题，子项缩进一层，移动端不依赖 hover
+                        if (children.length > 0) {
+                            return (
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between px-4 pt-2 pb-1">
+                                        <span class="text-[12px] font-bold tracking-wide text-black/40 dark:text-white/40">
+                                            {link.name}
+                                        </span>
+                                        <Icon name="material-symbols:expand-more-rounded" class="text-[1rem] text-black/25 dark:text-white/25" />
+                                    </div>
+                                    {children.map((child) => (
+                                        <a
+                                            href={child.external ? child.url : url(child.url)}
+                                            class="group flex justify-between items-center py-2.5 pl-7 pr-4 rounded-xl gap-4 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition-all hover:translate-x-1"
+                                            target={child.external ? "_blank" : null}
+                                        >
+                                            <span class="transition text-[13.5px] text-black/70 dark:text-white/70 font-medium group-hover:text-[var(--primary)]">
+                                                {child.name}
+                                            </span>
+                                            <span class="flex items-center gap-2">
+                                                {!child.external && (
+                                                    <Icon
+                                                        name="material-symbols:chevron-right-rounded"
+                                                        class="transition text-[1.15rem] text-[var(--primary)] group-hover:translate-x-1"
+                                                    />
+                                                )}
+                                                {child.external && (
+                                                    <Icon
+                                                        name="fa6-solid:arrow-up-right-from-square"
+                                                        class="transition text-[0.7rem] text-black/25 dark:text-white/25"
+                                                    />
+                                                )}
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            );
+                        }
+
+                        return (
                         <a 
                             href={link.external ? link.url : url(link.url)} 
                             class="group flex justify-between items-center py-3 px-4 rounded-xl gap-4 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition-all hover:translate-x-1"
@@ -88,7 +129,8 @@ const links = Astro.props.links;
                                 )}
                             </div>
                         </a>
-                    ))}
+                        );
+                    })}
                 </div>
                 <!-- 文章分类 -->
                 <BoardNav></BoardNav>

@@ -319,10 +319,26 @@ content:
           - name: url
             label: 链接
             type: string
-            description: "首页填 /，归档填 /archive/，关于填 /about/，其余为自定义页面"
+            description: "首页填 /，归档填 /archive/，关于填 /about/；有子项时可以留空，只作下拉的分组标题"
           - name: external
             label: 站外链接
             type: boolean
+          - name: children
+            label: 二级导航（留空则该项是普通链接）
+            type: object
+            list: true
+            optional: true
+            fields:
+              - name: name
+                label: 子项名称
+                type: string
+              - name: url
+                label: 子项链接
+                type: string
+                description: "站内页面填 /archive/ 这类路径，站外填完整 https:// 地址"
+              - name: external
+                label: 子项站外链接
+                type: boolean
 
       - name: profile
         label: 侧边栏资料
