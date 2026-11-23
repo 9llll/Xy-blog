@@ -16,14 +16,9 @@ keywords:
   - 三国
   - 页游
   - 经营
-downloadLinks:
-  - name: "【百度网盘】策略页游-三国之戈霜王者一键单机端"
-    url: "https://pan.baidu.com/s/1apwlgR2V3MbOme-2sMzO6A"
-    code: "ay1h"
-    password: "47913"
-    size: "519 MB"
-    icon: baidu
-    hint: "邮箱：golooo@qq.com"
+downloadLinks: |-
+  【百度网盘】策略页游-三国之戈霜王者一键单机端 | https://pan.baidu.com/s/1apwlgR2V3MbOme-2sMzO6A | ay1h | 47913 | 519 MB
+downloadHint: 邮箱：golooo@qq.com
 author: 羡鱼
 series: 单机游戏
 seriesOrder: 0

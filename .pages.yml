@@ -48,6 +48,29 @@ content:
         type: string
         required: true
 
+      # ---------- 下载资源（表单化，替代手写 ::download{...}） ----------
+      # 一行一个网盘，竖线分隔：名称 | 链接 | 提取码 | 访问密码 | 文件大小
+      # 构建时自动在正文最上方生成下载卡片，与手写 ::download{} 完全一致。
+      # 正文里已经手写过指令的文章以正文为准，这里会被忽略。
+      - name: downloadLinks
+        label: 下载资源（一行一个网盘，多个网盘换行多写几条）
+        type: text
+        optional: true
+        description: |-
+          每行一条，用竖线 | 分隔，最多五段：名称 | 链接 | 提取码 | 访问密码 | 文件大小。
+          后面的段没有就省略不写，跳过某一段则留空（例如只想填大小：名称 | 链接 ||| 519 MB）。
+          有提取码、有访问密码：
+          【百度网盘】大话西游2单机版 | https://pan.baidu.com/s/xxxx | 1wau | 66398
+          免费直下、无密码：
+          【夸克网盘】大话西游2单机版 | https://pan.quark.cn/s/xxxx
+          网盘类型与卡片封面会自动识别，不用填。
+
+      - name: downloadHint
+        label: 下载密码获取方式（可选）
+        type: string
+        optional: true
+        description: "读者点下载时会看到这句话，例如：邮箱 golooo@qq.com。留空则显示「请联系作者获取」"
+
       - name: description
         label: 简介（列表页摘要 / SEO 描述）
         type: text
@@ -104,108 +127,6 @@ content:
         type: string
         list: true
         optional: true
-
-      # ---------- 下载资源（表单化，替代手写 ::download{...}） ----------
-      # 填完这里，构建时会自动在正文最上方生成下载卡片，效果与正文里手写
-      # ::download{name="..." url="..." code="..." password="..."} 完全一致：
-      # 同样的样式、同样的密码加密、同样的右侧栏资源总览。
-      # 注意：如果正文里已经手写过 ::download{...}，以正文为准，这里会被忽略。
-      - name: downloadLinks
-        label: 下载资源（一行一个网盘，填空即可）
-        description: "不用再记 ::download{...} 的写法。填完自动生成下载卡片，排在正文最上方。正文里已经手写过指令的文章不受影响。"
-        type: object
-        list: true
-        optional: true
-        fields:
-          - name: name
-            label: 资源名称
-            type: string
-            required: true
-            description: "卡片标题，例如：【百度网盘】2026 新大话2经典怀旧单机版一键端"
-
-          - name: url
-            label: 网盘链接
-            type: string
-            description: "完整地址，以 https:// 开头。付费资源留空，改填下面的购买页地址"
-
-          - name: code
-            label: 提取码
-            type: string
-            description: "网盘提取码。填了卡片上会显示出来并支持一键复制"
-
-          - name: password
-            label: 访问密码
-            type: string
-            description: "文章内的解锁密码，读者必须输入正确才能拿到地址。留空 = 免费直下"
-
-          - name: size
-            label: 文件大小
-            type: string
-            description: "例如 519 MB、6.1 GB"
-
-          - name: icon
-            label: 网盘类型（留空自动识别）
-            type: select
-            optional: true
-            options:
-              values:
-                - label: 百度网盘
-                  value: baidu
-                - label: 夸克网盘
-                  value: quark
-                - label: 阿里云盘
-                  value: aliyun
-                - label: 123 云盘
-                  value: "123"
-                - label: 蓝奏云
-                  value: lanzou
-                - label: 天翼云盘
-                  value: tianyi
-                - label: 迅雷
-                  value: xunlei
-                - label: 城通网盘
-                  value: chengtong
-                - label: 奶牛快传
-                  value: cowtransfer
-                - label: 微云
-                  value: weiyun
-                - label: 360 云盘
-                  value: "360"
-                - label: 115 网盘
-                  value: "115"
-                - label: PikPak
-                  value: pikpak
-
-          - name: hint
-            label: 获取密码的提示
-            type: string
-            description: "例如：邮箱 golooo@qq.com。留空时读者点下载会看到「未提供访问密码？请联系作者获取」"
-
-          - name: cover
-            label: 卡片封面图
-            type: image
-            optional: true
-            options:
-              media: post-images
-            description: "留空则自动用正文第一张图"
-
-          - name: tag
-            label: 角标文字
-            type: string
-            optional: true
-            description: "卡片左上角的小标签，留空自动显示「免费 / 加密」"
-
-          - name: buy
-            label: 购买页地址（付费资源）
-            type: string
-            optional: true
-            description: "填了这里就会渲染成付费卡片，上面的网盘链接与密码都不再输出到页面"
-
-          - name: price
-            label: 价格
-            type: string
-            optional: true
-            description: "配合购买页地址使用，例如 9.9"
 
       - name: author
         label: 作者（留空用站点默认作者）
