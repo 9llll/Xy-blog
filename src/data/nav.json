@@ -15,29 +15,24 @@
     "external": false,
     "children": [
       {
-        "name": "大话西游",
-        "url": "/archive/?category=游戏资源/大话西游",
-        "external": false
-      },
-      {
-        "name": "传奇",
-        "url": "/archive/?category=游戏资源/传奇",
-        "external": false
-      },
-      {
         "name": "网站资源",
-        "url": "/archive/?category=网站资源",
-        "external": false
+        "url": "https://moci.cc/category/webs/",
+        "external": true
+      },
+      {
+        "name": "游戏资源",
+        "url": "https://moci.cc/category/game/",
+        "external": true
       },
       {
         "name": "软件工具",
-        "url": "/archive/?category=软件工具",
-        "external": false
+        "url": "https://moci.cc/category/tools/",
+        "external": true
       },
       {
         "name": "教程文档",
-        "url": "/archive/?category=教程文档",
-        "external": false
+        "url": "https://moci.cc/category/docs/",
+        "external": true
       }
     ]
   },
