@@ -10,7 +10,7 @@ tags:
   - 进销存
   - Windows
 category:
-  - 软件工具
+  - 软件工具/电脑端
 image: images/erp/erp1.avif
 keywords:
   - 进销存,ERP,仓库管理
