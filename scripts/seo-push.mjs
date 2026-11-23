@@ -32,6 +32,8 @@ const INDEXNOW_KEY = "6292379dce0a7882f3563cdf4ffac798";
 const args = new Set(process.argv.slice(2));
 const FORCE_ALL = args.has("--all");
 const DRY_RUN = args.has("--dry");
+/** 默认以线上 sitemap 为准：本地 dist 可能是几天前的旧产物，推错了照样记账，反而漏推新页面 */
+const USE_LOCAL = args.has("--local");
 
 const dist = join(process.cwd(), "dist");
 const stateDir = join(process.cwd(), ".seo-cache");
@@ -72,11 +74,12 @@ async function collectFromSitemap(sitemapUrl) {
 }
 
 /**
- * 优先用本地刚构建出来的 dist，保证推的是「即将上线」的内容；
- * 本地没有产物（比如 CI 里只跑推送）就退回去读线上 sitemap。
+ * 默认读线上 sitemap —— 那是「真实可访问的页面集合」。
+ * 只有刚构建完、想赶在部署前推送时才用 --local 读 dist。
+ * 本地 dist 若已过期，推出去的是一批旧 URL，还会被记成已推，新页面就漏了。
  */
 async function collectUrls() {
-	if (existsSync(dist)) {
+	if (USE_LOCAL && existsSync(dist)) {
 		const files = readdirSync(dist).filter((f) => /^sitemap-\d+\.xml$/.test(f));
 		if (files.length > 0) {
 			const all = [];
@@ -85,7 +88,7 @@ async function collectUrls() {
 			return all;
 		}
 	}
-	console.log("[sitemap] 来源：线上（本地无构建产物）");
+	console.log("[sitemap] 来源：线上");
 	return collectFromSitemap(`${SITE}/sitemap-index.xml`);
 }
 
