@@ -109,13 +109,42 @@ export const siteConfig: SiteConfig = {
 
 /* ---------------------------------------------------------------- 导航栏 */
 
+/** CMS 导航条目：字段全部可选，缺什么就用默认值兜底 */
+type RawNav = {
+	name?: string;
+	url?: string;
+	external?: boolean;
+	/** 上级导航名称（新版编辑界面才有这个字段） */
+	parent?: string;
+	children?: RawNav[];
+};
+
+/**
+ * 拆出「父/子」写法的导航名。
+ *
+ * 为什么不用 parent 字段：PagesCMS 偶尔会沿用旧的配置缓存，
+ * 新加的字段不会出现在编辑界面里，更糟的是保存时会把它当未知字段清掉。
+ * 所以层级改用名称本身表达（与文章分类的「父/子」写法一致）：
+ * 名称写「资源/网站资源」，斜杠前是一级项，斜杠后是下拉里显示的文字。
+ * parent 字段若存在则优先使用，两者都写也不会冲突。
+ */
+function parseNavName(item: RawNav): { parentName: string; displayName: string } {
+	const raw = str(item?.name, "").trim();
+	const slash = raw.search(/[/／]/);
+	if (slash <= 0) return { parentName: "", displayName: raw };
+	const parentName = raw.slice(0, slash).trim();
+	const displayName = raw.slice(slash + 1).trim();
+	if (parentName === "" || displayName === "") return { parentName: "", displayName: raw };
+	return { parentName, displayName };
+}
+
 /**
  * 把 CMS 里填的导航项还原成 NavBarLink。
  * 三个内置页面（首页 / 归档 / 关于）仍走 LinkPreset，
  * 以保留多语言文案（写死中文会导致切换语言时导航不跟随）。
  *
  * 二级导航不写成嵌套数组：PagesCMS 的「列表里再嵌列表」编辑区不渲染，
- * 改成一级项与子项同处一个列表，子项用 parent 字段填父项名称归位。
+ * 改成一级项与子项同处一个列表，子项用「父/子」名称归位。
  * 父项 url 留空即「只作分组标题」，点击只展开下拉。
  */
 function toChildLink(item: RawNav): NavBarLink | null {
@@ -154,23 +183,31 @@ function toNavLink(item: RawNav, childrenRaw: RawNav[] = []): NavBarLink | LinkP
 	};
 }
 
-/** CMS 里的导航是一个平铺列表：parent 为空的是一级，非空的是该项的下拉子项 */
+/**
+ * CMS 里的导航是一个平铺列表：
+ * - 名称不带斜杠 → 一级导航
+ * - 名称写「资源/网站资源」→ 资源下拉里的子项
+ * - 也可以用 parent 字段指定上级（字段存在时生效）
+ */
 const rawNavItems: RawNav[] = Array.isArray(navData) ? (navData as RawNav[]) : [];
 const navChildGroups = new Map<string, RawNav[]>();
 const navTopItems: RawNav[] = [];
 
 for (const item of rawNavItems) {
-	const parent = str(item?.parent, "").trim();
-	if (parent === "") {
-		navTopItems.push(item);
+	const { parentName, displayName } = parseNavName(item);
+	// 显示名统一换成斜杠后的部分，确保导航条上不会出现「资源/网站资源」这种全名
+	const normalized: RawNav = { ...item, name: displayName };
+	const parent = str(item?.parent, "").trim() || parentName;
+	if (parent === "" || parent === displayName) {
+		navTopItems.push(normalized);
 		continue;
 	}
 	const bucket = navChildGroups.get(parent) ?? [];
-	bucket.push(item);
+	bucket.push(normalized);
 	navChildGroups.set(parent, bucket);
 }
 
-// parent 填错、找不到同名一级项时，子项升为一级，避免整条链接从导航里消失
+// 上级填错、找不到同名一级项时，子项升为一级，避免整条链接从导航里消失
 const navTopNames = new Set(navTopItems.map((item) => str(item.name, "").trim()));
 for (const [parent, items] of [...navChildGroups]) {
 	if (!navTopNames.has(parent)) {

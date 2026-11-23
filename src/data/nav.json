@@ -15,25 +15,25 @@
     "external": false
   },
   {
-    "name": "网站资源",
+    "name": "资源/网站资源",
     "url": "https://moci.cc/category/webs/",
     "external": true,
     "parent": "资源"
   },
   {
-    "name": "游戏资源",
+    "name": "资源/游戏资源",
     "url": "https://moci.cc/category/game/",
     "external": true,
     "parent": "资源"
   },
   {
-    "name": "软件工具",
+    "name": "资源/软件工具",
     "url": "https://moci.cc/category/tools/",
     "external": true,
     "parent": "资源"
   },
   {
-    "name": "教程文档",
+    "name": "资源/教程文档",
     "url": "https://moci.cc/category/docs/",
     "external": true,
     "parent": "资源"

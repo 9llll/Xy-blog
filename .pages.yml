@@ -316,6 +316,7 @@ content:
           - name: name
             label: 名称
             type: string
+            description: "一级导航直接写名称，例如：论坛。要放进某个下拉里就写成「资源/网站资源」——斜杠前是一级项名称，斜杠后是下拉里显示的文字"
           - name: url
             label: 链接
             type: string
