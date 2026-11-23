@@ -9,10 +9,12 @@
  *      以及网盘识别与筛选标签聚合。
  *
  * 运行（源文件是 .ts，Node 不能直接解析无扩展名的相对导入，先用 esbuild 打包）：
- *   ./node_modules/.pnpm/esbuild@*/node_modules/esbuild/bin/esbuild \
- *     scripts/verify-search-facets.mjs --bundle --platform=node --format=esm \
- *     --outfile=.cache-bak/verify-facets.mjs
- *   node .cache-bak/verify-facets.mjs
+ *   1) 打包（esbuild 是 astro 的传递依赖，不暴露 bin，用 .pnpm 下的实际路径；
+ *      版本目录按本机 node_modules/.pnpm 里的 esbuild@ 版本调整）：
+ *      node_modules/.pnpm/esbuild@0.25.9/node_modules/esbuild/bin/esbuild \
+ *        scripts/verify-search-facets.mjs --bundle --platform=node --format=esm \
+ *        --outfile=.cache-bak/verify-facets.mjs
+ *   2) node .cache-bak/verify-facets.mjs
  */
 import assert from "node:assert/strict";
 import { lineToAttributes } from "../src/plugins/remark-frontmatter-downloads.mjs";
@@ -118,6 +120,13 @@ check("免费资源的派生词含免费/百度", () => {
 		assert.ok(terms.includes(word), `缺少派生词 ${word}`);
 	}
 	assert.ok(!terms.includes("66398"), "口令原文不得进入派生词");
+});
+
+check("免费资源的派生词不含「加密」子串", () => {
+	// 子串匹配下「不加密」会让搜「加密」的人命中全部免费资源，属反向词污染
+	const facets = buildSearchFacets({ body: DIRECTIVE });
+	const polluted = facets.terms.filter((term) => term.includes("加密"));
+	assert.deepEqual(polluted, [], "免费资源的派生词里出现了含「加密」的词");
 });
 
 check("加密资源的派生词含加密/需要密码", () => {
