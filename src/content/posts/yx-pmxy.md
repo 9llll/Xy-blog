@@ -11,7 +11,7 @@ tags:
   - 可联网
   - 服务器
 category:
-  - 游戏资源
+  - 游戏资源/大话西游
 image: images/dhsy.avif
 author: 羡鱼
 series: 回合制

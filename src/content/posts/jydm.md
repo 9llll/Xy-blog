@@ -9,7 +9,7 @@ tags:
   - 游戏源码
   - 免虚拟机
 category:
-  - 游戏资源
+  - 游戏资源/传奇
 image: images/jydm/jydm.avif
 keywords:
   - GEE,传奇,单机

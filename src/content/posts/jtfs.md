@@ -11,7 +11,7 @@ tags:
   - 传奇私服
   - 解压即玩
 category:
-  - 游戏资源
+  - 游戏资源/传奇
 kind: free
 image: images/jtfs/jtfs.avif
 keywords:

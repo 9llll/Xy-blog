@@ -10,7 +10,7 @@ tags:
   - 资源下载
   - 解压即玩
 category:
-  - 游戏资源
+  - 游戏资源/大话西游
 image: images/yjd/3uiyj1.avif
 author: 羡鱼
 series: 回合制

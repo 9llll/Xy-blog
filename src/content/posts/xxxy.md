@@ -12,7 +12,7 @@ tags:
   - 解压即玩
   - 大话2
 category:
-  - 游戏资源
+  - 游戏资源/大话西游
 image: images/xxxy/xxxy7.avif
 author: 羡鱼
 series: 回合制
