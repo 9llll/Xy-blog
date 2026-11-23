@@ -83,6 +83,27 @@ const postsCollection = defineCollection({
 		 * 留空时按正文自动判定（有 password 才算加密）；填了则以手动为准。
 		 */
 		kind: z.enum(["free", "locked", "news", "oss"]).optional(),
+
+		/**
+		 * 下载资源（Pages CMS 表单填写）。一行一个网盘，竖线分隔：
+		 *   名称 | 链接 | 提取码 | 访问密码 | 文件大小
+		 * 构建期由 remark-frontmatter-downloads 转成下载卡片。
+		 *
+		 * 这里必须声明，否则 z.object 会把未知键剥掉：
+		 * 正文手写指令时它无关紧要，但搜索需要读它判断「免费/加密」与网盘类型。
+		 * 同时兼容历史上写过的「对象数组」格式。
+		 */
+		downloadLinks: z
+			.preprocess((val: unknown) => {
+				if (val === undefined || val === null) return undefined;
+				if (typeof val === "string") return val;
+				if (Array.isArray(val)) return val;
+				return undefined;
+			}, z.union([z.string(), z.array(z.record(z.string(), z.unknown()))]).optional())
+			.optional(),
+
+		/** 下载密码获取方式（展示在密码弹框里，不属于敏感信息） */
+		downloadHint: z.string().optional().default(""),
 		/** 是否开启评论（保留字段，兼容其他来源的写法） */
 		comment: z.boolean().optional().default(true),
 

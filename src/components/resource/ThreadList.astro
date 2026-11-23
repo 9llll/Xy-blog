@@ -61,7 +61,7 @@ const catBadge =
             const catFull = (p.data.category && p.data.category[0]) || "";
             // 二级分类只显示末级名称，完整路径放在 title 里，避免徽章被撑长
             const cat = catFull ? getCategoryLabel(catFull) : "未分类";
-            const kind = POST_KIND_META[getPostKind(p.body, p.data.kind)];
+            const kind = POST_KIND_META[getPostKind(p.body, p.data.kind, p.data.downloadLinks)];
 
             return (
                 <a
