@@ -1,0 +1,167 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import { Icon } from "astro-icon/components";
+import { getHomePosts, type HomePost } from "../../utils/home-posts";
+import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+import { getPostUrlBySlug, getDir } from "../../utils/url-utils";
+import { POST_KIND_META, getPostKind } from "../../utils/post-kind";
+import { getCategoryLabel } from "../../utils/content-utils";
+import { resolveCoverImage } from "../../utils/cover-image";
+import ImageWrapper from "../misc/ImageWrapper.astro";
+import PostCoverPlaceholder from "../misc/PostCoverPlaceholder.astro";
+import PostPagination from "./PostPagination.astro";
+
+interface Props {
+	/** 当前页的文章 */
+	posts?: HomePost[];
+	currentPage?: number;
+	totalPages?: number;
+	totalCount?: number;
+	/** 面板标题，与列表版保持同一文案 */
+	heading?: string;
+}
+
+const {
+	posts: pagePosts,
+	currentPage = 1,
+	totalPages = 1,
+	totalCount,
+	heading = "最新发布",
+} = Astro.props;
+
+/**
+ * 首页「封面卡片网格」版式（与 ThreadList 列表版互为替代，由站点设置切换）
+ *
+ * 与列表版的差别只在信息呈现：封面占主导，类型角标压在封面上，
+ * 标题下面只留「分类 · 日期」。数据源、分页、类型判定与列表版完全一致，
+ * 因此切换版式不会改变任何 URL，也不会让文章归类出现分歧。
+ */
+const list = pagePosts ?? (await getHomePosts());
+const total = totalCount ?? list.length;
+
+/**
+ * 判断封面是否真的能出图。
+ *
+ * 为什么要先查文件：ImageWrapper 在找不到文件时只往控制台打一行错误，
+ * 页面上留下一个永久转圈的加载占位 —— 网格版每张卡都有封面位，
+ * 一张坏图就是一块持续转动的空白。这里在构建期确定性地判断一次，
+ * 找不到就退到占位封面，不在浏览器里赌。
+ */
+function coverExists(entry: HomePost, rel: string): boolean {
+	if (!rel) return false;
+	if (/^(https?:)?\/\//i.test(rel) || rel.startsWith("data:")) return true;
+	if (rel.startsWith("/")) {
+		return fs.existsSync(path.resolve("public", rel.slice(1)));
+	}
+	return fs.existsSync(path.resolve(path.dirname(entry.filePath), rel));
+}
+
+/** 正文里第一张图：作者没填封面字段时用它兜底 */
+function firstBodyImage(body: string | undefined): string {
+	const text = body ?? "";
+	return (
+		text.match(/!\[[^\]]*\]\(\s*<?([^\s)>]+)>?[^)]*\)/)?.[1] ??
+		text.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] ??
+		""
+	);
+}
+
+const cards = list.map((p) => {
+	const catFull = (p.data.category && p.data.category[0]) || "";
+	const kind = getPostKind(p.body, p.data.kind, p.data.downloadLinks);
+	const rawCover = resolveCoverImage(
+		(p.data.image ?? "").trim() || firstBodyImage(p.body),
+		p.id,
+	);
+	// 随机封面 API 是外链，首页要秒开，不用它；本地图先确认文件在不在
+	const candidate = /^https?:\/\//i.test(rawCover) ? "" : rawCover;
+	const cover = coverExists(p, candidate) ? candidate : "";
+	return {
+		post: p,
+		url: getPostUrlBySlug(p.slug),
+		catFull,
+		cat: catFull ? getCategoryLabel(catFull) : "未分类",
+		kind,
+		meta: POST_KIND_META[kind],
+		cover,
+		coverBase: path.join("content/posts/", getDir(p.id)),
+		date: formatDateToYYYYMMDD(p.data.published),
+	};
+});
+---
+
+<div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
+    <div class="flex items-center gap-2 h-12 px-4 border-b border-[var(--line-divider)]">
+        <Icon name="material-symbols:grid-view-outline-rounded" class="text-[1.2rem] text-[var(--primary)]" />
+        <h1 class="font-bold text-[15px] text-black/85 dark:text-white/85">{heading}</h1>
+        <span class="ml-auto text-[11.5px] text-black/30 dark:text-white/30">
+            共 {total} 篇{totalPages > 1 ? ` · 第 ${currentPage}/${totalPages} 页` : ""}
+        </span>
+    </div>
+
+    {list.length === 0 && (
+        <div class="px-4 py-12 text-center text-[13px] text-black/40 dark:text-white/40">暂无文章</div>
+    )}
+
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 p-3">
+        {cards.map(({ post, url, catFull, cat, kind, meta, cover, coverBase, date }) => (
+            <a
+                href={url}
+                class="group flex flex-col rounded-lg overflow-hidden border border-[var(--line-divider)] hover:border-[var(--primary)] transition-colors bg-[var(--card-bg)]"
+            >
+                <div class="relative w-full overflow-hidden bg-[var(--btn-regular-bg)]" style="aspect-ratio:16/10">
+                    {cover ? (
+                        <ImageWrapper
+                            src={cover}
+                            basePath={coverBase}
+                            alt={post.data.title}
+                            class="w-full h-full"
+                        />
+                    ) : (
+                        <PostCoverPlaceholder
+                            title={post.data.title}
+                            category={catFull}
+                            type={kind === "free" || kind === "locked" ? "download" : "tutorial"}
+                            encrypted={kind === "locked"}
+                            class="w-full h-full"
+                        />
+                    )}
+
+                    {(kind === "free" || kind === "locked") && (
+                        <span
+                            class="absolute left-2 top-2 z-20 rounded px-1.5 py-0.5 text-[10px] font-bold leading-none text-white"
+                            style={`background:${meta.color}`}
+                        >
+                            {meta.label}
+                        </span>
+                    )}
+
+                    {post.data.pinned && (
+                        <span class="absolute right-2 top-2 z-20 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                            置顶
+                        </span>
+                    )}
+                </div>
+
+                <div class="flex flex-1 flex-col px-2.5 py-2.5">
+                    <h2
+                        class="line-clamp-2 text-[13.5px] font-semibold leading-[1.35] text-black/85 dark:text-white/85 group-hover:text-[var(--primary)] transition-colors"
+                        style="min-height:2.7em"
+                        title={post.data.title}
+                    >
+                        {post.data.title}
+                    </h2>
+                    <div class="mt-auto flex items-center gap-1.5 pt-2 text-[11px] text-black/35 dark:text-white/35">
+                        <span class="min-w-0 truncate rounded bg-[#e0f2fe] px-1.5 py-0.5 font-semibold text-[#0369a1] dark:bg-[#0b3a52] dark:text-[#7dd3fc]" title={catFull || cat}>
+                            {cat}
+                        </span>
+                        <span class="ml-auto shrink-0">{date}</span>
+                    </div>
+                </div>
+            </a>
+        ))}
+    </div>
+
+    {totalPages > 1 && <PostPagination currentPage={currentPage} totalPages={totalPages} />}
+</div>

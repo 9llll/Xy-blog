@@ -1,8 +1,14 @@
 import type { CollectionEntry } from "astro:content";
 import { getSortedPosts } from "./content-utils";
 
-/** 首页每页文章数 */
-export const HOME_PAGE_SIZE = 10;
+/**
+ * 首页每页文章数
+ *
+ * 取 12 而不是 10：网格版是三列，12 篇正好排满 4 行，最后一行不会缺角。
+ * 两种版式共用同一个值 —— 版式切换只改外观，分页地址（/page/2/…）保持不变，
+ * 否则切换一次版式就会让原本存在的分页页变成 404。
+ */
+export const HOME_PAGE_SIZE = 12;
 
 export type HomePost = CollectionEntry<"posts">;
 

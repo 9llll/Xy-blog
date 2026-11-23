@@ -50,12 +50,24 @@ function num(value: unknown, fallback: number): number {
 	return typeof value === "number" && !Number.isNaN(value) ? value : fallback;
 }
 
+/**
+ * 首页版式的取值归一化。
+ *
+ * CMS 下拉框存的是字符串，清空或手改 JSON 会留下空串 / 拼错的值。
+ * 这里只认 "list"，其余一律当网格：网格是默认版式，
+ * 拼错时宁可退回默认，也不要让首页整块区域空掉。
+ */
+function resolveHomeLayout(value: unknown): SiteConfig["homeLayout"] {
+	return value === "list" ? "list" : "grid";
+}
+
 /* ---------------------------------------------------------------- 站点信息 */
 
 const siteDefaults: SiteConfig = {
 	title: "羡鱼资源",
 	keywords: "",
 	description: "",
+	homeLayout: "grid",
 	lang: "zh_CN",
 	themeColor: { hue: 250, fixed: true },
 	banner: {
@@ -79,6 +91,7 @@ export const siteConfig: SiteConfig = {
 	logo: resolveLogo(site.logo),
 	keywords: str(site.keywords, siteDefaults.keywords),
 	description: str(site.description, siteDefaults.description),
+	homeLayout: resolveHomeLayout(site.homeLayout),
 	lang: str(site.lang, siteDefaults.lang) as SiteConfig["lang"],
 	themeColor: {
 		hue: num(themeData.hue, siteDefaults.themeColor.hue),

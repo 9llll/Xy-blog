@@ -214,6 +214,17 @@ content:
             label: 站点简介（首页与 SEO 描述）
             type: text
 
+          - name: homeLayout
+            label: 首页版式
+            type: select
+            options:
+              values:
+                - value: grid
+                  label: 卡片网格（封面图，适合图片资源站）
+                - value: list
+                  label: 列表（文字条目，适合教程资讯为主）
+            description: "切换后重新构建生效。网格显示封面图与类型角标，列表只显示文字条目。"
+
           - name: keywords
             label: 站点关键词（SEO，逗号分隔）
             type: text

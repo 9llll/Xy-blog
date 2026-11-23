@@ -4,6 +4,13 @@ export type SiteConfig = {
 	title: string;
 	keywords: string;
 	description: string;
+	/**
+	 * 首页版式
+	 * - grid：封面卡片网格，图多的资源站
+	 * - list：文字条目列表，教程资讯为主
+	 * 在 Pages CMS「站点设置 → 站点信息 → 首页版式」切换。
+	 */
+	homeLayout: "grid" | "list";
 	/** 导航栏 logo 图片（public 下的路径）；留空则用内置的房子图标 */
 	logo: string;
 	

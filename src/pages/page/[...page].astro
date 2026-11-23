@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BoardNav from "../../components/resource/BoardNav.astro";
+import PostGrid from "../../components/resource/PostGrid.astro";
 import SiteAside from "../../components/resource/SiteAside.astro";
 import ThreadList from "../../components/resource/ThreadList.astro";
 import ResourceLayout from "../../layouts/ResourceLayout.astro";
@@ -17,8 +18,9 @@ interface Props {
 /**
  * 首页分页：/page/2/、/page/3/ …
  *
- * 首页只放 10 篇，第 2 页起由本路由生成。第 1 页就是 /，
+ * 首页只放 12 篇，第 2 页起由本路由生成。第 1 页就是 /，
  * /page/1/ 走 301 跳转，避免同一批文章出现两个可收录地址。
+ * 网格 / 列表两种版式共用同一套分页，切换版式不会改变这些地址。
  */
 export const getStaticPaths = (async () => {
 	const posts = await getHomePosts();
@@ -48,12 +50,21 @@ const { pageNum, totalPages, totalCount, posts } = Astro.props as Props;
 >
     <BoardNav slot="left" />
 
-    <ThreadList
-        posts={posts}
-        currentPage={pageNum}
-        totalPages={totalPages}
-        totalCount={totalCount}
-    />
+    {siteConfig.homeLayout === "grid" ? (
+        <PostGrid
+            posts={posts}
+            currentPage={pageNum}
+            totalPages={totalPages}
+            totalCount={totalCount}
+        />
+    ) : (
+        <ThreadList
+            posts={posts}
+            currentPage={pageNum}
+            totalPages={totalPages}
+            totalCount={totalCount}
+        />
+    )}
 
     <SiteAside slot="right" />
 </ResourceLayout>
