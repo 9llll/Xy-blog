@@ -55,6 +55,15 @@ const LABEL_FREE_RES = "免费资源";
 const LABEL_LOCK_RES = "加密资源";
 const LABEL_PAY_RES = "付费资源";
 const LABEL_NEED_PASSWORD = "需访问密码";
+/**
+ * 作者没写 hint 时的兜底提示。
+ *
+ * 访问密码按设计不出现在页面任何位置（只有地址被密码派生密钥加密），
+ * 因此「没写 hint 的加密卡片」对读者是一条死路：点下载弹框要密码，
+ * 而页面上查不到任何获取途径。这里补一句固定的下一步动作，
+ * 至少让读者知道该去找谁，而不是对着输入框反复试错。
+ */
+const LABEL_HINT_FALLBACK = "未提供访问密码？请联系作者获取";
 
 function svgIcon(name, size = 20) {
 	return h(
@@ -414,6 +423,8 @@ export function DownloadComponent(props, children) {
 			"data-dl-name": item.name,
 			"data-dl-hash": item.hash,
 			"data-dl-hint": item.hint ?? "",
+			// 只有加密资源才需要；无密码的卡片前端不会显示它
+			"data-dl-hint-fallback": LABEL_HINT_FALLBACK,
 			"data-dl-title": i18n(I18nKey.downloadUnlockTitle),
 			"data-dl-desc": i18n(I18nKey.downloadUnlockDesc),
 			"data-dl-placeholder": i18n(I18nKey.passwordPlaceholder),

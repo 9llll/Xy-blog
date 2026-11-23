@@ -159,6 +159,10 @@ function askPassword(
 		if (btn.dataset.dlHint) {
 			hint.style.display = "block";
 			hint.textContent = `${btn.dataset.dlHintLabel ?? ""}: ${btn.dataset.dlHint}`;
+		} else if (btn.dataset.dlHintFallback && btn.dataset.dlHash) {
+			// 作者没写 hint 的加密卡片：至少告诉读者下一步该找谁
+			hint.style.display = "block";
+			hint.textContent = btn.dataset.dlHintFallback;
 		}
 
 		if (errorText) {
