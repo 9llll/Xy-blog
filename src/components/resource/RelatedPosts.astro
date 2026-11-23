@@ -1,0 +1,50 @@
+---
+import { Icon } from "astro-icon/components";
+import type { CollectionEntry } from "astro:content";
+import { getCategoryLabel } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getPostUrlBySlug } from "@utils/url-utils";
+
+/**
+ * 文章底部「相关推荐」
+ *
+ * 与右栏「最新发布」的分工：那个是按时间，这个是按相似度
+ * （同分类 / 同标签），读者的下一篇更可能在这里。
+ */
+interface Props {
+	posts: CollectionEntry<"posts">[];
+}
+
+const { posts } = Astro.props;
+
+const catBadge =
+	"shrink-0 rounded px-1.5 py-0.5 text-[10.5px] font-semibold leading-none " +
+	"bg-[#e0f2fe] text-[#0369a1] dark:bg-[#0b3a52] dark:text-[#7dd3fc]";
+---
+
+{posts.length > 0 && (
+	<section class="mt-4 rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] overflow-hidden shadow-sm">
+		<div class="flex items-center gap-2 h-12 px-4 border-b border-[var(--line-divider)]">
+			<Icon name="material-symbols:auto-awesome-outline-rounded" class="text-[1.15rem] text-[var(--primary)]" />
+			<h2 class="font-bold text-[15px] text-black/85 dark:text-white/85">相关推荐</h2>
+			<span class="ml-auto text-[11.5px] text-black/30 dark:text-white/30">按分类与标签匹配</span>
+		</div>
+
+		<div class="divide-y divide-[var(--line-divider)]">
+			{posts.map((post) => (
+				<a
+					href={getPostUrlBySlug(post.slug)}
+					class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--btn-plain-bg-hover)]"
+				>
+					<span class={catBadge}>{getCategoryLabel(post.data.category?.[0]) || "未分类"}</span>
+					<span class="min-w-0 flex-1 truncate text-[13.5px] font-medium text-black/80 dark:text-white/80">
+						{post.data.title}
+					</span>
+					<span class="shrink-0 text-[11px] text-black/30 dark:text-white/30">
+						{formatDateToYYYYMMDD(post.data.published)}
+					</span>
+				</a>
+			))}
+		</div>
+	</section>
+)}

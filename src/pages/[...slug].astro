@@ -5,8 +5,10 @@ import Markdown from "@components/misc/Markdown.astro";
 import PostBadge from "@components/PostBadge.astro";
 import PostMetadata from "@components/PostMeta.astro";
 import BoardNav from "@components/resource/BoardNav.astro";
+import ArticleActions from "@components/resource/ArticleActions.astro";
 import DownloadSidebar from "@components/resource/DownloadSidebar.astro";
 import LatestList from "@components/resource/LatestList.astro";
+import RelatedPosts from "@components/resource/RelatedPosts.astro";
 import UserCard from "@components/resource/UserCard.astro";
 import TOC from "@components/widget/TOC.astro";
 import I18nKey from "@i18n/i18nKey";
@@ -14,6 +16,7 @@ import { i18n } from "@i18n/translation";
 import ResourceLayout from "@layouts/ResourceLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
 import { DEFAULT_OG_IMAGE, toAbsoluteOgImage } from "@utils/og-image";
+import { getRelatedPosts } from "@utils/related-posts";
 import { getCategoryUrl, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
@@ -37,6 +40,9 @@ const { remarkPluginFrontmatter } = await entry.render();
 // 文章内的下载资源清单（由 remark-download-list 写入，只含展示字段）
 const downloads = (remarkPluginFrontmatter?.downloads ?? []) as DownloadListItem[];
 const hasDownloads = downloads.length > 0;
+
+// 相关推荐：按分类 + 标签相似度算，构建期完成
+const relatedPosts = await getRelatedPosts(entry, 4);
 const hasHeadings = headings.length > 0;
 
 const categoryName = entry.data.category?.[0] ?? "";
@@ -237,6 +243,9 @@ const breadcrumbJsonLd = {
         </div>
     </article>
 
+    <!-- 分享与阅读进度（纯前端，无第三方请求） -->
+    <ArticleActions title={entry.data.title} />
+
     <!-- 上一篇 / 下一篇 -->
     <div class="mt-4 flex w-full flex-row justify-between gap-4 overflow-hidden">
         <a
@@ -273,6 +282,9 @@ const breadcrumbJsonLd = {
             )}
         </a>
     </div>
+
+    <!-- 相关推荐：既是读者出口，也是给蜘蛛的内链 -->
+    <RelatedPosts posts={relatedPosts} />
 
     <!-- 系列文章导航 -->
     {seriesName && (

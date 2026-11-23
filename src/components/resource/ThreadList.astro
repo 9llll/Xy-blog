@@ -14,6 +14,8 @@ interface Props {
 	currentPage?: number;
 	totalPages?: number;
 	totalCount?: number;
+	/** 列表面板标题。首页用默认「最新发布」，分类页传分类名 */
+	heading?: string;
 }
 
 const {
@@ -21,6 +23,7 @@ const {
 	currentPage = 1,
 	totalPages = 1,
 	totalCount,
+	heading = "最新发布",
 } = Astro.props;
 
 /**
@@ -44,7 +47,7 @@ const catBadge =
 <div class="rounded-xl bg-[var(--card-bg)] border border-[var(--line-divider)] overflow-hidden shadow-sm">
     <div class="flex items-center gap-2 h-12 px-4 border-b border-[var(--line-divider)]">
         <Icon name="material-symbols:forum-outline-rounded" class="text-[1.2rem] text-[var(--primary)]" />
-        <h1 class="font-bold text-[15px] text-black/85 dark:text-white/85">最新发布</h1>
+        <h1 class="font-bold text-[15px] text-black/85 dark:text-white/85">{heading}</h1>
         <span class="ml-auto text-[11.5px] text-black/30 dark:text-white/30">
             共 {total} 篇{totalPages > 1 ? ` · 第 ${currentPage}/${totalPages} 页` : ""}
         </span>
