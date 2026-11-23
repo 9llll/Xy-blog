@@ -9,7 +9,7 @@ tags:
   - 解压即玩
   - 资源下载
 category:
-  - 游戏资源
+  - 游戏资源/电脑单机
 image: images/hong/hong.avif
 author: 羡鱼
 series: 单机游戏
