@@ -11,7 +11,7 @@ tags:
 category:
   - 教程文档/演示
 kind: news
-image: images/xiazai.avif
+image: images/wendang.avif
 keywords:
   - ::download 演示，Markdown 下载按钮演示，资源下载指令，Astro 下载按钮，静态站下载按钮示例  今天
     21:05   如何在Markdown文章中插入下载按钮？   下载按钮的密码保护逻辑是怎样的？   如何进行常见故障排查？
