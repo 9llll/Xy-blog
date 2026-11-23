@@ -298,7 +298,16 @@ function checkLeak(posts) {
 
 /** 示例 / 保留域名：教程文档里的占位地址不是真资源，不该算死链 */
 function isPlaceholderUrl(url) {
-	return /(^https?:\/\/)(example\.(com|org|net)|localhost|127\.0\.0\.1)/i.test(url);
+	if (/(^https?:\/\/)(example\.(com|org|net)|localhost|127\.0\.0\.1)/i.test(url)) {
+		return true;
+	}
+	// 教程演示地址（如 pan.baidu.com/s/1DemoBaiduAutoDetect）保留真实域名是为了
+	// 演示「网盘图标自动识别」，本身不是可下载资源，按占位地址跳过检测
+	try {
+		return /demo/i.test(new URL(url).pathname);
+	} catch {
+		return false;
+	}
 }
 
 function escapeRegExp(text) {

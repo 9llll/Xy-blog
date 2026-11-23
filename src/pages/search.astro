@@ -4,13 +4,16 @@ import BoardNav from "@components/resource/BoardNav.astro";
 import SiteAside from "@components/resource/SiteAside.astro";
 import ResourceLayout from "@layouts/ResourceLayout.astro";
 
+import { toPublicPost } from "@/utils/public-post";
+
 const allPosts = await getCollection("posts");
 const POSTS_PER_PAGE = 10;
 
 // 搜索只用得到标题 / 摘要 / 标签 / 分类 / 封面 / 日期，
 // 正文（含下载地址、访问密码、提取码）不需要内联进页面 ——
 // 否则搜索页源码里会直接暴露这些敏感信息。
-const posts = allPosts.map(({ body, ...rest }) => rest);
+// 注意：不能只解构掉 body 再 `...rest`，entry 上的 rendered.html 同样是完整正文。
+const posts = allPosts.map((post) => toPublicPost(post));
 ---
 
 <ResourceLayout title="搜索文章" description="搜索博客文章">
