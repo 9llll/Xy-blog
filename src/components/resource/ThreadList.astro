@@ -5,6 +5,7 @@ import { getHomePosts, type HomePost } from "../../utils/home-posts";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 import { getPostUrlBySlug } from "../../utils/url-utils";
 import { POST_KIND_META, getPostKind } from "../../utils/post-kind";
+import { getCategoryLabel } from "../../utils/content-utils";
 import PostPagination from "./PostPagination.astro";
 
 interface Props {
@@ -54,7 +55,9 @@ const catBadge =
             <div class="px-4 py-12 text-center text-[13px] text-black/40 dark:text-white/40">暂无文章</div>
         )}
         {list.map((p) => {
-            const cat = (p.data.category && p.data.category[0]) || "未分类";
+            const catFull = (p.data.category && p.data.category[0]) || "";
+            // 二级分类只显示末级名称，完整路径放在 title 里，避免徽章被撑长
+            const cat = catFull ? getCategoryLabel(catFull) : "未分类";
             const kind = POST_KIND_META[getPostKind(p.body, p.data.kind)];
 
             return (
@@ -64,7 +67,7 @@ const catBadge =
                 >
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class={catBadge}>{cat}</span>
+                            <span class={catBadge} title={catFull || cat}>{cat}</span>
                             <span class="min-w-0 flex-1 truncate font-semibold text-[15px] text-black/85 dark:text-white/85 group-hover:text-[var(--primary)] transition-colors">
                                 {p.data.title}
                             </span>

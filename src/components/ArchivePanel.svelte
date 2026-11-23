@@ -83,7 +83,14 @@ function buildGroups(
 		filteredPosts = filteredPosts.filter(
 			(post) =>
 				Array.isArray(post.data.category) &&
-				post.data.category.some((cat) => categoryList.includes(cat)),
+				post.data.category.some((cat) =>
+					// 选中父级分类时，其所有子级（父/子）一并命中
+					categoryList.some((target) => {
+						const value = String(cat ?? "").trim();
+						const base = String(target ?? "").trim();
+						return value === base || value.startsWith(`${base}/`);
+					}),
+				),
 		);
 	}
 

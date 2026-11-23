@@ -74,7 +74,7 @@ content:
         optional: true
 
       - name: category
-        label: 分类（回车添加多个）
+        label: 分类（回车添加多个；二级分类用「父/子」写法，如 游戏资源/动作冒险）
         type: string
         list: true
         optional: true

@@ -30,6 +30,13 @@ const className = Astro.props.class;
 
 // 过滤空标签
 const visibleTags = (tags || []).filter((t) => t && t.trim() !== "");
+
+// 二级分类在文章页显示为「父 · 子」，保留层级归属
+const categoryText = (category[0] || "")
+	.trim()
+	.replace(/\s*\/\s*/g, " · ")
+	.trim();
+const categoryFull = (category[0] || "").trim();
 ---
 
 <div class:list={["flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2", className]}>    
@@ -41,10 +48,11 @@ const visibleTags = (tags || []).filter((t) => t && t.trim() !== "");
     <!-- categories -->
     <div class="flex items-center">
         <div class="flex flex-row flex-nowrap items-center">
-            <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
+            <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${categoryFull} category`}
+               title={categoryFull || undefined}
                class="link-lg transition text-50 text-sm font-medium
                             hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap">
-                {category[0] || i18n(I18nKey.uncategorized)}
+                {categoryText || i18n(I18nKey.uncategorized)}
             </a>
         </div>
     </div>
