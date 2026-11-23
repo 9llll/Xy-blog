@@ -9,7 +9,8 @@ tags:
   - 视频
   - 教程
 category:
-  - 教程文档
+  - 教程文档/说明
+kind: news
 image: images/shipin.avif
 keywords:
   - Markdown 自定义指令，::btn 按钮指令，::video 视频指令，::gallery 图片网格，Markdown 扩展语法教程
@@ -20,7 +21,6 @@ ogImage: https://www.3x3.top/images/xy2.avif
 draft: false
 pinned: false
 comment: true
-kind: news
 ---
 本文介绍 `::btn`（链接按钮）与 `::video`（视频播放器）两个自定义指令的用法。所有示例都是真实可用的，直接照抄即可。
 
@@ -33,12 +33,12 @@ kind: news
 ### 基本用法
 
 ```md
-::btn{href="https://example.com" text="点我"}
+::btn{href="https://example.com" text="点我跳转"}
 ```
 
 渲染效果：
 
-::btn{href="https://example.com" text="点我" icon="arrow"}
+::btn{href="https://example.com" text="点我跳转" icon="arrow"}
 
 ### 参数说明
 
