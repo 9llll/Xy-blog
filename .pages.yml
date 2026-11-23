@@ -60,7 +60,7 @@ content:
       # 正文里已经手写过指令的文章以正文为准，这里会被忽略。
       - name: downloadLinks
         label: 下载资源（一行一个网盘，多个网盘换行多写几条）
-        type: text
+        type: tex
         optional: true
         description: |-
           每行一条，用竖线 | 分隔，最多五段：名称 | 链接 | 提取码 | 访问密码 | 文件大小。
