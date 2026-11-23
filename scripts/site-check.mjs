@@ -27,6 +27,16 @@ const PUBLIC_DIR = join(ROOT, "public");
 const JSON_ONLY = process.argv.includes("--json");
 const FIX = process.argv.includes("--fix");
 
+/**
+ * 构建产物目录。默认 dist；本地沙箱覆盖 dist 旧文件会被 safe-delete 闸门打断，
+ * 常用 `astro build --outDir dist-check` 产出干净副本，用 --dist=dist-check 指过去，
+ * 避免对着上一次的过期残留做安全判定。
+ */
+const DIST = join(
+	ROOT,
+	(process.argv.find((a) => a.startsWith("--dist=")) || "").split("=")[1] || "dist",
+);
+
 const issues = [];
 const notes = [];
 
@@ -219,7 +229,7 @@ async function checkDownloadLinks(posts) {
 /* ───────────────────────── 3. 安全底线 ───────────────────────── */
 
 function checkLeak(posts) {
-	const dist = join(ROOT, "dist");
+	const dist = DIST;
 
 	/**
 	 * 收集敏感值：下载地址、提取码、访问密码
