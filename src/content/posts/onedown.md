@@ -12,7 +12,7 @@ tags:
   - WordPress
   - 资源下载
 category:
-  - 网站资源
+  - 网站资源/WordPress
 image: images/onedown/one3.avif
 keywords:
   - neDown,OneDown WordPress 主题，WordPress 资源站主题，WordPress 下载站主题，WordPress
