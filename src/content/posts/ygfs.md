@@ -9,7 +9,7 @@ tags:
   - 架设
   - 可外网
 category:
-  - 游戏资源
+  - 游戏资源/页游
 image: images/ygfs/ygfs1.avif
 keywords:
   - 远古封神,页游,架设,联网,WIN一键端,外网,GM
