@@ -5,6 +5,12 @@ published: 2026-11-23
 updated: 2026-11-23
 tags:
   - DNF
+  - 网游单机
+  - 游戏
+  - 一键端
+  - 地下城
+category:
+  - 游戏资源/DNF
 seriesOrder: 0
 draft: false
 pinned: false
