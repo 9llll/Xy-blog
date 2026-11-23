@@ -1,5 +1,8 @@
 ---
 title: 【单机】策略页游-三国之戈霜王者一键单机端
+downloadLinks: 【百度网盘】策略页游-三国之戈霜王者一键单机端 |
+  https://pan.baidu.com/s/1apwlgR2V3MbOme-2sMzO6A | ay1h | 47913 | 519 MB
+downloadHint: 邮箱：golooo@qq.com
 description: 策略页游-三国之戈霜王者一键单机端
 published: 2026-11-23
 updated: 2026-11-23
@@ -16,9 +19,6 @@ keywords:
   - 三国
   - 页游
   - 经营
-downloadLinks: |-
-  【百度网盘】策略页游-三国之戈霜王者一键单机端 | https://pan.baidu.com/s/1apwlgR2V3MbOme-2sMzO6A | ay1h | 47913 | 519 MB
-downloadHint: 邮箱：golooo@qq.com
 author: 羡鱼
 series: 单机游戏
 seriesOrder: 0
@@ -27,6 +27,9 @@ draft: false
 pinned: false
 comment: true
 ---
+::download{name="策略页游-三国之戈霜王者一键单机端" url="https://pan.baidu.com/s/18sif60Le62Awre9QS6HE7A" code="f3gw"}
+
+
 
 ### 服务端解压到 D 盘：`D:\fxsg`
 
@@ -55,3 +58,4 @@ comment: true
 ![版本截图三](images/sgzgs/sgzgs.avif)
 
 ![版本截图三](images/sgzgs/sgzgs1.avif)
+
