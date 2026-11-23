@@ -32,6 +32,8 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkPostBadge } from "./src/plugins/remark-post-badge.mjs";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { remarkUnwrapPastedCode } from "./src/plugins/remark-unwrap-pasted-code.mjs";
+import remarkUnsetextAccidental from "./src/plugins/remark-unsetext-accidental.mjs";
+import remarkFrontmatterDownloads from "./src/plugins/remark-frontmatter-downloads.mjs";
 import { remarkUnwrapBoldDirective } from "./src/plugins/remark-unwrap-bold-directive.mjs";
 
 // https://astro.build/config
@@ -125,6 +127,7 @@ export default defineConfig({
 
 	markdown: {
 		remarkPlugins: [
+			remarkUnsetextAccidental,
 			remarkUnwrapPastedCode,
 			remarkMath,
 			remarkReadingTime,
@@ -132,6 +135,8 @@ export default defineConfig({
 			remarkGithubAdmonitionsToDirectives,
 			remarkDirective,
 			remarkUnwrapBoldDirective,
+			// 表单填写的下载资源 → 指令节点，必须早于 remarkDownloadList 才能被统计进侧栏
+			remarkFrontmatterDownloads,
 			remarkPostBadge,
 			remarkDownloadList,
 			remarkSectionize,
