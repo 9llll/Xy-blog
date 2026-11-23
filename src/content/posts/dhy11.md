@@ -4,7 +4,10 @@ description: 全新改版，支持一账号建5角色多开，或多个账号多
 published: 2026-11-23
 updated: 2026-11-23
 tags:
-  - 大话西游2,大话2,大话2单机,网游单机,大话2公益
+  - 大话西游2
+  - 网游单机
+  - 游戏
+  - 一键端
 category:
   - 游戏资源/大话西游
 image: images/dhy11/dhy11.avif
