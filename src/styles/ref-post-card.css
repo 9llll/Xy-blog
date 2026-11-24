@@ -1,0 +1,214 @@
+/* 正文里的「引用文章」卡片（::post 指令）
+ *
+ * 与站内 PostCard 的横向版式保持一致：左侧封面、右侧标题与元信息。
+ * 颜色全部走主题变量，明暗模式自动适配，不写死任何色值。
+ */
+
+.ref-post-card {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	margin: 0.85rem 0;
+	padding: 0.6rem;
+	border: 1px solid var(--line-divider);
+	border-radius: 0.9rem;
+	background: var(--card-bg);
+	color: inherit !important;
+	text-decoration: none !important;
+	transition:
+		border-color 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.ref-post-card:hover {
+	border-color: var(--primary);
+	box-shadow: 0 4px 14px -6px var(--line-color);
+}
+
+/* 封面 */
+.ref-post-card .rpc-cover {
+	position: relative;
+	flex: none;
+	width: 110px;
+	aspect-ratio: 8 / 5;
+	overflow: hidden;
+	border-radius: 0.55rem;
+	background: linear-gradient(135deg, var(--btn-regular-bg), var(--page-bg));
+}
+
+.ref-post-card .rpc-cover img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* 封面加载失败时 img 会被隐藏，露出父级的渐变底色 */
+
+/* 文本区 */
+.ref-post-card .rpc-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+	flex: 1;
+}
+
+.ref-post-card .rpc-title {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	font-size: 0.9rem;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--deep-text);
+	text-decoration: none !important;
+	transition: color 0.2s ease;
+}
+
+.ref-post-card:hover .rpc-title {
+	color: var(--primary);
+}
+
+.ref-post-card .rpc-desc {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 1;
+	overflow: hidden;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	color: var(--deep-text);
+	opacity: 0.55;
+}
+
+.ref-post-card .rpc-meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin-top: 0.1rem;
+	font-size: 0.72rem;
+	line-height: 1;
+	color: var(--deep-text);
+	opacity: 0.45;
+}
+
+.ref-post-card .rpc-meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
+}
+
+.ref-post-card .rpc-meta-item svg {
+	width: 0.75rem;
+	height: 0.75rem;
+}
+
+.ref-post-card .rpc-tag {
+	max-width: 8rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0.1rem 0.4rem;
+	border-radius: 0.3rem;
+	background: var(--btn-regular-bg);
+	color: var(--btn-content);
+	font-size: 0.7rem;
+	font-weight: 600;
+	opacity: 1;
+}
+
+/* 加载骨架：与成品同尺寸，避免加载完成后页面跳动 */
+.ref-post-card-host {
+	display: flex;
+	gap: 0.75rem;
+	align-items: center;
+	margin: 0.85rem 0;
+	padding: 0.6rem;
+	border: 1px solid var(--line-divider);
+	border-radius: 0.9rem;
+	background: var(--card-bg);
+}
+
+.ref-post-card-host .rpc-skeleton-cover {
+	flex: none;
+	width: 110px;
+	aspect-ratio: 8 / 5;
+	border-radius: 0.55rem;
+	background: var(--btn-regular-bg);
+}
+
+.ref-post-card-host .rpc-skeleton-body {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+}
+
+.ref-post-card-host .rpc-skeleton-line {
+	height: 0.7rem;
+	border-radius: 0.3rem;
+	background: var(--btn-regular-bg);
+}
+
+.ref-post-card-host .rpc-skeleton-line.w-70 {
+	width: 70%;
+}
+
+.ref-post-card-host .rpc-skeleton-line.w-40 {
+	width: 40%;
+	height: 0.55rem;
+}
+
+.ref-post-card-host.is-loading .rpc-skeleton-cover,
+.ref-post-card-host.is-loading .rpc-skeleton-line {
+	animation: rpc-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes rpc-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+/* 加载完成：容器让位给卡片本身，避免双层边框 */
+.ref-post-card-host.is-filled {
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+/* 加载失败：一行提示，不占大块版面 */
+.ref-post-card-host .rpc-fail {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.78rem;
+	color: var(--deep-text);
+	opacity: 0.6;
+}
+
+.ref-post-card-host .rpc-fail button {
+	padding: 0.15rem 0.5rem;
+	border: 1px solid var(--line-divider);
+	border-radius: 0.35rem;
+	background: var(--btn-regular-bg);
+	color: var(--btn-content);
+	font-size: 0.72rem;
+	cursor: pointer;
+}
+
+/* 窄屏：封面收窄，保证标题有足够行宽 */
+@media (max-width: 480px) {
+	.ref-post-card .rpc-cover,
+	.ref-post-card-host .rpc-skeleton-cover {
+		width: 88px;
+	}
+}

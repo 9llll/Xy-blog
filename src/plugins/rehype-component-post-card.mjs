@@ -1,215 +1,185 @@
 /// <reference types="mdast" />
 import { h } from "hastscript";
 
+/**
+ * ::post{id="文章slug"} —— 在正文里引用另一篇文章
+ *
+ * 渲染分两段：
+ *   1. 构建期输出同尺寸的骨架（服务端 HTML，避免加载完成后页面跳动）
+ *   2. 浏览器端拉 /api/<id>.json 填充真实内容
+ *
+ * 为什么不在构建期直接渲染：rehype 插件拿不到其它文章的集合与图片资源，
+ * 只能由页面层去做；这个接口是 prerender 的静态 JSON，一次请求即完成。
+ *
+ * 样式在 src/styles/ref-post-card.css，颜色全部走主题变量。
+ */
+
+const DATE_ICON =
+	'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>';
+const CLOCK_ICON =
+	'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+
+/** 骨架：尺寸与成品完全一致，加载时不会引起布局位移 */
+function renderSkeleton(containerId) {
+	return h("div", { id: containerId, class: "ref-post-card-host is-loading" }, [
+		h("div", { class: "rpc-skeleton-cover" }),
+		h("div", { class: "rpc-skeleton-body" }, [
+			h("div", { class: "rpc-skeleton-line" }),
+			h("div", { class: "rpc-skeleton-line w-70" }),
+			h("div", { class: "rpc-skeleton-line w-40" }),
+		]),
+	]);
+}
+
+/** 浏览器端加载脚本（字符串形式，随页面内联输出） */
+function renderLoader(containerId, id) {
+	return `
+(function () {
+	var host = document.getElementById(${JSON.stringify(containerId)});
+	if (!host) return;
+
+	var API = ${JSON.stringify(`/api/${id}.json`)};
+	var HREF = ${JSON.stringify(`/${id}`)};
+
+	function iconSvg(path) {
+		return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">' + path + "</svg>";
+	}
+
+	function metaItem(path, text) {
+		var wrap = document.createElement("span");
+		wrap.className = "rpc-meta-item";
+		wrap.innerHTML = iconSvg(path);
+		var label = document.createElement("span");
+		label.textContent = text;
+		wrap.appendChild(label);
+		return wrap;
+	}
+
+	function formatDate(value) {
+		var d = new Date(value);
+		if (isNaN(d.getTime())) return "";
+		return d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+	}
+
+	function build(data) {
+		var card = document.createElement("a");
+		// no-styling：正文的 .custom-md a:not(.no-styling) 会强制 display:inline-block、
+		// 主色文字与虚线下划线，把卡片压成竖排——加上这个类即被排除
+		card.className = "ref-post-card no-styling";
+		card.href = HREF;
+
+		var cover = document.createElement("span");
+		cover.className = "rpc-cover";
+		if (data.image) {
+			var img = document.createElement("img");
+			img.src = data.image;
+			img.alt = "";
+			img.loading = "lazy";
+			img.addEventListener("error", function () {
+				img.remove();
+			});
+			cover.appendChild(img);
+		}
+
+		var body = document.createElement("span");
+		body.className = "rpc-body";
+
+		var title = document.createElement("span");
+		title.className = "rpc-title";
+		title.textContent = data.title || "未命名文章";
+		body.appendChild(title);
+
+		if (data.description) {
+			var desc = document.createElement("span");
+			desc.className = "rpc-desc";
+			desc.textContent = data.description;
+			body.appendChild(desc);
+		}
+
+		var meta = document.createElement("span");
+		meta.className = "rpc-meta";
+
+		var category = data.category && data.category[0];
+		if (category) {
+			var tag = document.createElement("span");
+			tag.className = "rpc-tag";
+			tag.textContent = String(category);
+			tag.title = category;
+			meta.appendChild(tag);
+		}
+		if (data.published) {
+			var dateText = formatDate(data.published);
+			if (dateText) meta.appendChild(metaItem(${JSON.stringify(DATE_ICON)}, dateText));
+		}
+		if (data.minutes) meta.appendChild(metaItem(${JSON.stringify(CLOCK_ICON)}, data.minutes + " 分钟"));
+
+		if (meta.childNodes.length) body.appendChild(meta);
+
+		card.appendChild(cover);
+		card.appendChild(body);
+		return card;
+	}
+
+	function renderFail() {
+		var box = document.createElement("span");
+		box.className = "rpc-fail";
+		var text = document.createElement("span");
+		text.textContent = "引用卡片加载失败";
+		var retry = document.createElement("button");
+		retry.type = "button";
+		retry.textContent = "重试";
+		retry.addEventListener("click", function (e) {
+			e.preventDefault();
+			load();
+		});
+		box.appendChild(text);
+		box.appendChild(retry);
+		return box;
+	}
+
+	async function load() {
+		host.classList.remove("is-filled");
+		host.classList.add("is-loading");
+		try {
+			var res = await fetch(API, { headers: { Accept: "application/json" } });
+			if (!res.ok) throw new Error("HTTP " + res.status);
+			var data = await res.json();
+			if (!data || !data.title) throw new Error("数据不完整");
+			host.classList.remove("is-loading");
+			host.classList.add("is-filled");
+			host.replaceChildren(build(data));
+		} catch (err) {
+			host.classList.remove("is-loading");
+			host.replaceChildren(renderFail());
+		}
+	}
+
+	load();
+})();
+`;
+}
+
+/** 同一页可能引用同一篇文章多次，容器 id 必须唯一 */
+let instanceSeq = 0;
+
 export function PostCardComponent(props, children) {
-	// 验证指令格式
+	// 容器指令是错误写法，提示正确格式
 	if (Array.isArray(children) && children.length !== 0) {
-		return h("div", { class: "bg-red-100 p-4 text-red-700 rounded-md" }, [
-			h("p", "错误：无效的指令格式"),
-			h("p", '正确格式应为：::post{id="文章ID"}'),
-		]);
-	}
-
-	// 验证ID是否存在
-	const id = props.id;
-	if (!id) {
-		return h("div", { class: "bg-red-100 p-4 text-red-700 rounded-md" }, [
-			h("p", "错误：未传入文章ID"),
-		]);
-	}
-
-	// 创建唯一的容器ID，避免重复
-	const containerId = `post-card-${id}`;
-
-	// 创建加载状态元素 - 紧凑设计
-	const loadingState = h(
-		"div",
-		{
-			id: containerId,
-			class:
-				"post-card group relative bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg overflow-hidden transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 dark:border-gray-700 h-64",
-		},
-		[
-			// 加载状态的骨架屏 - 紧凑版本
-			h("div", { class: "animate-pulse h-full" }, [
-				// 图片占位符 - 占满整个卡片
-				h("div", {
-					class:
-						"absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600",
-				}),
-				// 内容占位符 - 悬浮在底部
-				h(
-					"div",
-					{
-						class:
-							"absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent",
-					},
-					[
-						h("div", {
-							class: "h-5 bg-white/20 rounded w-3/4 mb-2",
-						}),
-						h("div", {
-							class: "h-3 bg-white/15 rounded w-full mb-1",
-						}),
-						h("div", {
-							class: "h-3 bg-white/15 rounded w-4/5",
-						}),
-					],
-				),
+		return h("div", { class: "ref-post-card-host" }, [
+			h("span", { class: "rpc-fail" }, [
+				'::post 必须写成单行指令：::post{id="文章slug"}',
 			]),
-			// 加载指示器
-			h(
-				"div",
-				{
-					class:
-						"absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm",
-				},
-				[
-					h("div", { class: "flex flex-col items-center gap-2" }, [
-						h("div", {
-							class:
-								"w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin",
-						}),
-						h("p", { class: "text-xs text-white font-medium" }, "加载中..."),
-					]),
-				],
-			),
-		],
-	);
+		]);
+	}
 
-	// 创建脚本元素，处理数据获取和渲染
-	const script = h(
-		"script",
-		{ type: "text/javascript", defer: true },
-		`
-        (async () => {
-            const container = document.getElementById('${containerId}');
-            if (!container) return;
+	const id = props?.id ? String(props.id).trim() : "";
+	if (!id) {
+		return h("div", { class: "ref-post-card-host" }, [
+			h("span", { class: "rpc-fail" }, ['::post 缺少 id，格式：::post{id="文章slug"}']),
+		]);
+	}
 
-            try {
-                // 发起API请求
-                const response = await fetch('/api/${id}.json');
-                
-                if (!response.ok) {
-                    throw new Error(\`请求失败: \${response.status} \${response.statusText}\`);
-                }
+	const containerId = `post-card-${id.replace(/[^\w-]/g, "-")}-${++instanceSeq}`;
 
-                // 解析响应数据
-                const data = await response.json();
-                
-                // 验证必要字段
-                if (!data.title) {
-                    throw new Error('文章数据不完整，缺少标题信息');
-                }
-
-                // 构建文章卡片HTML - 基于用户模板的简化设计
-                container.innerHTML = \`
-                    <article class="post-card">
-                        <!-- 图片区域 -->
-                        <div class="img">
-                            <img src="\${data.image}" class="not-prose"
-                                 alt="\${data.title}" 
-                                 loading="lazy"
-                            />
-                        </div>
-                        
-                        <!-- 分类标签 -->
-                        <div class="category">
-                            \${data.category?.[0] || '未分类'}
-                        </div>
-                        
-                        <!-- 底部信息区域 -->
-                        <div class="button">
-                            <!-- 标题 -->
-                            <div class="title">
-                                \${data.title}
-                            </div>
-                            
-                            <!-- 文章信息 -->
-                            <div class="article-info">
-                                <!-- 发布日期 -->
-                                <div class="date">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <span>\${new Date(data.published).toLocaleDateString('zh-CN')}</span>
-                                </div>
-                                
-                                <!-- 阅读时间 -->
-                                <div class="reading-time">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <span>\${data.minutes || '5'} 分钟</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                \`;
-
-                // 添加点击事件，点击卡片跳转到文章详情
-                container.style.cursor = 'pointer';
-                container.addEventListener('click', () => {
-                    window.location.href = '/${id}';
-                });
-
-            } catch (error) {
-                // 处理错误状态 - 紧凑错误显示
-                container.innerHTML = \`
-                    <div class="relative h-64 flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20">
-                        <!-- 错误内容 -->
-                        <div class="text-center p-6">
-                            <!-- 错误图标 -->
-                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                                </svg>
-                            </div>
-                            
-                            <!-- 错误信息 -->
-                            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">加载失败</h3>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-4 max-w-xs">
-                                \${error.message}
-                            </p>
-                            
-                            <!-- 重试按钮 -->
-                            <button id="retry-btn-${id}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-md transition-colors duration-200">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
-                                重试
-                            </button>
-                        </div>
-                    </div>
-                \`;
-
-                // 添加重试按钮事件
-                document.getElementById('retry-btn-${id}').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    // 显示重新加载状态 - 紧凑版本
-                    container.innerHTML = \`
-                        <div class="relative h-64 animate-pulse bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600">
-                            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
-                                <div class="h-4 bg-white/20 rounded w-3/4 mb-2"></div>
-                                <div class="h-3 bg-white/15 rounded w-full mb-1"></div>
-                                <div class="h-3 bg-white/15 rounded w-4/5"></div>
-                            </div>
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-                                <div class="flex flex-col items-center gap-2">
-                                    <div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    <p class="text-xs text-white font-medium">重新加载中...</p>
-                                </div>
-                            </div>
-                        </div>
-                    \`;
-                    // 重新执行请求
-                    location.reload();
-                });
-            }
-        })();
-        `,
-	);
-
-	// 返回加载状态和脚本
-	return [loadingState, script];
+	return [renderSkeleton(containerId), h("script", {}, renderLoader(containerId, id))];
 }
