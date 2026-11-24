@@ -1,5 +1,6 @@
 ---
 title: 【单机】红警2025高清重置版安装包，单机游戏，win7/10/11全兼容
+downloadLinks: 红警2025高清重置版安装包|https://pan.baidu.com/s/13PsLKBTRIUd0h0upCbPYJQ|8888
 description: 红警2025高清重置版安装包，单机游戏，win7/10/11全兼容
 published: 2026-11-02
 updated: 2026-11-02
@@ -9,7 +10,7 @@ tags:
   - 解压即玩
   - 资源下载
 category:
-  - 游戏资源/电脑单机
+  - 游戏资源/策略
 image: images/hong/hong.avif
 author: 羡鱼
 series: 单机游戏
@@ -19,7 +20,7 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔑免费资源】红警2025高清重置版安装包" url="https://pan.baidu.com/s/13PsLKBTRIUd0h0upCbPYJQ" desc="红警2025高清重置版安装包，单机游戏，win7/10/11全兼容" code="8888" size="10 GB" icon="zip"}
+
 
 ![版本截图一](images/hong/hong.avif)
 
