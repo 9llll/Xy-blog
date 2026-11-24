@@ -134,6 +134,12 @@ export async function getPostsByCategory(category: string): Promise<CollectionEn
 	});
 }
 
+/**
+ * 一级分类的置底名单（按分类名精确匹配，写父级即可连带其子级）。
+ * 教程类内容不是「资源」，压在侧栏最下面，别跟游戏/软件抢首屏。
+ */
+const CATEGORY_PIN_LAST = ["教程文档"];
+
 /** 构建分类树，父级计数包含全部子级 */
 export async function getCategoryTree(): Promise<CategoryNode[]> {
 	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
@@ -192,11 +198,28 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
 		if (node) node.count = bucket.size;
 	}
 
+	// 不依赖 localeCompare：本地 Windows 与 CI（Linux）对中文的排序结果不一致，
+	// 会导致同一份内容在两边渲染出不同的分类顺序。这里按名称码位固定排序。
+	const byName = (a: CategoryNode, b: CategoryNode) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+
 	const sortNodes = (nodes: CategoryNode[]) => {
-		nodes.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+		nodes.sort(byName);
 		nodes.forEach((n) => sortNodes(n.children));
 	};
 	sortNodes(roots);
+
+	// 置底名单只在最外层生效，且保持名单里的相对顺序（按名单顺序排）
+	if (CATEGORY_PIN_LAST.length > 0) {
+		const pinned: CategoryNode[] = [];
+		CATEGORY_PIN_LAST.forEach((name) => {
+			const found = roots.find((node) => node.name === name);
+			if (found) pinned.push(found);
+		});
+		if (pinned.length > 0) {
+			const rest = roots.filter((node) => !pinned.includes(node));
+			roots.splice(0, roots.length, ...rest, ...pinned);
+		}
+	}
 
 	return roots;
 }
