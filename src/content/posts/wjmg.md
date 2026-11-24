@@ -1,5 +1,7 @@
 ---
 title: 【单机】物集西游魔改版+可带99龙骨+5颗内丹+成长率轻松破10+物集单机+免虚拟机+直接上手体验!
+downloadLinks: 物集单机+免虚拟机+解压即可上手体验!|https://pan.baidu.com/s/1d5vAbDKgV9lPHUt510NZLA|8888|11369
+downloadHint: 邮箱：golooo@qq.com
 description: 物集西游魔改版10级仙器100级神兵+庭院种植+启灵系统+可带99龙骨+5颗内丹+七座骑+带3个坐骑技能+成长率轻松破10+物集单机+免虚拟机+直接上手体验!
 published: 2026-10-24
 updated: 2026-10-24
@@ -10,7 +12,7 @@ tags:
   - 免虚拟机
   - 解压即玩
 category:
-  - 游戏资源/大话西游
+  - 游戏资源/回合制
 image: images/wjmg/niba.avif
 keywords:
   - 大话西游2单机,大话2单机版,大话西游2精修单机端,大话2光武特效单机,大话西游2单机变态,大话2天演册法门单机,大话西游2单机资源
@@ -22,7 +24,7 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔒加密资源】物集单机+免虚拟机+解压即可上手体验!" url="https://pan.baidu.com/s/1d5vAbDKgV9lPHUt510NZLA" desc="10级仙器100级神兵+庭院种植+启灵系统+可带99龙骨+5颗内丹+七座骑+带3个坐骑技能+成长率轻松破10" code="8888" size="4 GB" password="11369" hint="联系：golooo@qq.com" icon="zip"}
+
 
 10级仙器+庭院种植+启灵系统+
 
