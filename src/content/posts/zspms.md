@@ -1,5 +1,5 @@
 ---
-title: 《战双帕弥什》4.9.1 安卓系统一键端 手机架设 无需电脑
+title: 【单机】《战双帕弥什》4.9.1 安卓系统一键端 手机架设 无需电脑
 downloadLinks: "《战双帕弥什》4.9.1 安卓系统一键端 手机架设
   无需电脑|https://pan.baidu.com/s/1XeN9ElI978cHF1la3HK1gg|w3t5 "
 downloadHint: 邮箱：golooo@qq.com
