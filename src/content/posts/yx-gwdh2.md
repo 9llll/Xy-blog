@@ -1,5 +1,8 @@
 ---
 title: 【单机】大话西游2 光武单机全修复精修版本（虚拟机版本）发布
+downloadLinks: 大话西游2
+  光武单机全修复精修版（虚拟机版本）|https://pan.baidu.com/s/1Q2EEt4JLMG0OLF3I-IQfCw|561j|18600
+downloadHint: 邮箱：golooo@qq.com
 description: 大话西游2 光武单机全修复精修版本的整理记录：基于官方逻辑真实修正、全系统功能稳定运行，含角色养成与战斗系统亮点，以及虚拟机版本网盘下载与提取码。
 published: 2026-10-07
 updated: 2026-10-07
@@ -9,12 +12,12 @@ tags:
   - 游戏源码
   - 虚拟机
 category:
-  - 游戏资源/大话西游
+  - 游戏资源/回合制
 image: images/xy2.avif
 keywords:
   - 大话西游2光武单机,大话2虚拟机单机版,大话西游2精修单机端,大话2光武特效单机,大话西游2单机仿官,大话2天演册法门单机,大话西游2单机资源
 author: 羡鱼
-series: 回合制
+series: 单机游戏
 seriesOrder: 0
 ogImage: https://www.3x3.top/images/xy2.avif
 draft: false
@@ -22,12 +25,6 @@ pinned: false
 comment: true
 ---
 > 说明：本文为个人学习收藏，仅作技术记录与学习交流之用。请在合法合规的前提下使用，勿用于任何商业用途或非法运营。
-
-### 、下载与提取码
-
-资源通过网盘分发，点击下方按钮前往，提取码已内置（点击可一键复制）：
-
-::download{name="【🔒加密资源】大话西游2 光武单机全修复精修版（虚拟机版本）" url="https://pan.baidu.com/s/1Q2EEt4JLMG0OLF3I-IQfCw" desc="虚拟机版本完整包，基于官方逻辑真实修正、全系统功能稳定运行" code="561j" size="4 GB" password="1860" hint="联系：golooo@qq.com" icon="zip"}
 
 ## 一、版本核心信息
 
