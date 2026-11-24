@@ -1,8 +1,8 @@
 ---
 title: 【文档】下载按钮使用说明
-description: 如何在文章任意位置插入下载按钮，支持网盘提取码、独立密码保护与付费资源卡片
+description: 在文章里放下载卡片的两种写法：后台表单（推荐，不用记语法）与正文 ::download 指令，含全部属性、密码保护原理与常见问题。
 published: 2026-10-01
-updated: 2026-10-01
+updated: 2026-11-24
 tags:
   - 下载按钮
   - 教程
@@ -12,134 +12,188 @@ category:
 kind: news
 image: images/wendang.avif
 keywords:
-  - ::download 下载按钮，Markdown 下载指令，羡鱼资源下载按钮，静态站下载按钮，Markdown 资源下载按钮教程
+  - 下载卡片，downloadLinks 表单，::download 指令，网盘提取码，访问密码，Markdown 资源下载按钮教程
 author: 羡鱼
 series: 指令
-seriesOrder: 0
+seriesOrder: 2
 ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
 ---
-在文章正文里用 `::download{...}` 指令即可插入下载按钮，**可以放在文章任意位置**（标题下、正文中间、末尾都行）。
+在文章里插入下载卡片有两条路：**后台表单**（推荐，不用记任何语法）和**正文指令**（需要精细控制时用）。两者渲染出来的卡片完全一样——样式、网盘识别、密码保护、右栏总览都一致，区别只在「怎么写」。
 
-## 最简用法
+## 一、推荐：用后台表单填
 
-```markdown
-::download{title="羡鱼资源" url="https://github.com/9llll/Xy-blog"}
+在 Pages CMS 的文章编辑页，「标题」下面是两个字段：
+
+| 字段 | 填什么 |
+| --- | --- |
+| **下载资源** | 多行文本，一行一个网盘 |
+| **下载密码获取方式** | 可选，一句话说明密码怎么拿，例如「邮箱 xxx@qq.com」 |
+
+「下载资源」每行按竖线分成五段，缺的段直接省略：
+
+```
+名称 | 链接 | 提取码 | 访问密码 | 文件大小
 ```
 
-## 支持的属性
+真实填写示例（免费直链、带提取码、带访问密码三种）：
 
+```
+【百度网盘】示例资源 | https://pan.baidu.com/s/1DemoBaiduAutoDetect | 8888 |  | 1.2 GB
+【夸克网盘】示例资源 | https://pan.quark.cn/s/demo
+需要密码的示例 | https://example.com/secret.zip ||| 66398 | 8.6 MB
+```
+
+**规则与容错**
+
+- 竖线中英文都可以（`|` 和 `｜` 等价），前后空格会被自动清掉
+- **一行里必须能找到 `http://` 或 `https://` 开头的链接**，找不到的行直接跳过——所以可以在里面写以 `#` 开头的注释行
+- 「提取码：1wau」「密码=66398」这种带前缀的写法也认，前缀会被自动去掉
+- `519 MB`、`6.1 GB`、`800KB` 这类值会被识别成**文件大小**，不会误当成提取码
+- 网盘类型（百度 / 夸克 / 蓝奏云…）和卡片封面都自动识别，不用填
+- **提取码是网盘的，访问密码是本站的**，两列不要填串
+- 卡片顺序 = 表单里的从上到下，整组卡片统一插在**正文最前面**
+
+**一个必须知道的优先级**：正文里已经手写了 `::download` 指令的文章，会**忽略**表单——否则同一张卡会渲染两遍。所以要么全用表单，要么全用指令，不要混着来。
+
+## 二、进阶：正文指令
+
+需要卡片封面、自定义角标、付费卡这类表单给不了的细节时，直接在正文里写指令（同样可以放在文章任意位置）：
+
+```markdown
+::download{title="羡鱼资源" url="https://www.3x3.top"}
+```
+
+### 支持的属性
 
 | 属性 | 说明 | 示例 |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
-| `url` | 普通 / 加密下载**必填**；付费卡片不要填。必须是 http(s) 或 `/` 开头 | `"/downloads/demo.zip"` |
-| `title` | 资源名称（`name` 为同义别名） | `"示例包"` |
-| `desc` | 资源简介（`source` 为同义别名，兼容旧写法） | `"合集资源，持续更新"` |
-| `size` | 文件大小 | `"12.4 MB"` |
-| `code` | 网盘提取码，点击一键复制 | `"a1b2"` |
-| `hint` | 密码提示，仅在设置密码时有意义 | `"提示：四位数字"` |
-| `password` | 访问密码，独立于文章密码 | `"1234"` |
-| `icon` | 图标：网盘关键字（`baidu`/`quark`/`aliyun`/`123`/`lanzou`/`tianyi`/`xunlei`/`chengtong`/`cowtransfer`/`weiyun`…）、通用类型（`zip`/`image`/`file`/`lock`/`key`）、或图片地址 / emoji（自定义） | `"baidu"` |
-| `pay` | 付费卡片开关，填商品编号即可；填了之后卡片**不会**输出任何下载地址 | `"SKU001"` |
-| `buy` | **付费时必填**，发卡平台商品购买页链接（http(s)） | `"https://发卡平台/商品"` |
+| --- | --- | --- |
+| `url` | 普通 / 加密卡**必填**，付费卡不要填。必须是 `http(s)://` 或 `/`、`./`、`../` 开头 | `"/downloads/demo.zip"` |
+| `name` | 资源名称；`title` 等价，`source` 是旧写法的兜底 | `"示例包"` |
+| `desc` | 资源简介（`source` 亦可，兼容旧文章） | `"合集资源，持续更新"` |
+| `size` | 文件大小，显示在标题下方的元信息行 | `"12.4 MB"` |
+| `code` | 网盘提取码，按钮左侧显示，点一下写入剪贴板 | `"a1b2"` |
+| `password` | 访问密码，点击下载时弹框校验 | `"66398"` |
+| `hint` | 密码提示，会显示在弹框里；**不填则显示固定兜底文案**「未提供访问密码？请联系作者获取」 | `"提示：五位数字"` |
+| `icon` | 网盘关键字（`baidu`/`quark`/`aliyun`/`123`/`lanzou`/`tianyi`/`xunlei`/`chengtong`/`cowtransfer`/`weiyun`/`360`/`115`/`pikpak`）、通用类型（`zip`/`file`/`image`/`lock`/`key`）、图片地址、或 emoji / 文字 | `"baidu"` |
+| `cover` | 卡片封面图。不填则用文章第一张图，再没有就用默认占位图 | `"/images/cover.avif"` |
+| `tag` | 封面左上角的角标文字；不填则自动显示「免费」或「加密」 | `"独家"` |
+| `pay` | 付费卡开关，填商品编号即可；填了之后卡片**不输出任何下载地址** | `"SKU001"` |
+| `buy` | **付费卡必填**，发卡平台的商品购买页链接 | `"https://faka.example.com/items/SKU001"` |
 | `price` | 价格，显示在购买按钮上 | `"19.9"` |
-| `buyText` | 自定义按钮文字（可选） | `"立即下单"` |
+| `buyText` | 自定义购买按钮文字，默认「获取或购买」 | `"立即下单"` |
 
-
-## 完整示例
+### 完整示例
 
 ```markdown
-::download{title="带提取码的下载" desc="示例：网盘资源需要提取码" size="12.4 MB" code="a1b2" url="https://example.com/file.zip"}
+::download{name="带提取码的下载" desc="示例：网盘资源需要提取码" size="12.4 MB" code="8888" url="https://www.3x3.top"}
 
-::download{title="加密的下载" desc="示例：需要密码才能下载" size="8.6 MB" password="1234" hint="提示：四位数字" url="https://example.com/secret.zip"}
+::download{name="加密的下载" desc="示例：需要密码才能下载" size="8.6 MB" password="66398" hint="提示：五位数字" url="https://www.3x3.top/secret.zip"}
 ```
 
-## 密码保护是怎么工作的
+实际渲染：
 
-填写 `password` 后：
+::download{name="带提取码的下载" desc="示例：网盘资源需要提取码" size="12.4 MB" code="8888" url="https://www.3x3.top"}
 
-1. **构建期**把明文密码转成 SHA-256 哈希，写入 HTML 的 `data-dl-hash` 属性
-2. **运行时**用 WebCrypto 计算你输入密码的哈希，与之比对
-3. 明文密码**不会出现在任何输出文件**中，查看网页源码也看不到
+::download{name="加密的下载" desc="示例：需要密码才能下载" size="8.6 MB" password="66398" hint="提示：五位数字" url="https://www.3x3.top/secret.zip"}
 
-需要注意：这是**访问门禁**而非强加密。校验发生在浏览器端，理论上仍可被绕过。纯静态站点没有后端，做不到真正的服务端鉴权——若需要彻底控制，请配合 Cloudflare Pages Functions 做中转。
+## 三、密码与地址是怎么保护的
 
-> ⚠️ **公开仓库警示**：本站源码托管在公开 GitHub 仓库，`src/content/posts/*.md` 可被任何人通过 `raw.githubusercontent.com` 直接读取。写在 `password` / `url` / `code` 里的内容虽然在**构建产物**中不可见，但在**源仓库**里是公开的。因此这套机制只能防「顺手扒页面」，**不能用来保护付费资源**。付费请走下面的「付费下载」，把地址和卡密放到发卡平台。
+填了 `password` 的卡片，构建期会做两件事：
 
-## 地址混淆
+1. 把明文密码转成 **SHA-256 哈希**，写进 HTML 的 `data-dl-hash`——只用来判断「输得对不对」
+2. 用 `PBKDF2(密码)` 派生密钥，把真实地址用 **AES-256-GCM 加密**，密文写进 `data-dl-url`
 
-下载地址在构建期会被 **Base64 编码**后写入 `data-dl-url`，所以：
+页面运行时：输入密码 → 比对哈希 → 用同一个密码派生密钥 → 解密出地址 → 跳转。密码不对时 GCM 校验失败，什么也解不出来，所以**页面源码、RSS、搜索索引里既没有明文密码，也没有下载地址**。
 
-- 查看网页源码 / F12 Elements 里**搜不到**真实下载地址
-- 但点击下载的瞬间，浏览器 Network 面板仍会显示真实地址
+没设密码的卡片没有可用的密钥，地址只能做 **Base64 混淆**：源码里搜不到可读的网址，但严格来说它只是「编码」而不是「加密」。
 
-这是混淆而非加密，目的是防止地址被批量采集。
+几个使用细节：
 
-## 网盘品牌图标
+- 密码框最多试 **3 次**，超过就关闭弹框，需要重新点下载
+- 密码两端的空格会被自动去掉，中间的空格会保留——复制粘贴时注意别带进空格
+- 校验发生在浏览器端，这是**访问门禁**而非强加密。纯静态站没有后端，做不到真正的服务端鉴权；要彻底控制，得配合 Cloudflare Workers / Pages Functions 做中转
 
-下载地址如果是常见网盘（百度网盘 / 夸克 / 阿里云盘 / 123 网盘 / 蓝奏云 / 天翼云 / 迅雷 / 城通 / 奶牛 / 微云 / 360 / 115 / PikPak 等），**无需任何配置**，左侧徽章会自动显示对应网盘的品牌色圆牌（按链接域名识别）：
+> ⚠️ **公开仓库警示**：本站源码在公开 GitHub 仓库，`src/content/posts/*.md` 谁都能通过 `raw.githubusercontent.com` 直接读取。`password` / `url` / `code` 在**构建产物**里看不见，但在**源仓库**里是明文。这套机制只能防「顺手扒页面」，**不能用来保护付费资源**——付费请走下面的付费卡。
 
-::download{title="百度网盘（自动识别）" desc="pan.baidu.com 自动显示百度蓝圆牌" size="1.2 GB" code="8888" url="https://pan.baidu.com/s/1DemoBaiduAutoDetect"}
+## 四、网盘图标
 
-::download{title="蓝奏云（自动识别）" desc="lanzou 域名自动显示蓝奏云圆牌" size="30 MB" url="https://8x8.lanzout.com/DemoLanzouAuto"}
+下载链接是常见网盘时（百度 / 夸克 / 阿里云盘 / 123 / 蓝奏云 / 天翼云 / 迅雷 / 城通 / 奶牛 / 微云 / 360 / 115 / PikPak），**不用任何配置**，左侧会自动出现对应品牌色的圆点和网盘名：
 
-手动指定网盘（覆盖自动识别，或用于非网盘地址）：
+::download{name="百度网盘（自动识别）" desc="pan.baidu.com 自动显示百度蓝" size="1.2 GB" code="8888" url="https://pan.baidu.com/s/1DemoBaiduAutoDetect"}
 
-::download{title="手动指定夸克" icon="quark" desc="icon=quark 手动指定" size="800 MB" url="https://example.com/quark-file"}
+::download{name="蓝奏云（自动识别）" desc="lanzou 域名自动显示蓝奏云" size="30 MB" url="https://8x8.lanzout.com/DemoLanzouAuto"}
+
+手动指定（覆盖自动识别，或用于非网盘地址）：
+
+::download{name="手动指定夸克" icon="quark" desc="icon=quark 手动指定" size="800 MB" url="https://example.com/quark-file"}
 
 自定义图标：填图片地址渲染图片，填 emoji / 文字渲染文字：
 
-::download{title="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
+::download{name="自定义 emoji 图标" icon="💾" desc="icon 填 emoji" size="10 MB" url="https://example.com/file-emoji"}
 
-::download{title="自定义图片图标" icon="https://www.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
+::download{name="自定义图片图标" icon="https://www.3x3.top/images/fenxiang.avif" desc="icon 填图片地址" size="10 MB" url="https://example.com/file-img"}
 
-## 付费下载（卡密 / 发卡平台）
+## 五、付费卡片
 
 付费资源**不要**把真实地址或卡密写进文章——仓库是公开的，写进去等于直接公开。
 
-正确做法是把**下载地址 / 提取码 / 卡密**填到第三方发卡平台（XorPay、虎皮椒、易支付、独角数卡、爱发电等）的商品「发货内容」里，用户付款后由平台自动发货；本站只展示购买入口。
+正确做法是把**下载地址 / 提取码 / 卡密**填到第三方发卡平台（易支付、虎皮椒、独角数卡、爱发电等）的商品「发货内容」里，用户付款后平台自动发货；本站只展示购买入口。
 
-下面这张就是付费卡片的**真实渲染效果**（黑金配色，点击在新标签页打开示例购买页）：
+下面这张是付费卡的**真实渲染效果**（购买链接是占位地址，点击会在新标签页打开）：
 
-::download{title="示例付费资源（效果预览）" desc="付费卡片真实渲染效果，非真实商品" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
+::download{name="示例付费资源（效果预览）" desc="付费卡片真实渲染效果，非真实商品" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
 
-完整语法如下（下方代码块展示写法，不会渲染成卡片）：
-
-```markdown
-::download{title="完整源码包" desc="含全部源码、素材与持续更新" size="1.2 GB" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
-```
-
-会渲染成一张和其它下载卡片样式一致的「付费资源」卡片，右侧是购买按钮，点击在新标签页打开发卡平台。**卡片里不含任何下载地址、提取码或密码**，HTML / RSS / 接口 / 搜索索引里也都没有。
-
-::download{title="付费完整包（演示）" desc="演示卡片，购买链接为占位地址" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
-
-### 同一篇文章混排三种下载
+完整写法（下面放在代码块里，不会渲染成卡片）：
 
 ```markdown
-::download{title="免费预览包" url="https://example.com/preview.zip"}
-
-::download{title="会员加密包" password="abcd1234" url="https://example.com/member.zip"}
-
-::download{title="付费完整包" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
+::download{name="完整源码包" desc="含全部源码、素材与持续更新" size="1.2 GB" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
 ```
 
-每条指令独立渲染，互不干扰：免费块直接下载、加密块输密码解密、付费块跳转发卡平台。
+卡片里**不含任何下载地址、提取码或密码**，HTML / RSS / 接口 / 搜索索引里也都没有。
 
-### 为什么不用「购买后输卡密解密」
+### 同一篇文章混排三种卡片
 
-看起来更站内化的做法是把卡密当 `password`，复用现有加密下载机制在购买后解密。但卡密必须先写进文章才能在构建期加密 URL，而文章在公开仓库里 —— **卡密和地址会一起泄露**。要做成真卡密，得把密钥挪进 CI Secrets 并改造构建流程（已接近服务端方案），个人站起步阶段不划算。
+```markdown
+::download{name="免费预览包" url="https://example.com/preview.zip"}
 
-> 极简替代：不需要卡片样式的话，直接用 `::btn{text="购买完整包 ¥19.9" href="发卡链接"}` 也完全可行，零配置。
+::download{name="会员加密包" password="abcd1234" url="https://example.com/member.zip"}
 
-## 常见问题
+::download{name="付费完整包" pay="SKU001" price="19.9" buy="https://faka.example.com/items/SKU001"}
+```
 
-**Q：按钮没显示？**
-A：检查属性是否用英文半角引号 `"`，不要用中文全角引号 `“”`；`::` 后面不要加空格；指令要单独成段，不要放在代码块里，也不要被 `**` 加粗包住（整行加粗会先被当成普通文字，指令就不生效了）。
+三条互不干扰：免费块直接下载、加密块弹框输密码、付费块跳转发卡平台。
+
+### 为什么不做「购买后输卡密解密」
+
+看起来更站内化，但卡密必须先写进文章才能在构建期加密地址，而文章在公开仓库里——**卡密和地址会一起泄露**。要做成真卡密，得把密钥挪进 CI Secrets 并改造构建流程（已接近服务端方案），个人站起步阶段不划算。
+
+> 极简替代：不需要卡片样式的话，直接用 `::btn{text="购买完整包" href="发卡链接"}` 也完全可行。
+
+## 六、常见问题
+
+**Q：表单填了，页面没有卡片？**
+
+按顺序排查：① 每行是否有 `http(s)://` 链接；② 这篇文章正文里是不是还留着旧的 `::download` 指令（有则整组表单被忽略）；③ 是否刚推上去、构建还没跑完。
+
+**Q：卡片的顺序和我填的顺序不一样？**
+
+表单里的卡片是整组插在**正文最前面**的，顺序与表单行序一致。想插在正文中间某个位置，只能用指令。
+
+**Q：卡片没显示？**
+
+写指令时：属性值必须用英文半角引号 `"`，`::` 后面不要有空格，指令要单独成段，不要包在 `**` 加粗里，也不要放进代码块（代码块里只会原样显示文字）。用表单填写时不存在这些问题——表单是纯文本，不需要引号。
 
 **Q：密码填对了还是提示错误？**
-A：确认密码前后没有多余空格（两端空格会被自动去除，但中间的会保留）。
+
+确认首尾没有多余空格；确认填的是「访问密码」而不是「网盘提取码」；大字号下容易把 `0` 和 `O`、`1` 和 `l` 看错。
 
 **Q：点击下载会跳走离开本站？**
-A：跨域地址会在新标签页打开（因为浏览器对跨域链接会忽略 `download` 属性），站内路径则直接下载。当前页面不会丢失。
+
+跨域地址会在新标签页打开（浏览器会忽略跨域链接的 `download` 属性），站内路径则直接下载。当前页面不会丢失。
+
+**Q：文件大小填了不显示？**
+
+大小显示在标题下方的元信息行（和网盘名同一行）。用表单时，它必须是第五段，或者写成 `519 MB` 这种「数字 + 单位」的形式才会被识别。

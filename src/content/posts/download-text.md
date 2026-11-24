@@ -1,88 +1,74 @@
 ---
 title: 【文档】下载按钮演示
-description: 下载按钮演示
+description: 本站下载卡片的真实渲染效果：免费直链、网盘提取码、访问密码、付费购买四种状态，以及网盘自动识别与自定义图标。
 published: 2026-10-01
-updated: 2026-10-01
+updated: 2026-11-24
 tags:
   - 下载按钮
+  - 演示
   - 教程
-  - Fuwari
-  - Astro
 category:
   - 教程文档/演示
 kind: news
 image: images/wendang.avif
 keywords:
-  - ::download 演示，Markdown 下载按钮演示，资源下载指令，Astro 下载按钮，静态站下载按钮示例  今天
-    21:05   如何在Markdown文章中插入下载按钮？   下载按钮的密码保护逻辑是怎样的？   如何进行常见故障排查？
+  - 下载卡片演示，网盘提取码，访问密码，付费资源卡片，网盘自动识别
 author: 羡鱼
 series: 指令
-seriesOrder: 0
+seriesOrder: 3
 ogImage: https://www.3x3.top/images/fenxiang.avif
 draft: false
 pinned: false
 comment: true
 ---
-::github{repo="9llll/pagecms"}
+这一页只做**渲染效果预览**，卡片都是真实渲染出来的（付费卡的购买链接是占位地址，点了会打不开）。具体怎么写、有哪些属性、密码怎么保护，都在文末那张卡片指向的《下载按钮使用说明》里，这里不重复。
 
-::download{title="测试-免费资源" source="下载来源" url="https://moci.cc"}
+## 一、四种基本状态
 
-::download{title="测试：提取码复制" desc="示例：网盘资源需要提取码" size="12.4 MB" code="8888" url="https://moci.cc"}
+**免费直链**（无提取码、无密码，点击直接下载）
 
-::download{title="测试：加密资源" desc="需要密码才能下载" size="8.6 MB" password="1234" hint="提示：密码：1234" url="https://moci.cc"}
+::download{name="免费资源" desc="无提取码、无访问密码，点一下直接下载" size="12.4 MB" url="https://www.3x3.top"}
 
-在文章正文里用 `::download{...}` 指令即可插入下载按钮，**可以放在文章任意位置**（标题下、正文中间、末尾都行）。
+**网盘提取码**（按钮左侧显示提取码，点一下复制）
 
-## 最简用法
+::download{name="网盘资源（带提取码）" desc="提取码紧贴下载按钮，点一下写入剪贴板" size="1.2 GB" code="8888" url="https://pan.baidu.com/s/1DemoBaiduAutoDetect"}
 
-```markdown
-::download{title="羡鱼资源" url="https://moci.cc"}
-```
+**访问密码**（点击弹出密码框，最多试 3 次）
 
-## 支持的属性
+::download{name="加密资源" desc="需要访问密码才能拿到真实地址" size="8.6 MB" password="66398" hint="提示：五位数字" url="https://www.3x3.top/secret.zip"}
 
+**付费资源**（卡片不含任何地址，只跳转发卡平台）
 
-| 属性 | 说明 | 示例 |
-| ---------- | ---------------------------------------------- | ----------------------- |
-| `url` | **必填**，下载地址。必须是 http(s) 或 `/` 开头的站内路径 | `"/downloads/demo.zip"` |
-| `title` | 资源名称（`name` 为同义别名） | `"示例包"` |
-| `desc` | 资源简介（`source` 为同义别名，兼容旧写法） | `"合集资源，持续更新"` |
-| `size` | 文件大小 | `"12.4 MB"` |
-| `code` | 网盘提取码，点击一键复制 | `"a1b2"` |
-| `hint` | 密码提示，仅在设置密码时有意义 | `"提示：四位数字"` |
-| `password` | 访问密码，独立于文章密码 | `"1234"` |
-| `icon` | 图标类型：`zip` / `image` / `file` / `lock` / `key` | `"zip"` |
+::download{name="付费资源（演示）" desc="购买链接为占位地址，非真实商品" size="1.2 GB" pay="DEMO001" price="19.9" buy="https://example.com/buy/DEMO001"}
 
+## 二、网盘自动识别
 
-## 密码保护是怎么工作的
+链接域名能认出来的网盘，品牌色圆点和网盘名会自动出现，不用填 `icon`：
 
-填写 `password` 后：
+::download{name="百度网盘" desc="pan.baidu.com 自动识别" size="1.2 GB" code="8888" url="https://pan.baidu.com/s/1DemoBaiduAutoDetect"}
 
-1. **构建期**把明文密码转成 SHA-256 哈希，写入 HTML 的 `data-dl-hash` 属性
-2. **运行时**用 WebCrypto 计算你输入密码的哈希，与之比对
-3. 明文密码**不会出现在任何输出文件**中，查看网页源码也看不到
+::download{name="蓝奏云" desc="lanzou 域名自动识别" size="30 MB" url="https://8x8.lanzout.com/DemoLanzouAuto"}
 
-需要注意：这是**访问门禁**而非强加密。校验发生在浏览器端，理论上仍可被绕过。纯静态站点没有后端，做不到真正的服务端鉴权——若需要彻底控制，请配合 Cloudflare Pages Functions 做中转。
+::download{name="夸克网盘（手动指定）" desc="icon=quark 覆盖自动识别" size="800 MB" icon="quark" url="https://example.com/quark-file"}
 
-## 地址混淆
+## 三、自定义封面与角标
 
-下载地址在构建期会被 **Base64 编码**后写入 `data-dl-url`，所以：
+封面默认取文章第一张图，角标默认显示「免费」或「加密」，两者都可以单独指定：
 
-- 查看网页源码 / F12 Elements 里**搜不到**真实下载地址
-- 但点击下载的瞬间，浏览器 Network 面板仍会显示真实地址
+::download{name="自定义封面与角标" desc="cover 指定封面，tag 指定角标文字" tag="独家" cover="/images/fenxiang.avif" size="666 MB" url="https://www.3x3.top"}
 
-这是混淆而非加密，目的是防止地址被批量采集。
+## 四、三种卡片混排
 
-## 常见问题
+同一篇文章里可以并排放，互不干扰：
 
-**Q：按钮没显示？**
-A：检查属性是否用英文半角引号 `"`，不要用中文全角引号 `“”`；`::` 后面不要加空格；指令要单独成段，不要放在代码块里。
+::download{name="免费预览包" desc="直接下载" size="120 MB" url="https://www.3x3.top"}
 
-**Q：密码填对了还是提示错误？**
-A：确认密码前后没有多余空格（两端空格会被自动去除，但中间的会保留）。
+::download{name="会员加密包" desc="需要访问密码" size="900 MB" password="abcd1234" url="https://www.3x3.top/member.zip"}
 
-**Q：点击下载会跳走离开本站？**
-A：跨域地址会在新标签页打开（因为浏览器对跨域链接会忽略 `download` 属性），站内路径则直接下载。当前页面不会丢失。
+::download{name="付费完整包" desc="跳转发卡平台" size="1.5 GB" pay="DEMO002" price="29.9" buy="https://example.com/buy/DEMO002"}
 
-引用文章：
+---
+
+字段怎么填，看这一篇：
+
 ::post{id="download-guide"}
