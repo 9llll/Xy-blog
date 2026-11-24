@@ -112,6 +112,18 @@ function pickCover(explicit, auto) {
 }
 
 /**
+ * 文件大小（元信息行内的一项）。
+ *
+ * `size` 字段一直存在于指令与 CMS 表单里，但早期版本只读取、从未渲染，
+ * 导致作者填了大小却看不到。这里补齐渲染，两处（普通卡 / 付费卡）共用。
+ */
+function sizeInline(size) {
+	const value = asString(size).trim();
+	if (!value) return null;
+	return h("span", { class: "shrink-0" }, [value]);
+}
+
+/**
  * 网盘名（元信息行内的小圆点 + 名称）。
  * 仅品牌圆牌 / 自定义文字可展示名称；自定义图片展示小图标；无法识别则不展示。
  */
@@ -294,6 +306,7 @@ function renderPayCard(props) {
 		asString(props.source).trim();
 	const name = stripMdEmphasis(rawName) || LABEL_PAY_RES;
 	const price = asString(props.price).trim();
+	const size = asString(props.size).trim();
 	const cover = pickCover(props.cover, props.autocover);
 	const buyText = asString(props.buyText).trim() || "获取或购买";
 	// 付费 / 加密双模式：只判断「有没有设密码」，密码本身绝不输出
@@ -303,10 +316,12 @@ function renderPayCard(props) {
 
 	const id = dlAnchorId(rawName);
 
-	/* 元信息行：网盘（可选）· 需访问密码 */
+	/* 元信息行：网盘（可选）· 文件大小（可选）· 需访问密码 */
 	const meta = [];
 	const ndEl = netdiskInline(resolveNetdisk(asString(props.icon).trim(), ""));
 	if (ndEl) meta.push(ndEl);
+	const sizeEl = sizeInline(size);
+	if (sizeEl) meta.push(sizeEl);
 	if (hasPassword) {
 		meta.push(
 			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
@@ -374,10 +389,12 @@ export function DownloadComponent(props, children) {
 	const lock = Boolean(item.hash);
 	const nd = resolveNetdisk(item.icon, item.url);
 
-	/* 元信息行：网盘名 · 需访问密码（提取码不在这里，见下方按钮左侧） */
+	/* 元信息行：网盘名 · 文件大小 · 需访问密码（提取码不在这里，见下方按钮左侧） */
 	const meta = [];
 	const ndEl = netdiskInline(nd);
 	if (ndEl) meta.push(ndEl);
+	const sizeEl = sizeInline(item.size);
+	if (sizeEl) meta.push(sizeEl);
 	if (lock) {
 		meta.push(
 			h("span", { class: "inline-flex shrink-0 items-center gap-1" }, [
