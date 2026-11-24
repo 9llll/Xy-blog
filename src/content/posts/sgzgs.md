@@ -12,7 +12,7 @@ tags:
   - 三国
   - 策略
 category:
-  - 游戏资源/页游
+  - 游戏资源/策略
 image: images/sgzgs/sgzgs.avif
 keywords:
   - 策略
@@ -27,9 +27,9 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="策略页游-三国之戈霜王者一键单机端" url="https://pan.baidu.com/s/18sif60Le62Awre9QS6HE7A" code="f3gw"}
 
 
+&nbsp;
 
 ### 服务端解压到 D 盘：`D:\fxsg`
 
