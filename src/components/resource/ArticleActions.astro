@@ -18,8 +18,16 @@ interface Props {
 
 const { title } = Astro.props;
 
+/**
+ * 按钮样式：
+ * 手机端 —— 两个一行、自动铺满（3 个时最后一个自然拉成整行，4 个时正好 2×2），
+ *          不再出现「分享这篇 + 两个按钮 + 一个孤零零的 Telegram」这种断行；
+ * 桌面端 —— sm 断点回到原来自适应的单行 inline 排布。
+ */
 const btn =
-	"inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12.5px] font-medium transition-colors " +
+	"inline-flex flex-1 basis-[calc(50%-0.25rem)] items-center justify-center gap-1.5 rounded-md px-3 py-2.5 " +
+	"text-[12.5px] font-medium transition-colors " +
+	"sm:flex-none sm:basis-auto sm:justify-start sm:py-1.5 " +
 	"bg-[var(--btn-regular-bg)] text-black/70 hover:bg-[var(--btn-regular-bg-hover)] hover:text-[var(--primary)] " +
 	"dark:text-white/70";
 ---
@@ -33,7 +41,7 @@ const btn =
 
 <section class="mt-4 rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] px-4 py-3 shadow-sm">
 	<div class="flex flex-wrap items-center gap-2">
-		<span class="mr-1 inline-flex items-center gap-1.5 text-[12.5px] text-black/45 dark:text-white/45">
+		<span class="flex w-full items-center gap-1.5 text-[12.5px] text-black/45 dark:text-white/45 sm:mr-1 sm:w-auto">
 			<Icon name="material-symbols:share-outline" class="text-[1rem]" />
 			分享这篇
 		</span>
