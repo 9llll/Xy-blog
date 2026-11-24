@@ -1,5 +1,6 @@
 ---
 title: 【单机】【修仙西游 AI修复一键端】160阶仙器+烧香+10000坐骑端
+downloadLinks: 修仙西游 AI修复一键端|https://pan.baidu.com/s/1TeIR7zrnMl6as3MhCGtQ5Q|8888
 description: |-
   一键启动、关闭，自带GM工具，想要什么自己发，仙器增加100-160阶【实测伤害破亿】
   召唤兽升星，陪玩机器人（实际是机器人自己组队在完成各种任务）、新增三种坐骑丹根骨、灵性、力量（不限次数每次增加5点坐骑属性），宠物也能起飞！
@@ -12,7 +13,7 @@ tags:
   - 解压即玩
   - 大话2
 category:
-  - 游戏资源/大话西游
+  - 游戏资源/回合制
 image: images/xxxy/xxxy7.avif
 author: 羡鱼
 series: 回合制
@@ -22,7 +23,7 @@ draft: false
 pinned: false
 comment: true
 ---
-::download{name="【🔑免费资源】**修仙西游 AI修复一键端**" url="https://pan.baidu.com/s/1TeIR7zrnMl6as3MhCGtQ5Q" desc="**【修仙西游 ai修复一键端】160阶仙器+烧香+10000坐骑端**" code="8888" size="4.2 GB" icon="zip"}
+
 
 ![版本截图三](images/xxxy/xxxy1.avif)
 
