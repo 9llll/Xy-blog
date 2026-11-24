@@ -1,5 +1,9 @@
 ---
-title: 【单机】[免虚拟机]2026年新大话2经典怀旧单机版一键端+源码
+title: 【单机】[免虚拟机]2026年新大话2经典怀旧单机版一键端
+downloadLinks: |-
+  【百度网盘】2026年新大话2经典怀旧单机版一键端|https://pan.baidu.com/s/17RRaPV-mnfCXg9dG7Qsg9w|1wau|66398
+  【夸克网盘】2026年新大话2经典怀旧单机版一键端|https://pan.quark.cn/s/c8910031388d|7wVr|66398
+downloadHint: 邮箱：golooo@qq.com
 description: 全新改版，支持一账号建5角色多开，或多个账号多开。
 published: 2026-11-23
 updated: 2026-11-23
@@ -9,7 +13,7 @@ tags:
   - 游戏
   - 一键端
 category:
-  - 游戏资源/大话西游
+  - 游戏资源/回合制
 image: images/dhy11/dhy11.avif
 keywords:
   - 大话西游2,大话2,大话2单机,网游单机,大话2公益
@@ -21,10 +25,7 @@ draft: false
 pinned: false
 comment: false
 ---
-**全新改版，支持一账号建5角色多开，或多个账号多开。**  
-::download{name="【百度网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.baidu.com/s/17RRaPV-mnfCXg9dG7Qsg9w" code="1wau" password="66398"}
-
-::download{name="【夸克网盘】2026年新大话2经典怀旧单机版一键端" url="https://pan.quark.cn/s/c8910031388d" code="7wVr" password="66398"}
+**全新改版，支持一账号建5角色多开，或多个账号多开。**
 
 **功能亮点：**  
 **✅ 灵宝、星盘、灵犀、法门、成圣之路、大黄鸭全都有**  
