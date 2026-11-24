@@ -12,7 +12,7 @@ tags:
   - 游戏
   - 一键端
 category:
-  - 游戏资源/页游
+  - 游戏资源/即时战斗
 image: images/cljy/cl.avif
 keywords:
   - 角色扮演,页游,一键端,网游单机
