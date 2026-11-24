@@ -1,5 +1,6 @@
 ---
 title: " 【单机】[GEE引擎]九鱼斗魔单职业假人版｜无大翅膀 无满屏花哨技能传奇版本"
+downloadLinks: "[GEE引擎]九鱼斗魔单职业假人版|https://pan.baidu.com/s/1VZ0vf7L_h5I_0OZbN28dqA|8888"
 description: 九鱼斗魔为 GEE 引擎打造的单职业传奇版本，内置智能假人系统，假人可自动上线、打怪、攻城，模拟真实玩家行为，单机体验也拥有充足游戏氛围。
 published: 2026-11-22
 updated: 2026-11-22
@@ -9,7 +10,7 @@ tags:
   - 游戏源码
   - 免虚拟机
 category:
-  - 游戏资源/传奇
+  - 游戏资源/即时战斗
 image: images/jydm/jydm.avif
 keywords:
   - GEE,传奇,单机
@@ -22,8 +23,6 @@ pinned: false
 comment: true
 ---
 九鱼斗魔为 GEE 引擎打造的单职业传奇版本，内置智能假人系统，假人可自动上线、打怪、攻城，模拟真实玩家行为，单机体验也拥有充足游戏氛围。
-
-::download{name="[GEE引擎]九鱼斗魔单职业假人版" url="https://pan.baidu.com/s/1VZ0vf7L_h5I_0OZbN28dqA" code="8888"}
 
 ![版本截图三](images/jydm/jydm.avif)
 
