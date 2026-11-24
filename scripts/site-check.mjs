@@ -78,6 +78,25 @@ function parsePosts() {
 			const password = grabs(body, /password\s*=\s*["'\u201c]([^"'\u201d]+)/g);
 			const codes = downloads.map((d) => d.code).filter(Boolean);
 
+			// frontmatter 的 downloadLinks（Pages CMS 表单原文）：`标题 | 地址 | 提取码 | 大小`
+			// 它不进正文，却会被整条塞进页面 props / 单篇 API，是历史上真实泄露过的渠道，
+			// 所以这里也要把其中的地址和提取码收进敏感值。
+			// CMS 保存时会把长行折成 `xxx\` + 换行 + 缩进，必须先拼回去再拆列。
+			const dlLinks = [];
+			const dlBlock = fm.match(/^downloadLinks:[ \t]*((?:[^\n]*\\\r?\n)*[^\n]*)/m);
+			if (dlBlock) {
+				const joined = dlBlock[1].replace(/\\\r?\n[ \t]*/g, "");
+				for (const line of joined.split(/\r?\n/)) {
+					const url = line.match(/https?:\/\/[^\s|"'\\]+/);
+					if (!url) continue;
+					const parts = line
+						.split("|")
+						.map((x) => x.trim().replace(/^["']|["']$/g, "").trim());
+					const code = parts[2] || "";
+					dlLinks.push({ url: url[0], code });
+				}
+			}
+
 			return {
 				file,
 				slug: grab("slug") || file.replace(/\.md$/, ""),
@@ -90,6 +109,7 @@ function parsePosts() {
 				downloads,
 				password,
 				codes,
+				dlLinks,
 			};
 		});
 }
@@ -239,15 +259,26 @@ function checkLeak(posts) {
 	 * 「字段名 + 值」一起出现在公开输出里，所以按 password="值" / password\":\"值 匹配。
 	 */
 	const secrets = [];
+	const seenSecret = new Set();
+	const pushSecret = (s) => {
+		if (seenSecret.has(s.value)) return;
+		seenSecret.add(s.value);
+		secrets.push(s);
+	};
 	for (const post of posts) {
 		for (const d of post.downloads) {
 			const url = d.url || "";
 			if (!/^https?:\/\//.test(url) || isPlaceholderUrl(url)) continue;
-			secrets.push({ kind: "下载地址", value: url, post: post.file, pattern: null });
+			pushSecret({ kind: "下载地址", value: url, post: post.file, pattern: null });
+		}
+		// frontmatter downloadLinks 里的地址同样属于敏感值
+		for (const d of post.dlLinks ?? []) {
+			if (!/^https?:\/\//.test(d.url) || isPlaceholderUrl(d.url)) continue;
+			pushSecret({ kind: "下载地址", value: d.url, post: post.file, pattern: null });
 		}
 		for (const p of post.password) {
 			// 5 位以下的密码在全局搜索里噪音太大，交给带上下文的匹配
-			secrets.push({
+			pushSecret({
 				kind: "访问密码",
 				value: p,
 				post: post.file,

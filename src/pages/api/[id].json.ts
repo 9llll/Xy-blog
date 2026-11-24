@@ -105,9 +105,14 @@ export const GET: APIRoute = async ({ params }) => {
 		const md = new MarkdownIt();
 		const renderedHTML = md.render(sanitizeMarkdownForFeed(a.body));
 
+		// 公开接口：frontmatter 里的 downloadLinks 是 CMS 表单原文，
+		// 第 3、4 列就是提取码与访问密码，必须剔除后才能外发
+		const { downloadLinks: _omitDownloadLinks, ...publicFrontmatter } =
+			frontmatter as typeof frontmatter & { downloadLinks?: unknown };
+
 		return new Response(
 			JSON.stringify({
-				...frontmatter,
+				...publicFrontmatter,
 				image: imageUrlNormalized,
 				body: renderedHTML,
 				slug: a.slug,
