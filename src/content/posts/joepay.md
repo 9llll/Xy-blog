@@ -18,6 +18,7 @@ tags:
   - 下载
 category:
   - 网站资源/Typecho
+image: images/joepay/mm.avif
 author: 羡鱼
 series: 插件
 seriesOrder: 0
@@ -25,8 +26,6 @@ draft: false
 pinned: false
 comment: true
 ---
-![](images/20261125115542116410.avif)
-
 ## **一、能干什么**
 
 - **付费下载**：百度网盘 / 天翼云盘 / 阿里云盘等资源的加密分享。访客付费、输卡密或填提取码后，才能拿到下载地址和提取码。
@@ -51,6 +50,10 @@ comment: true
 
 
 > 小提示：就算不配置任何支付接口，卡密模式也能直接赚钱；等跑通了再接易支付也不迟。
+
+![](images/joepay/ff.avif)
+
+![](images/joepay/mm.avif)
 
 ---
 
