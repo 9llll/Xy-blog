@@ -42,6 +42,21 @@ const URL_RE = /https?:\/\/[^\s"'<>|｜]+/i;
 const SIZE_RE = /^\d+(\.\d+)?\s*(KB|MB|GB|TB)$/i;
 /** 「提取码：xxx」「密码: xxx」这类前缀 */
 const LABEL_RE = /^(提取码|访问码|密码|访问密码|解压密码|文件大小|大小)\s*[:：]\s*/;
+/** 带前缀时直接指定落位：密码类 → 访问密码，提取码类 → 提取码 */
+const LABEL_SLOTS: [RegExp, "code" | "password"][] = [
+	[/^(访问密码|解压密码|密码)\s*[:：]/, "password"],
+	[/^(提取码|访问码)\s*[:：]/, "code"],
+];
+
+/**
+ * 剥掉「整行被【】包住」的外层装饰，与 lineToAttributes 的同名逻辑保持一致。
+ * 不剥的话 `【名称|链接||88386】` 收尾的 】 会被并进密码，用户永远输不对。
+ */
+function stripOuterBracket(text: string): string {
+	if (!text.startsWith("【") || !text.endsWith("】")) return text;
+	if ((text.match(/】/g) || []).length !== 1) return text;
+	return text.slice(1, -1).trim();
+}
 
 /** 一条下载资源的最小信息（不含口令原文，只记有没有，供公开输出使用） */
 export interface DownloadEntry {
@@ -74,11 +89,12 @@ export function attrValue(attrs: string, name: string): string {
  * 规则与 remark-frontmatter-downloads 的 lineToAttributes 保持一致：
  *   - 全角竖线 ｜ 等价半角 |
  *   - 链接可以不在第二列，找不到就在整行里取第一个 http 地址
- *   - 空列跳过，文件大小不算口令
+ *   - 第 3 段 = 提取码，第 4 段 = 访问密码；空段占位，文件大小不算口令
+ *   - 「密码：xxx」前缀直接指定落位；整行被【】包住时先剥外层
  * 两者一致性由 scripts/verify-search-facets.mjs 对拍保证。
  */
 export function parseDownloadLine(line: string): DownloadEntry | null {
-	const raw = String(line ?? "").trim();
+	const raw = stripOuterBracket(String(line ?? "").trim());
 	if (!raw || raw.startsWith("#")) return null;
 
 	const parts = raw.split(/[|｜]/).map((s) => s.trim());
@@ -94,14 +110,25 @@ export function parseDownloadLine(line: string): DownloadEntry | null {
 	}
 	if (!url) return null;
 
-	const slots = rest
-		.map((s) => s.replace(LABEL_RE, "").trim())
-		.filter((s) => s && !SIZE_RE.test(s));
+	const fields: (string | null)[] = [null, null];
+	let cursor = 0;
+	for (const piece of rest) {
+		const value = piece.replace(LABEL_RE, "").trim();
+		if (!value) {
+			cursor += 1;
+			continue;
+		}
+		if (SIZE_RE.test(value)) continue;
+		const forced = LABEL_SLOTS.find(([re]) => re.test(piece))?.[1];
+		const slot = forced === "password" ? 1 : forced === "code" ? 0 : cursor;
+		if (slot < 2 && fields[slot] === null) fields[slot] = value;
+		cursor += 1;
+	}
 
 	return {
 		url,
-		hasCode: slots.length >= 1,
-		hasPassword: slots.length >= 2,
+		hasCode: !!fields[0],
+		hasPassword: !!fields[1],
 	};
 }
 

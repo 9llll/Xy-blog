@@ -45,6 +45,9 @@ const LINES = [
 	"https://pan.xunlei.com/s/abc",
 	"名称 | https://pan.xunlei.com/s/abc || 1.2 GB",
 	"名称 | https://pan.quark.cn/s/xyz | abc | 2024-01-01",
+	"名称 | https://pan.xunlei.com/s/abc | | 88386",
+	"名称 | https://pan.xunlei.com/s/abc | 密码：88386",
+	"【JoePay：付费插件|https://8x8.lanzout.com/inwol4fcbxof||88386】",
 	"只有文字没有链接的一行",
 	"# 这是注释",
 	"",
@@ -65,6 +68,38 @@ for (const line of LINES) {
 		);
 	});
 }
+
+/* ---------- 1b. 空位 / 整行方括号 / 前缀落位 ---------- */
+check("空提取码位：密码落 password，不挤进 code", () => {
+	const a = lineToAttributes("名称 | https://pan.baidu.com/s/x | | 88386");
+	assert.equal(a.code, undefined);
+	assert.equal(a.password, "88386");
+	const b = parseDownloadLine("名称 | https://pan.baidu.com/s/x | | 88386");
+	assert.equal(b.hasCode, false);
+	assert.equal(b.hasPassword, true);
+});
+
+check("整行被【】包住：收尾的 】 不粘进密码", () => {
+	const a = lineToAttributes(
+		"【JoePay：付费插件|https://8x8.lanzout.com/inwol4fcbxof||88386】",
+	);
+	assert.equal(a.name, "JoePay：付费插件");
+	assert.equal(a.password, "88386");
+	assert.equal(a.code, undefined);
+	assert.equal(parseDownloadLine("【名称|https://8x8.lanzout.com/x||88386】").hasPassword, true);
+});
+
+check("【蓝奏云】前缀写法不被误剥", () => {
+	const a = lineToAttributes("【蓝奏云】JoePay | https://8x8.lanzout.com/inwol4fcbxof | 8888");
+	assert.equal(a.name, "【蓝奏云】JoePay");
+	assert.equal(a.code, "8888");
+});
+
+check("「密码：」前缀直接落位到 password", () => {
+	const a = lineToAttributes("名称 | https://pan.baidu.com/s/x | 密码：88386");
+	assert.equal(a.password, "88386");
+	assert.equal(a.code, undefined);
+});
 
 /* ---------- 2. 资源类型判定 ---------- */
 const DIRECTIVE = '::download{name="游戏" url="https://pan.baidu.com/s/1abc" code="1wau"}';

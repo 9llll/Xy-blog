@@ -13,6 +13,7 @@
  *
  * 每行格式（后三段可省略）：
  *   名称 | 链接 | 提取码 | 访问密码 | 文件大小
+ * 没有的段留空但竖线要留着：`名称 | 链接 | | 访问密码` 表示只有密码没有提取码。
  *
  * 处理时机：插进来的节点会被随后的 remarkDirective / parseDirectiveNode
  * 当成真正的 leafDirective，交给 rehype-component-download 渲染成卡片，
@@ -52,11 +53,29 @@ const SIZE_RE = /^\d+(?:\.\d+)?\s*(?:[KMGT]B?|字节)$/i;
 /** 「提取码：xxx」「密码=xxx」这类前缀 */
 const LABEL_RE =
 	/^\s*(?:提取码|提取碼|访问密码|訪問密碼|密码|密碼|解压密码|解壓密碼|code|password|pwd|size|大小|文件大小)\s*[:：=]\s*/i;
+/** 带前缀时直接指定落位：密码类 → 访问密码，提取码类 → 提取码 */
+const LABEL_SLOTS = [
+	[/^\s*(?:访问密码|訪問密碼|密码|密碼|解压密码|解壓密碼|password|pwd)\s*[:：=]/i, "password"],
+	[/^\s*(?:提取码|提取碼|code)\s*[:：=]/i, "code"],
+];
 
 /** 去掉「提取码：」这类说明性前缀，只留值 */
 function stripLabel(text) {
 	return String(text).replace(LABEL_RE, "").trim();
 }
+
+/**
+ * 剥掉「整行被【】包住」的外层装饰。
+ * 作者容易把一行整体写成 `【名称|链接||密码】`，不剥的话收尾的 】 会粘到最后一个值上，
+ * 变成密码 `88386】`，用户输 88386 永远对不上。
+ * 只在「行首 【 + 行尾 】 + 全行仅一个 】」时剥，不会误伤 `【蓝奏云】名称 | ...` 这种正常写法。
+ */
+function stripOuterBracket(text) {
+	if (!text.startsWith("【") || !text.endsWith("】")) return text;
+	if ((text.match(/】/g) || []).length !== 1) return text;
+	return text.slice(1, -1).trim();
+}
+
 
 /** 正文里是否已经有手写的 download 指令 */
 function hasBodyDirective(tree) {
@@ -82,10 +101,12 @@ function hasBodyDirective(tree) {
  *   - 全角竖线 ｜ 与半角 | 等价
  *   - 链接不在第二列时，按「整行第一个 http 地址」兜底，名称里混入的链接会被剔除
  *   - 形如 519 MB 的值优先落到 size，不会被误当成提取码
- *   - 支持「提取码：xxx」这种带前缀的写法
+ *   - 空段占位：`名称 | 链接 | | 密码` 的密码落在「访问密码」，不会被挤到「提取码」
+ *   - 支持「提取码：xxx」「密码：xxx」前缀，且前缀直接决定落位
+ *   - 整行被【】包住时剥掉外层，收尾的 】 不会粘到最后一个值上
  */
 export function lineToAttributes(line) {
-	const raw = String(line ?? "").trim();
+	const raw = stripOuterBracket(String(line ?? "").trim());
 	if (!raw || raw.startsWith("#")) return null;
 
 	const parts = raw.split(/[|｜]/).map((s) => s.trim());
@@ -109,19 +130,25 @@ export function lineToAttributes(line) {
 	name = stripLabel(name);
 	if (name) attributes.name = name;
 
-	const slots = ["code", "password"];
+	// 位置即语义：第 3 段 = 提取码，第 4 段 = 访问密码。
+	// 空段必须占位，否则 `名称 | 链接 | | 88386` 里的 88386 会被挤到「提取码」，
+	// 卡片当成「有提取码、无密码」渲染，访问密码直接明文暴露在页面上。
+	const fields = ["code", "password"];
+	let cursor = 0;
 	for (const piece of rest) {
 		const value = stripLabel(piece);
-		if (!value) continue;
+		if (!value) {
+			cursor += 1;
+			continue;
+		}
 		if (!attributes.size && SIZE_RE.test(value)) {
 			attributes.size = value;
 			continue;
 		}
-		for (const slot of slots) {
-			if (attributes[slot]) continue;
-			attributes[slot] = value;
-			break;
-		}
+		const forced = LABEL_SLOTS.find(([re]) => re.test(piece))?.[1];
+		const slot = forced ?? fields[cursor];
+		if (slot && !attributes[slot]) attributes[slot] = value;
+		cursor += 1;
 	}
 
 	return attributes;
