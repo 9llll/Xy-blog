@@ -1,6 +1,6 @@
 ---
 title: JoePay：Typecho 付费下载 & 付费阅读插件
-downloadLinks: JoePay：Typecho 付费下载 & 付费阅读插件|https://8x8.lanzout.com/inwol4fcbxof||88386|
+downloadLinks: JoePay：Typecho 付费下载 & 付费阅读插件|https://8x8.lanzout.com/inwol4fcbxof|1988|88386
 downloadHint: 邮箱：golooo@qq.com
 description: |
   付费下载：百度网盘 / 天翼云盘 / 阿里云盘等资源的加密分享。访客付费、输卡密或填提取码后，才能拿到下载地址和提取码。
