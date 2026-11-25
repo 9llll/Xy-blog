@@ -18,6 +18,7 @@ tags:
   - 下载
 category:
   - 网站资源/Typecho
+image: images/20261125115542116410.avif
 author: 羡鱼
 series: 插件
 seriesOrder: 0
@@ -64,7 +65,6 @@ comment: true
 启用后，后台左侧会出现 **「JoePay → 订单管理」** 菜单。
 
 > 如果你用的是本站同款 Joe 主题（自用修改版），主题已经内置了同款订单中心，**不装插件也有完整功能**；同时启用时主题会自动让位，由插件接管，不会重复渲染。两边读写的是同一张订单表，历史订单不用迁移。  
->
 >
 > ![mwahrcu8.png](https://moci.cc/usr/uploads/2026/11/1185562310.png "mwahrcu8.png")
 
