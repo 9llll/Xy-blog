@@ -63,5 +63,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Sync code font
+        # public/fonts/maple-mono/ 不进仓库（8.9 MB），从 @mogeko/maple-mono-cn 复制
+        run: node scripts/sync-code-font.mjs
+
       - name: Run Astro Build
         run: pnpm astro build
