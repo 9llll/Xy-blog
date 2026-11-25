@@ -105,7 +105,7 @@ const cards = list.map((p) => {
     )}
 
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 p-3">
-        {cards.map(({ post, url, catFull, cat, kind, meta, cover, coverBase, date }) => (
+        {cards.map(({ post, url, catFull, cat, kind, meta, cover, coverBase, date }, i) => (
             <a
                 href={url}
                 class="group flex flex-col rounded-lg overflow-hidden border border-[var(--line-divider)] hover:border-[var(--primary)] transition-colors bg-[var(--card-bg)]"
@@ -117,6 +117,10 @@ const cards = list.map((p) => {
                             basePath={coverBase}
                             alt={post.data.title}
                             class="w-full h-full"
+                            widths={[240, 480, 720]}
+                            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 240px"
+                            loading={i < 3 ? "eager" : "lazy"}
+                            fetchpriority={i === 0 ? "high" : undefined}
                         />
                     ) : (
                         <PostCoverPlaceholder

@@ -17,6 +17,7 @@ if (!aboutPost) {
 const { Content } = await render(aboutPost);
 ---
 <ResourceLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
+    <link slot="head" rel="stylesheet" href="/fonts/maple-mono/maple-mono.css" />
     <BoardNav slot="left" />
 
     <div class="overflow-hidden rounded-xl border border-[var(--line-divider)] bg-[var(--card-bg)] shadow-sm">

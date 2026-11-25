@@ -121,6 +121,9 @@ const breadcrumbJsonLd = {
     ogImage={ogImageFinal}
 >
     <Fragment slot="head">
+        {/* 代码块字体：239 条 @font-face + 分片，只有文章页需要。走 public 静态文件，
+            避免 Astro 把 catch-all 路由的 CSS 注入到全站（首页白下 250 KB）。 */}
+        <link rel="stylesheet" href="/fonts/maple-mono/maple-mono.css" />
         <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
         <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)}></script>
         <meta property="article:published_time" content={new Date(entry.data.published).toISOString()} />

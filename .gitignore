@@ -45,3 +45,6 @@ dist-check/
 .tmp-*.png
 .tmp-*
 .workbuddy/
+
+# 代码块字体分片：由 scripts/sync-code-font.mjs 在 build 前从 @mogeko/maple-mono-cn 复制，不进仓库
+public/fonts/maple-mono/

@@ -6,9 +6,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // "Maple UI" 已改为 woff2 子集（public/fonts/*.woff2，约 740 KB/字重），
-        // 源文件全量 TTF 放在 font-src/ 不参与部署；重新生成见 scripts/build-fonts.py。
-        // 若换回系统字体，请同时删掉 Layout.astro 里的 @font-face 与 preload。
+        // "Maple UI" 现在按字频分片（public/fonts/maple-ui/*.woff2 + src/styles/maple-ui.css），
+        // 浏览器只下本页用到的片，约 40–150 KB。重新生成：scripts/build-fonts-split.py
+        // 若换回系统字体，请同时删掉 Layout.astro 里的 preload 与 maple-ui.css 的 import。
         sans: ["Maple UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", "WenQuanYi Micro Hei", ...defaultTheme.fontFamily.sans],
       },
     },

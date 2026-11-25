@@ -8,12 +8,31 @@ interface Props {
 	alt?: string;
 	position?: string;
 	basePath?: string;
+	/**
+	 * 响应式输出：传 widths + sizes 时由 Astro 生成 srcset，浏览器按实际显示宽度挑图。
+	 * 不传则沿用旧行为（原图单尺寸）——正文大图例外，缩略图务必传，否则卡片要下整张原图。
+	 */
+	widths?: number[];
+	sizes?: string;
+	loading?: "lazy" | "eager";
+	/** 首屏图给 high，避免懒加载拖累 LCP */
+	fetchpriority?: "high" | "low" | "auto";
 }
 
 import { Image } from "astro:assets";
 import { url } from "../../utils/url-utils";
 
-const { id, src, alt, position = "center", basePath = "/" } = Astro.props;
+const {
+	id,
+	src,
+	alt,
+	position = "center",
+	basePath = "/",
+	widths,
+	sizes,
+	loading = "lazy",
+	fetchpriority,
+} = Astro.props;
 const className = Astro.props.class;
 
 const isLocal = !(
@@ -61,6 +80,14 @@ if (isLocal) {
 	}
 }
 
+/**
+ * 卡片缩略图按 srcset 出图：丢掉超过原图宽度的档位（sharp 会把小图放大重采样，体积反而涨）。
+ * 一个档位都不剩时退回单尺寸，行为与改造前一致。
+ */
+const safeWidths: number[] | undefined =
+	widths && img ? widths.filter((w) => w < (img as { width: number }).width) : undefined;
+const useSrcset = !!safeWidths && safeWidths.length > 0;
+
 const imageClass = "w-full h-full object-cover";
 const imageStyle = `object-position: ${position}`;
 ---
@@ -92,6 +119,11 @@ const imageStyle = `object-position: ${position}`;
             alt={alt || ""} 
             class={`${imageClass} image-wrapper-img opacity-0 transition-opacity duration-300`} 
             style={imageStyle}
+            widths={useSrcset ? safeWidths : undefined}
+            sizes={useSrcset ? sizes : undefined}
+            loading={loading}
+            fetchpriority={fetchpriority}
+            decoding="async"
         />
     )}
     
@@ -101,7 +133,9 @@ const imageStyle = `object-position: ${position}`;
             alt={alt || ""} 
             class={`${imageClass} image-wrapper-img opacity-0 transition-opacity duration-300`} 
             style={imageStyle}
-            loading="lazy"
+            loading={loading}
+            fetchpriority={fetchpriority}
+            decoding="async"
         />
     )}
 </div>

@@ -1,4 +1,8 @@
 """
+【已废弃】生成单文件 Maple UI 子集（740 KB/字重，首页必须整包下载）。
+现在改用 scripts/build-fonts-split.py：按字频分片 + unicode-range 按需加载。
+保留本文件仅作字形来源与子集参数的参考。
+
 生成 Maple UI 的 woff2 子集字体。
 
 背景：font-src/ 下的源文件是全量 TTF（19.6 MB / 14.8 MB）。直接把它们挂到 @font-face
