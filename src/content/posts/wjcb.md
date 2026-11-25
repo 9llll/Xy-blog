@@ -21,11 +21,9 @@ series: 回合制
 seriesOrder: 0
 ogImage: https://www.3x3.top/images/xy2.avif
 draft: false
-pinned: true
+pinned: false
 comment: true
 ---
-
-
 ![版本截图一](images/wjcb/wjcb1.avif)
 
 ![版本截图一](images/wjcb/wjcb2.avif)
