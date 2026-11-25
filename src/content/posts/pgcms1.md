@@ -11,7 +11,7 @@ tags:
   - 采集
   - 视频模板
 category:
-  - 网站源码/PHP
+  - 网站资源/PHP
 image: images/pgcms1.avif
 author: 羡鱼
 series: 网站源码
